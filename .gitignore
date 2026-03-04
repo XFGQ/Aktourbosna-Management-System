@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Compiled class file
 *.class
 
@@ -22,3 +23,28 @@
 # virtual machine crash logs, see http://www.java.com/en/download/help/error_hotspot.xml
 hs_err_pid*
 replay_pid*
+=======
+# Java & Maven
+**/target/
+*.class
+*.jar
+*.war
+
+# IDE (IntelliJ)
+.idea/
+*.iml
+*.iws
+
+# Eclipse (Eskiden kullandığın için kalıntı kalmasın)
+.metadata/
+.settings/
+.project
+.classpath
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Secrets
+application.properties.example
+>>>>>>> b47c42e (Initial commit: Project structure and .gitignore added)
