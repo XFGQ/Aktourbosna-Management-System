@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane fx:id="mainPane" fx:controller="org.example.controller.MainController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TableView fx:id="tourTable" layoutX="70.0" layoutY="57.0" prefHeight="308.0" prefWidth="480.0">
+        <columns>
+          <TableColumn fx:id="nameColumn" editable="false" prefWidth="75.0" text="Tur Adı" />
+          <TableColumn fx:id="routeColumn" editable="false" prefWidth="75.0" text="Rota" />
+            <TableColumn fx:id="priceColumn" editable="false" prefWidth="75.0" text="Fİyat" />
+        </columns>
+         <columnResizePolicy>
+            <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+         </columnResizePolicy>
+      </TableView>
+   </children>
+</AnchorPane>

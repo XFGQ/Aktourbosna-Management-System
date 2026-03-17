@@ -1,0 +1,4 @@
+1- Run Main.java of tur-backend and see JSON from localhost:8080/api/tours if you cant see make sure there is no problem
+2- Run MainLauncher.java (Do not run main.java because of jdk problem we created this class VM problem) and see the GUI
+
+
