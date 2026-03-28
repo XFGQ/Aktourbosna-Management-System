@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<VBox prefWidth="250.0" styleClass="sidebar" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/26">
+
+    <HBox alignment="CENTER" prefHeight="100.0">
+        <Label styleClass="logo-text" text="ViaBalkan" />
+    </HBox>
+
+    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
+        <padding>
+            <Insets left="20.0" right="20.0" top="20.0" />
+        </padding>
+
+        <Button maxWidth="Infinity" styleClass="nav-button" text="Dashboard" />
+        <Button maxWidth="Infinity" styleClass="nav-button" text="Tour Management" />
+        <Button maxWidth="Infinity" styleClass="nav-button" text="Expense Tracker" />
+        <Button maxWidth="Infinity" styleClass="nav-button" text="Vehicles &amp; Guides" />
+    </VBox>
+
+    <VBox alignment="BOTTOM_CENTER" prefHeight="100.0">
+        <padding>
+            <Insets bottom="20.0" left="20.0" right="20.0" />
+        </padding>
+        <Button maxWidth="Infinity" styleClass="logout-button" text="Logout" />
+    </VBox>
+</VBox>
