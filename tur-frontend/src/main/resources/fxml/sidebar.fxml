@@ -4,27 +4,35 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<VBox prefWidth="250.0" styleClass="sidebar" stylesheets="@../styles/styles.css" xmlns="http://javafx.com/javafx/26">
+<VBox prefWidth="240.0" styleClass="sidebar"
+      stylesheets="@../styles/styles.css"
+      xmlns="http://javafx.com/javafx/17"
+      xmlns:fx="http://javafx.com/fxml/1"
+      fx:controller="org.example.controller.SidebarController">
 
-    <HBox alignment="CENTER" prefHeight="100.0">
-        <Label styleClass="logo-text" text="ViaBalkan" />
-    </HBox>
-
-    <VBox spacing="10.0" VBox.vgrow="ALWAYS">
-        <padding>
-            <Insets left="20.0" right="20.0" top="20.0" />
-        </padding>
-
-        <Button maxWidth="Infinity" styleClass="nav-button" text="Dashboard" />
-        <Button maxWidth="Infinity" styleClass="nav-button" text="Tour Management" />
-        <Button maxWidth="Infinity" styleClass="nav-button" text="Expense Tracker" />
-        <Button maxWidth="Infinity" styleClass="nav-button" text="Vehicles &amp; Guides" />
+    <VBox styleClass="logo-container" alignment="CENTER_LEFT">
+        <Label styleClass="logo-text" text="Aktour" />
+        <Label styleClass="logo-subtitle" text="ViaBalkan" style="-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;" />
     </VBox>
 
-    <VBox alignment="BOTTOM_CENTER" prefHeight="100.0">
+    <VBox spacing="4.0" VBox.vgrow="ALWAYS">
         <padding>
-            <Insets bottom="20.0" left="20.0" right="20.0" />
+            <Insets left="12.0" right="12.0" top="16.0" />
         </padding>
-        <Button maxWidth="Infinity" styleClass="logout-button" text="Logout" />
+        <Button fx:id="btnDashboard"      maxWidth="Infinity" styleClass="nav-button" text="  Dashboard"             onAction="#onDashboard" />
+        <Button fx:id="btnTourManagement" maxWidth="Infinity" styleClass="nav-button" text="  Tour Management"       onAction="#onTourManagement" />
+        <Button fx:id="btnExpenseTracker" maxWidth="Infinity" styleClass="nav-button" text="  Expense Tracker"       onAction="#onExpenseTracker" />
+        <Button fx:id="btnVehiclesGuides" maxWidth="Infinity" styleClass="nav-button" text="  Vehicles &amp; Guides"  onAction="#onVehiclesGuides" />
     </VBox>
+
+    <VBox>
+        <padding>
+            <Insets bottom="20.0" left="12.0" right="12.0" top="12.0" />
+        </padding>
+        <Separator styleClass="sidebar-separator">
+            <VBox.margin><Insets bottom="10.0" /></VBox.margin>
+        </Separator>
+        <Button maxWidth="Infinity" styleClass="logout-button" text="  Logout" />
+    </VBox>
+
 </VBox>
