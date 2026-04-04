@@ -1,30 +1,176 @@
+.root {
+    -fx-font-family: "Segoe UI", "Arial", sans-serif;
+    -fx-font-size: 14px;
+    -fx-background-color: #f0f2f5;
+}
+
 .sidebar {
-    -fx-background-color: #2c3e50;
+    -fx-background-color: #1a2535;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.35), 12, 0, 3, 0);
+}
+
+.logo-container {
+    -fx-background-color: #141d2b;
+    -fx-padding: 22 20 18 20;
 }
 
 .logo-text {
-    -fx-font-size: 24px;
+    -fx-font-size: 22px;
     -fx-font-weight: bold;
-    -fx-text-fill: white;
+    -fx-text-fill: #ffffff;
+}
+
+.logo-subtitle {
+    -fx-font-size: 22px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #ffffff;
 }
 
 .nav-button {
     -fx-background-color: transparent;
-    -fx-text-fill: #ecf0f1;
-    -fx-font-size: 16px;
+    -fx-text-fill: #a0b4c8;
+    -fx-font-size: 14px;
     -fx-alignment: CENTER_LEFT;
-    -fx-padding: 10 15;
+    -fx-padding: 11 20;
     -fx-cursor: hand;
+    -fx-background-radius: 6;
 }
 
 .nav-button:hover {
-    -fx-background-color: #34495e;
-    -fx-text-fill: #3498db;
+    -fx-background-color: #243044;
+    -fx-text-fill: #e8f0f8;
+}
+
+.nav-button-active {
+    -fx-background-color: #1e4b7a;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-alignment: CENTER_LEFT;
+    -fx-padding: 11 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.nav-button-active:hover { -fx-background-color: #255c96; }
+
+.sidebar-separator {
+    -fx-background-color: #2a3a4e;
+    -fx-pref-height: 1;
 }
 
 .logout-button {
-    -fx-background-color: #e74c3c;
-    -fx-text-fill: white;
+    -fx-background-color: #c0392b;
+    -fx-text-fill: #ffffff;
     -fx-font-weight: bold;
+    -fx-padding: 11 20;
+    -fx-background-radius: 6;
     -fx-cursor: hand;
+    -fx-alignment: CENTER_LEFT;
+}
+
+.logout-button:hover { -fx-background-color: #e74c3c; }
+
+.content-area { -fx-background-color: #f0f2f5; }
+
+.page-title {
+    -fx-font-size: 20px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2535;
+}
+
+.stat-card {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-padding: 18 20;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 2);
+}
+
+.stat-label {
+    -fx-font-size: 12px;
+    -fx-text-fill: #7a8a9e;
+}
+
+.stat-value {
+    -fx-font-size: 26px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2535;
+    -fx-padding: 4 0 2 0;
+}
+
+.stat-sub {
+    -fx-font-size: 11px;
+    -fx-text-fill: #27ae60;
+}
+
+.panel {
+    -fx-background-color: #ffffff;
+    -fx-background-radius: 8;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.04), 6, 0, 0, 2);
+}
+
+.panel-header {
+    -fx-padding: 16 20;
+}
+
+.panel-title {
+    -fx-font-size: 15px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2535;
+}
+
+.btn-link {
+    -fx-background-color: transparent;
+    -fx-text-fill: #2563eb;
+    -fx-font-size: 12px;
+    -fx-cursor: hand;
+    -fx-padding: 4 8;
+}
+
+.btn-link:hover {
+    -fx-text-fill: #1d4ed8;
+    -fx-underline: true;
+}
+
+.table-view {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent;
+}
+
+.table-view .column-header-background { -fx-background-color: transparent; }
+
+.table-view .column-header {
+    -fx-background-color: transparent;
+    -fx-padding: 0 16;
+    -fx-border-color: transparent transparent #eef0f4 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .column-header .label {
+    -fx-font-size: 11px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #9aa5b4;
+    -fx-padding: 9 0;
+}
+
+.table-view .table-row-cell {
+    -fx-background-color: transparent;
+    -fx-border-color: transparent transparent #f0f2f5 transparent;
+    -fx-border-width: 0 0 1 0;
+}
+
+.table-view .table-row-cell:hover    { -fx-background-color: #f8f9fb; }
+.table-view .table-row-cell:selected { -fx-background-color: #eef3ff; }
+
+.table-view .table-cell {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2d3748;
+    -fx-padding: 10 16;
+}
+
+.scroll-bar:vertical { -fx-background-color: transparent; -fx-pref-width: 6; }
+.scroll-bar .thumb { -fx-background-color: #cdd2da; -fx-background-radius: 3; }
+.scroll-bar .thumb:hover { -fx-background-color: #a0aec0; }
+.scroll-bar .track { -fx-background-color: transparent; }
+.scroll-bar .increment-button, .scroll-bar .decrement-button {
+    -fx-background-color: transparent; -fx-pref-width: 0; -fx-pref-height: 0;
 }

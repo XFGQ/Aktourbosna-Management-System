@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-area"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.DashboardController">
+
+    <VBox spacing="20.0">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+        </padding>
+
+        <Label styleClass="page-title" text="Dashboard" />
+
+        <HBox spacing="16.0">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Tours" />
+                <Label fx:id="totalToursValue" styleClass="stat-value" text="—" />
+                <Label fx:id="totalToursChange" styleClass="stat-sub" text="" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Revenue" />
+                <Label fx:id="revenueValue" styleClass="stat-value" text="—" />
+                <Label fx:id="revenueChange" styleClass="stat-sub" text="" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Guides" />
+                <Label fx:id="guidesValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Vehicles" />
+                <Label fx:id="vehiclesValue" styleClass="stat-value" text="—" />
+                <Label fx:id="vehiclesStatus" styleClass="stat-sub" text="" />
+            </VBox>
+        </HBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                <Label styleClass="panel-title" text="Recent Tours" />
+                <Region HBox.hgrow="ALWAYS" />
+                <Button styleClass="btn-link" text="View all" onAction="#onViewAllTours" />
+            </HBox>
+            <TableView fx:id="recentToursTable" styleClass="table-view" VBox.vgrow="ALWAYS"
+                       prefHeight="260.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colTourName" text="Tour Name" prefWidth="180.0" />
+                    <TableColumn fx:id="colDestination" text="Destination" prefWidth="160.0" />
+                    <TableColumn fx:id="colDate" text="Date" prefWidth="110.0" />
+                    <TableColumn fx:id="colGuide" text="Guide" prefWidth="130.0" />
+                    <TableColumn fx:id="colStatus" text="Status" prefWidth="100.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

@@ -2,16 +2,18 @@
 
 <?import javafx.scene.layout.*?>
 
-<BorderPane prefHeight="600.0" prefWidth="900.0" stylesheets="@../styles/styles.css"
-            xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
+<BorderPane prefHeight="700.0" prefWidth="1100.0"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.AppController">
 
     <left>
-        <fx:include source="sidebar.fxml"/>
+        <fx:include fx:id="sidebar" source="sidebar.fxml"/>
     </left>
 
     <center>
-        <StackPane fx:id="contentArea" style="-fx-background-color: #f4f4f4;">
-        </StackPane>
+        <StackPane fx:id="contentArea" />
     </center>
 
 </BorderPane>
