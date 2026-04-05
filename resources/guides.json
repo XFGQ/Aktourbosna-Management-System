@@ -1,0 +1,78 @@
+[
+  {
+    "guide_id": "PARTNER-001",
+    "full_name": "Hasan Talha Akçakıl",
+    "role": "Company Owner",
+    "base_city": "Sarajevo",
+    "contact": { "email": "info@rinnesoft.com", "phone": "TBD" },
+    "languages": [
+      { "language": "Turkish", "level": "Native" },
+      { "language": "Bosnian", "level": "Professional" },
+      { "language": "English", "level": "Intermediate" }
+    ],
+    "expertise_areas": [
+      {
+        "country": "Bosnia and Herzegovina",
+        "cities": ["Sarajevo", "Mostar", "Konjic", "Jablanica", "Blagaj", "Počitelj", "Trebinje", "Travnik", "Jajce", "Banja Luka", "Bihać", "Tuzla", "Srebrenica", "Višegrad", "Neum", "Stolac", "Livno"]
+      },
+      {
+        "country": "Serbia",
+        "cities": ["Belgrade", "Novi Sad", "Niš", "Kragujevac", "Subotica", "Zlatibor", "Kraljevo", "Čačak", "Novi Pazar"]
+      },
+      {
+        "country": "Montenegro",
+        "cities": ["Kotor", "Budva", "Podgorica", "Tivat", "Herceg Novi", "Cetinje", "Bar", "Ulcinj", "Nikšić", "Žabljak", "Perast", "Plav", "Rožaje", "Bijelo Polje"]
+      }
+    ],
+    "skills": [
+      "International Relations Degree",
+      "B Category License & Large Vehicle Specialist",
+      "First Aid Certified",
+      "Scout Leader (İzci)",
+      "Trekking & Survival Expert",
+      "Historical & Cultural Analysis"
+    ],
+    "rating": 5.0,
+    "notes": "Company Founder & Technical/Strategic Lead."
+  },
+  {
+    "guide_id": "PARTNER-002",
+    "full_name": "Ahmed Şamil Akçakıl",
+    "role": "Company Partner",
+    "base_city": "Sarajevo",
+    "contact": { "email": "ahmedsamilakcakil@gmail.com", "phone": "TBD" },
+    "languages": [
+      { "language": "Turkish", "level": "Native" },
+      { "language": "English", "level": "Professional" },
+      { "language": "Bosnian", "level": "Lower-Intermediate" }
+    ],
+    "expertise_areas": [
+      {
+        "country": "Bosnia and Herzegovina",
+        "cities": ["Sarajevo", "Mostar", "Konjic", "Jablanica", "Blagaj", "Počitelj", "Trebinje", "Travnik", "Jajce", "Banja Luka", "Bihać", "Tuzla", "Srebrenica", "Višegrad", "Neum", "Kiseljak", "Vitez", "Maglaj"]
+      },
+      {
+        "country": "Serbia",
+        "cities": ["Belgrade", "Novi Sad", "Niš", "Kragujevac", "Subotica", "Zlatibor", "Kraljevo", "Čačak", "Pančevo", "Smederevo", "Leskovac", "Užice"]
+      },
+      {
+        "country": "Montenegro",
+        "cities": ["Kotor", "Budva", "Podgorica", "Tivat", "Herceg Novi", "Cetinje", "Bar", "Ulcinj", "Nikšić", "Žabljak", "Perast", "Risan", "Berane", "Kolašin", "Mojkovac", "Pljevlja", "Danilovgrad"]
+      },
+      {
+        "country": "Croatia",
+        "cities": ["Dubrovnik", "Split", "Zagreb", "Zadar", "Rijeka", "Šibenik", "Makarska"]
+      }
+    ],
+    "skills": [
+      "International Relations Expert",
+      "B Category License & Large Vehicle Specialist",
+      "First Aid Certified",
+      "Scout Leader (İzci)",
+      "Trekking & Survival Expert",
+      "Historical Knowledge"
+    ],
+    "rating": 4.8,
+    "notes": "Partner. Broad regional expertise including Adriatic coast and internal Montenegro mountain routes."
+  }
+]

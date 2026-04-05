@@ -1,0 +1,132 @@
+[
+  {
+    "route_id": "SAR-MOS-001",
+    "route_name": "Sarajevo - Mostar & Herzegovina Tour",
+    "origin": "Sarajevo",
+    "destination": "Mostar",
+    "base_distance_km": 126,
+    "total_fees": [
+      { "name": "Sarajevo-Tarčin Motorway", "cost": 3.50, "currency": "BAM" }
+    ],
+    "waypoints": [
+      {
+        "city": "Konjic",
+        "travel_time_from_previous_stop_min": 60,
+        "default_stay_minutes": 30,
+        "default_free_time_minutes": 15,
+        "activity": "Konjic Bridge & History",
+        "description": "Konjic tarihi ve köprü gezisi anlatımı."
+      },
+      {
+        "city": "Jablanica",
+        "travel_time_from_previous_stop_min": 30,
+        "default_stay_minutes": 60,
+        "default_free_time_minutes": 0,
+        "activity": "Lunch Break",
+        "description": "Kuzu çevirme molası."
+      },
+      {
+        "city": "Blagaj",
+        "travel_time_from_previous_stop_min": 50,
+        "default_stay_minutes": 45,
+        "default_free_time_minutes": 20,
+        "activity": "Blagaj Tekke Visit",
+        "description": "Alperenler Tekkesi gezisi ve tarihi anlatımı."
+      },
+      {
+        "city": "Mostar",
+        "travel_time_from_previous_stop_min": 20,
+        "default_stay_minutes": 60,
+        "default_free_time_minutes": 180,
+        "activity": "Old Bridge & Old Town",
+        "description": "Mostar Köprüsü ve çarşı gezisi."
+      }
+    ]
+  },
+  {
+    "route_id": "SAR-TRA-002",
+    "route_name": "Sarajevo - Travnik & Jajce Tour",
+    "origin": "Sarajevo",
+    "destination": "Jajce",
+    "base_distance_km": 160,
+    "total_fees": [],
+    "waypoints": [
+      {
+        "city": "Visoko",
+        "travel_time_from_previous_stop_min": 40,
+        "default_stay_minutes": 30,
+        "default_free_time_minutes": 15,
+        "activity": "Pyramids Briefing",
+        "description": "Piramitler hakkında kısa bilgilendirme."
+      },
+      {
+        "city": "Travnik",
+        "travel_time_from_previous_stop_min": 60,
+        "default_stay_minutes": 60,
+        "default_free_time_minutes": 120,
+        "activity": "City of Viziers Tour",
+        "description": "Kale ziyareti ve meşhur kahve molası."
+      },
+      {
+        "city": "Jajce",
+        "travel_time_from_previous_stop_min": 70,
+        "default_stay_minutes": 45,
+        "default_free_time_minutes": 60,
+        "activity": "Jajce Waterfall",
+        "description": "Şelale ve tarihi su değirmenleri gezisi."
+      }
+    ]
+  },
+  {
+    "route_id": "SAR-CITY-003",
+    "route_name": "Saraybosna Şehir Turu",
+    "origin": "Kovači",
+    "destination": "Baščaršija",
+    "base_distance_km": 10,
+    "total_fees": [],
+    "waypoints": [
+      {
+        "city": "Kovači",
+        "travel_time_from_previous_stop_min": 0,
+        "default_stay_minutes": 30,
+        "default_free_time_minutes": 0,
+        "activity": "Şehitlik Ziyareti",
+        "description": "Turun başlangıç noktası."
+      },
+      {
+        "city": "Baščaršija",
+        "travel_time_from_previous_stop_min": 15,
+        "default_stay_minutes": 90,
+        "default_free_time_minutes": 240,
+        "activity": "Old Town Walking Tour",
+        "description": "Sebil, Başçarşı Cami, Moricahan, Gazi Hüsrev Bey, Katedral, Etnik Park."
+      }
+    ]
+  },
+  {
+    "route_id": "SAR-SRE-004",
+    "route_name": "Sarajevo - Srebrenica Memorial Tour",
+    "origin": "Sarajevo",
+    "destination": "Srebrenica",
+    "base_distance_km": 130,
+    "total_fees": [],
+    "waypoints": [
+      {
+        "city": "Road Stops",
+        "travel_time_from_previous_stop_min": 90,
+        "default_stay_minutes": 40,
+        "default_free_time_minutes": 0,
+        "activity": "Coffee & Rest Break",
+        "description": "Yol üzerindeki ihtiyaç ve kahve molaları."
+      },
+      {
+        "city": "Srebrenica Potocari",
+        "travel_time_from_previous_stop_min": 60,
+        "default_stay_minutes": 120,
+        "default_free_time_minutes": 120,
+        "activity": "Memorial Visit",
+        "description": "Anıt mezar ve müze ziyareti."
+      }
+    ]
+  }
+]
