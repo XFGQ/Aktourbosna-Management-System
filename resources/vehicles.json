@@ -1,0 +1,108 @@
+[
+  {
+    "vehicle_id": "VW-PAS-001",
+    "brand": "Volkswagen",
+    "model": "Passat",
+    "year": 2018,
+    "color": "Grey",
+    "current_km": 210000,
+    "fuel_type": "Diesel",
+    "avg_consumption_100km": 5.2,
+    "tire_type": "Winter",
+    "last_small_service_date": "2026-01-15",
+    "service_history": [
+      {
+        "date": "2026-01-15",
+        "operation": "Small Service (Oil & Filters)",
+        "cost": 250,
+        "currency": "BAM",
+        "performed_by": "Pale Usta",
+        "phone": "+387 61 111 222",
+        "location_url": "https://maps.google.com/?q=sarajevo+auto+service",
+        "notes": "Castrol 5W-30 used."
+      }
+    ]
+  },
+  {
+    "vehicle_id": "VW-PAS-002",
+    "brand": "Volkswagen",
+    "model": "Passat",
+    "year": 2016,
+    "color": "Black",
+    "current_km": 260000,
+    "fuel_type": "Diesel",
+    "avg_consumption_100km": 5.5,
+    "tire_type": "All-Season",
+    "last_small_service_date": "2025-11-22",
+    "service_history": [
+      {
+        "date": "2025-11-22",
+        "operation": "Small Service",
+        "cost": 230,
+        "currency": "BAM",
+        "performed_by": "Adnan Service",
+        "phone": "+387 62 333 444",
+        "location_url": "https://maps.google.com/?q=ilidza+auto",
+        "notes": "Brake pads checked, good condition."
+      }
+    ]
+  },
+  {
+    "vehicle_id": "FOR-TRA-003",
+    "brand": "Ford",
+    "model": "Transit",
+    "year": 2020,
+    "color": "Black",
+    "current_km": 160000,
+    "fuel_type": "Diesel",
+    "avg_consumption_100km": 8.1,
+    "tire_type": "Summer",
+    "last_small_service_date": "2025-09-06",
+    "service_history": [
+      {
+        "date": "2025-09-06",
+        "operation": "Small Service & Front Left Air Bellows Replacement",
+        "cost": 450,
+        "currency": "BAM",
+        "performed_by": "Ford Specialist Kenan",
+        "phone": "+387 63 555 666",
+        "location_url": "https://maps.google.com/?q=rajlovac+industrial+zone",
+        "notes": "Sol ön tekerlek körük değişti."
+      }
+    ]
+  },
+  {
+    "vehicle_id": "REN-MEG-004",
+    "brand": "Renault",
+    "model": "Megane",
+    "year": 2011,
+    "color": "Black",
+    "current_km": 185000,
+    "fuel_type": "Diesel",
+    "avg_consumption_100km": 4.8,
+    "tire_type": "Winter",
+    "last_small_service_date": "2025-03-18",
+    "service_history": [
+      {
+        "date": "2025-03-18",
+        "operation": "Small Service",
+        "cost": 180,
+        "currency": "BAM",
+        "performed_by": "Eko Service",
+        "phone": "+387 60 777 888",
+        "location_url": "https://maps.google.com/?q=vogosca+service",
+        "notes": "Regular maintenance."
+      },
+      {
+        "date": "2026-02-07",
+        "operation": "Injector Replacement (3 units)",
+        "cost": 900,
+        "currency": "BAM",
+        "performed_by": "Diesel Power Sarajevo",
+        "phone": "+387 61 999 000",
+        "location_url": "https://maps.google.com/?q=diesel+specialist+sarajevo",
+        "notes": "3 enjektör değişimi yapıldı, enjektörler test edildi, 2. enjektörün konnektörü değişti"
+      }
+    ]
+  }
+]
