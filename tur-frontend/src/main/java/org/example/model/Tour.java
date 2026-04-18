@@ -4,6 +4,7 @@ public class Tour {
     private String tourName;
     private String destination;
     private Double totalPrice;
+    private String hotelName;
     //startDate
     //status
     //id eklenecek
@@ -11,18 +12,28 @@ public class Tour {
     // empty  constructor for GSON/Jackson  needed
     public Tour() {}
 
-     public Tour(String tourName, String route, Double price) {
+    public Tour(String tourName, String destination, Double totalPrice) {
         this.tourName = tourName;
-        this.destination = route;
-        this.totalPrice= price;
+        this.destination = destination;
+        this.totalPrice = totalPrice;
+    }
+
+    public Tour(String tourName, String destination, Double totalPrice, String hotelName) {
+        this.tourName = tourName;
+        this.destination = destination;
+        this.totalPrice = totalPrice;
+        this.hotelName = hotelName;
     }
 
     public String getTourName() { return tourName; }
     public void setTourName(String tourName) { this.tourName = tourName; }
 
-    public String getRoute() { return destination; }
-    public void setRoute(String route) { this.destination = route; }
+    public String getDestination() { return destination; }
+    public void setDestination(String destination) { this.destination = destination; }
 
-    public Double getPrice() { return totalPrice; }
-    public void setPrice(Double price) { this.totalPrice = price; }
+    public Double getTotalPrice() { return totalPrice; }
+    public void setTotalPrice(Double totalPrice) { this.totalPrice = totalPrice; }
+
+    public String getHotelName() { return hotelName; }
+    public void setHotelName(String hotelName) { this.hotelName = hotelName; }
 }

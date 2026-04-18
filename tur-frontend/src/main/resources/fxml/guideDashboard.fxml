@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-area"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.GuideDashboardController">
+
+    <VBox spacing="20.0">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+        </padding>
+
+        <VBox spacing="4.0">
+            <Label styleClass="page-title" text="My Schedule" />
+            <Label styleClass="page-subtitle" text="Welcome back, Guide" />
+        </VBox>
+
+        <HBox spacing="16.0">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Tours This Week" />
+                <Label fx:id="toursThisWeekValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Customers" />
+                <Label fx:id="customersValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Completed Tours" />
+                <Label fx:id="completedToursValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Next Tour" />
+                <Label fx:id="nextTourValue" styleClass="stat-value-sm" text="—" />
+            </VBox>
+        </HBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox styleClass="panel-header" alignment="CENTER_LEFT">
+                <Label styleClass="panel-title" text="Today's Tour" />
+            </HBox>
+            <VBox styleClass="today-body" spacing="14.0">
+                <Label fx:id="todayTourName" styleClass="today-title" text="No tour scheduled for today" />
+                <HBox spacing="36.0">
+                    <VBox spacing="4.0">
+                        <Label styleClass="field-label" text="Time" />
+                        <Label fx:id="todayTourTime" styleClass="field-value" text="—" />
+                    </VBox>
+                    <VBox spacing="4.0">
+                        <Label styleClass="field-label" text="Hotel" />
+                        <Label fx:id="todayHotel" styleClass="field-value" text="—" />
+                    </VBox>
+                    <VBox spacing="4.0">
+                        <Label styleClass="field-label" text="Destination" />
+                        <Label fx:id="todayDestination" styleClass="field-value" text="—" />
+                    </VBox>
+                    <VBox spacing="4.0">
+                        <Label styleClass="field-label" text="Group" />
+                        <Label fx:id="todayGroupSize" styleClass="field-value" text="—" />
+                    </VBox>
+                    <VBox spacing="4.0">
+                        <Label styleClass="field-label" text="Vehicle" />
+                        <Label fx:id="todayVehicle" styleClass="field-value" text="—" />
+                    </VBox>
+                </HBox>
+            </VBox>
+        </VBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox styleClass="panel-header" alignment="CENTER_LEFT">
+                <Label styleClass="panel-title" text="Upcoming Tours" />
+            </HBox>
+            <TableView fx:id="upcomingToursTable" styleClass="table-view"
+                       prefHeight="220.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colDate" text="Date" prefWidth="100.0" />
+                    <TableColumn fx:id="colTourName" text="Tour Name" prefWidth="170.0" />
+                    <TableColumn fx:id="colDestination" text="Destination" prefWidth="150.0" />
+                    <TableColumn fx:id="colHotel" text="Hotel" prefWidth="150.0" />
+                    <TableColumn fx:id="colGroupSize" text="Group" prefWidth="80.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

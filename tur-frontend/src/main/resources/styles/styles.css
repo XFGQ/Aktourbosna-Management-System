@@ -97,6 +97,39 @@
     -fx-padding: 4 0 2 0;
 }
 
+.stat-value-sm {
+    -fx-font-size: 18px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2535;
+    -fx-padding: 6 0 4 0;
+}
+
+.page-subtitle {
+    -fx-font-size: 13px;
+    -fx-text-fill: #7a8a9e;
+}
+
+.today-body {
+    -fx-padding: 4 20 22 20;
+}
+
+.today-title {
+    -fx-font-size: 17px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #1a2535;
+}
+
+.field-label {
+    -fx-font-size: 11px;
+    -fx-text-fill: #9aa5b4;
+    -fx-font-weight: bold;
+}
+
+.field-value {
+    -fx-font-size: 13px;
+    -fx-text-fill: #2d3748;
+}
+
 .stat-sub {
     -fx-font-size: 11px;
     -fx-text-fill: #27ae60;
