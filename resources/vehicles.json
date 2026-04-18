@@ -5,11 +5,15 @@
     "model": "Passat",
     "year": 2018,
     "color": "Grey",
+    "plateNumber": "A26-T-626",
+    "capacity": "5",
     "current_km": 210000,
     "fuel_type": "Diesel",
     "avg_consumption_100km": 5.2,
     "tire_type": "Winter",
-    "last_small_service_date": "2026-01-15",
+    "daily_rental_fee": 80.0,
+    "currency": "EUR",
+    "lastMinorService": "2026-01-15",
     "service_history": [
       {
         "date": "2026-01-15",
@@ -29,11 +33,15 @@
     "model": "Passat",
     "year": 2016,
     "color": "Black",
+    "plateNumber": "A12-K-332",
+    "capacity": "5",
     "current_km": 260000,
     "fuel_type": "Diesel",
     "avg_consumption_100km": 5.5,
     "tire_type": "All-Season",
-    "last_small_service_date": "2025-11-22",
+    "daily_rental_fee": 70.0,
+    "currency": "EUR",
+    "lastMinorService": "2025-11-22",
     "service_history": [
       {
         "date": "2025-11-22",
@@ -53,11 +61,15 @@
     "model": "Transit",
     "year": 2020,
     "color": "Black",
+    "plateNumber": "E45-M-908",
+    "capacity": "8",
     "current_km": 160000,
     "fuel_type": "Diesel",
     "avg_consumption_100km": 8.1,
     "tire_type": "Summer",
-    "last_small_service_date": "2025-09-06",
+    "daily_rental_fee": 110.0,
+    "currency": "EUR",
+    "lastMinorService": "2025-09-06",
     "service_history": [
       {
         "date": "2025-09-06",
@@ -77,11 +89,15 @@
     "model": "Megane",
     "year": 2011,
     "color": "Black",
+    "plateNumber": "K78-J-119",
+    "capacity": "5",
     "current_km": 185000,
     "fuel_type": "Diesel",
     "avg_consumption_100km": 4.8,
     "tire_type": "Winter",
-    "last_small_service_date": "2025-03-18",
+    "daily_rental_fee": 50.0,
+    "currency": "EUR",
+    "lastMinorService": "2026-02-07",
     "service_history": [
       {
         "date": "2025-03-18",
@@ -101,7 +117,7 @@
         "performed_by": "Diesel Power Sarajevo",
         "phone": "+387 61 999 000",
         "location_url": "https://maps.google.com/?q=diesel+specialist+sarajevo",
-        "notes": "3 enjektör değişimi yapıldı, enjektörler test edildi, 2. enjektörün konnektörü değişti"
+        "notes": "3 enjektör değişimi yapıldı."
       }
     ]
   }

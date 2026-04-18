@@ -1,0 +1,51 @@
+[
+  {
+    "booking_id": "BKG-10045",
+    "tour_id": "TOUR-2026-05-001",
+    "assigned_guide_id": "PARTNER-001",
+    "lead_customer_name": "Ahmet Yılmaz",
+    "guest_count": 2,
+    "guests": [
+      {
+        "full_name": "Ahmet Yılmaz",
+        "passport_number": "U12345678",
+        "phone": "+90 532 111 22 33",
+        "nationality": "TR"
+      },
+      {
+        "full_name": "Osman Gültekin",
+        "passport_number": "U87654321",
+        "phone": "+90 555 999 88 77",
+        "nationality": "TR"
+      }
+    ],
+    "accommodation": {
+      "hotel_id": "HOTEL-SAR-001",
+      "check_in": "2026-05-10",
+      "check_out": "2026-05-13",
+      "nights_stayed": 3
+    },
+    "booking_status": "CONFIRMED"
+  },
+  {
+    "booking_id": "BKG-10046",
+    "tour_id": "TOUR-2026-05-002",
+    "assigned_guide_id": "PARTNER-002",
+    "lead_customer_name": "Mehmet Demir",
+    "guest_count": 1,
+    "guests": [
+      {
+        "full_name": "Mehmet Demir",
+        "passport_number": "U33445566",
+        "phone": "+90 530 444 55 66",
+        "nationality": "TR"
+      }
+    ],
+    "accommodation": {
+      "hotel_id": "HOTEL-SAR-002",
+      "check_in": "2026-05-13",
+      "check_out": "2026-05-16",
+      "nights_stayed": 4
+    },    "booking_status": "WAITING-PAYMENT"
+  }
+]
