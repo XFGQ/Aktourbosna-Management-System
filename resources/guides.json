@@ -3,8 +3,15 @@
     "guide_id": "PARTNER-001",
     "full_name": "Hasan Talha Akçakıl",
     "role": "Company Owner",
+    "licenseNo": "123123",
     "base_city": "Sarajevo",
-    "contact": { "email": "info@rinnesoft.com", "phone": "TBD" },
+    "daily_fee": 100.0,
+    "currency": "EUR",
+    "rating": 5.0,
+    "contact": {
+      "email": "info@rinnesoft.com",
+      "phone": "+387600000001"
+    },
     "languages": [
       { "language": "Turkish", "level": "Native" },
       { "language": "Bosnian", "level": "Professional" },
@@ -32,15 +39,21 @@
       "Trekking & Survival Expert",
       "Historical & Cultural Analysis"
     ],
-    "rating": 5.0,
     "notes": "Company Founder & Technical/Strategic Lead."
   },
   {
     "guide_id": "PARTNER-002",
     "full_name": "Ahmed Şamil Akçakıl",
     "role": "Company Partner",
+    "licenseNo": "123123",
     "base_city": "Sarajevo",
-    "contact": { "email": "ahmedsamilakcakil@gmail.com", "phone": "TBD" },
+    "daily_fee": 100.0,
+    "currency": "EUR",
+    "rating": 4.8,
+    "contact": {
+      "email": "ahmedsamilakcakil@gmail.com",
+      "phone": "+387600000002"
+    },
     "languages": [
       { "language": "Turkish", "level": "Native" },
       { "language": "English", "level": "Professional" },
@@ -72,7 +85,6 @@
       "Trekking & Survival Expert",
       "Historical Knowledge"
     ],
-    "rating": 4.8,
-    "notes": "Partner. Broad regional expertise including Adriatic coast and internal Montenegro mountain routes."
+    "notes": "Partner. Broad regional expertise."
   }
 ]

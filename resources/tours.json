@@ -1,0 +1,16 @@
+[
+  {
+    "tour_id": "TOUR-2026-05-001",
+    "route_id": "SAR-MOS-001",
+    "guide_id": "PARTNER-001",
+    "vehicle_id": "VW-PAS-001",
+    "start_date": "2026-05-12T08:00:00",
+    "end_date": "2026-05-12T20:00:00",
+    "expenses": [
+      { "category":"Extra Parking Mostar ","amount": 5.0,"date":"2026-05-12T08:00:00","path":"/home/xfgq/receipts/parking.png", "currency": "BAM" }
+    ],
+    "status": "COMPLETED"
+  }
+
+]
+
