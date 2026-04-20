@@ -2,21 +2,22 @@ package org.example.controller;
 
 import org.example.model.Vehicle;
 import org.example.repository.VehicleRepository;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/vehicles") //if spring get an something called api/tours send this request this class
-@CrossOrigin(origins = "*")
+@RequestMapping("/api/vehicles")
 public class VehicleController {
 
-    private final VehicleRepository vehicleRepository;
+    @Autowired
+    private VehicleRepository vehicleRepository;
 
-    public VehicleController(VehicleRepository vehicleRepository){
-        this.vehicleRepository=vehicleRepository;
-    }
-    @GetMapping //except this thing api/vehicles become 404
-    public List<Vehicle> getAllVehicles(){
+    @GetMapping
+    public List<Vehicle> getAllVehicles() {
         return vehicleRepository.findAll();
     }
 }

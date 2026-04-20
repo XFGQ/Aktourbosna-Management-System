@@ -5,15 +5,22 @@ import lombok.Data;
 
 @Entity
 @Table(name = "vehicles")
-@Data
+@Data //
 public class Vehicle {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
 
-    private String plateNumber; // Plaka
+     @Id
+    @Column(name = "vehicle_id", length = 50)
+    private String vehicleId;
+
+    private String brand;
     private String model;
-    private String litreHundred;
-    private Integer seatCapacity;
-    private Boolean isAvailable = true;
+    private Integer vehicleYear;
+    private String color;
+    private Integer currentKm;
+    private String fuelType;
+    private Double dailyRentalFee;
+    private String currency;
+    private String plateNumber;
+    private int seatCapacity;
+    private boolean isAvailable;
 }
