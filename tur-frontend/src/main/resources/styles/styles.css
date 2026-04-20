@@ -164,6 +164,20 @@
     -fx-underline: true;
 }
 
+.btn-primary {
+    -fx-background-color: #1e4b7a;
+    -fx-text-fill: #ffffff;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-padding: 10 20;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+
+.btn-primary:hover { -fx-background-color: #255c96; }
+
+.tm-header { -fx-background-color: #ffffff; }
+
 .table-view {
     -fx-background-color: transparent;
     -fx-border-color: transparent;
