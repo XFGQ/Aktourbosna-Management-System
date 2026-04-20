@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-area"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.TourManagementController">
+
+    <VBox spacing="20.0">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+        </padding>
+
+        <HBox alignment="CENTER_LEFT">
+            <VBox HBox.hgrow="ALWAYS">
+                <Label styleClass="page-title" text="Tour Management" />
+                <Label styleClass="page-subtitle" text="Overview of all tours" />
+            </VBox>
+            <Button styleClass="btn-primary" text="+ Add Tour" onAction="#onAddTour" />
+        </HBox>
+
+        <HBox spacing="16.0">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Tours" />
+                <Label fx:id="totalToursValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Revenue" />
+                <Label fx:id="revenueValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Expenses" />
+                <Label fx:id="expensesValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Net Profit" />
+                <Label fx:id="netProfitValue" styleClass="stat-value" text="—" />
+            </VBox>
+        </HBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox styleClass="panel-header" alignment="CENTER_LEFT">
+                <Label styleClass="panel-title" text="Recent Tours" />
+            </HBox>
+            <TableView fx:id="recentToursTable" styleClass="table-view"
+                       prefHeight="180.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colRecentName"        text="Tour Name"    prefWidth="140.0" />
+                    <TableColumn fx:id="colRecentDeparture"   text="Departure"    prefWidth="130.0" />
+                    <TableColumn fx:id="colRecentDestination" text="Destination"  prefWidth="120.0" />
+                    <TableColumn fx:id="colRecentDate"        text="Date"         prefWidth="95.0" />
+                    <TableColumn fx:id="colRecentHotel"       text="Hotel"        prefWidth="120.0" />
+                    <TableColumn fx:id="colRecentVehicle"     text="Vehicle"      prefWidth="140.0" />
+                    <TableColumn fx:id="colRecentGuide"       text="Guide"        prefWidth="120.0" />
+                    <TableColumn fx:id="colRecentPrice"       text="Price (€)"    prefWidth="85.0" />
+                    <TableColumn fx:id="colRecentStatus"      text="Status"       prefWidth="85.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox styleClass="panel-header" alignment="CENTER_LEFT">
+                <Label styleClass="panel-title" text="Upcoming Tours" />
+            </HBox>
+            <TableView fx:id="upcomingToursTable" styleClass="table-view"
+                       prefHeight="260.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colUpcomingName"        text="Tour Name"   prefWidth="140.0" />
+                    <TableColumn fx:id="colUpcomingDeparture"   text="Departure"   prefWidth="130.0" />
+                    <TableColumn fx:id="colUpcomingDestination" text="Destination" prefWidth="120.0" />
+                    <TableColumn fx:id="colUpcomingDate"        text="Date"        prefWidth="95.0" />
+                    <TableColumn fx:id="colUpcomingHotel"       text="Hotel"       prefWidth="120.0" />
+                    <TableColumn fx:id="colUpcomingVehicle"     text="Vehicle"     prefWidth="140.0" />
+                    <TableColumn fx:id="colUpcomingGuide"       text="Guide"       prefWidth="120.0" />
+                    <TableColumn fx:id="colUpcomingPrice"       text="Price (€)"   prefWidth="85.0" />
+                    <TableColumn fx:id="colUpcomingStatus"      text="Status"      prefWidth="85.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>
