@@ -8,4 +8,5 @@ import org.springframework.stereotype.Repository;
 public interface UserRepository extends JpaRepository<User, Long> {
     // Spring bu ismi analiz eder ve otomatik sorgu oluşturur
     User findByUsername(String username);
-}
+} 
+ 
