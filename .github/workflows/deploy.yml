@@ -9,13 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+
       - name: Set up JDK 21
         uses: actions/setup-java@v3
         with:
           java-version: '21'
           distribution: 'temurin'
 
+      # Hatanın çözümü burası:
       - name: Build with Maven
+        working-directory: tur-backend
         run: mvn clean package -DskipTests
 
       - name: Copy JAR to Server
@@ -24,9 +27,10 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          source: "target/*.jar"
+          # Dosyanın yeri artık belli:
+          source: "tur-backend/target/*.jar"
           target: "/home/ius2026/app/"
-          strip_components: 1
+          strip_components: 2
 
       - name: Restart Service
         uses: appleboy/ssh-action@master
