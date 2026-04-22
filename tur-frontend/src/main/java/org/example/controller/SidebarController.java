@@ -25,7 +25,7 @@ public class SidebarController {
 
     @FXML
     private void onTourManagement() {
-        // appController.navigateTo("tour-management.fxml");
+        appController.navigateTo("tourManagement.fxml");
         setActive(btnTourManagement);
     }
 
