@@ -25,7 +25,8 @@ public class Vehicle {
     @Column(name = "model", nullable = false, length = 100)
     private String model;
 
-    @Column(name = "year")
+    // "year" is a MySQL reserved word — mapped to manufacture_year
+    @Column(name = "manufacture_year")
     private Integer year;
 
     @Column(name = "color", length = 50)
@@ -58,8 +59,10 @@ public class Vehicle {
     @ElementCollection
     @CollectionTable(name = "vehicle_service_history", joinColumns = @JoinColumn(name = "vehicle_id"))
     @Column(name = "service_record", length = 500)
+    @Builder.Default
     private List<String> serviceHistory = new ArrayList<>();
 
     @OneToMany(mappedBy = "vehicle")
+    @Builder.Default
     private List<Tour> tours = new ArrayList<>();
 }

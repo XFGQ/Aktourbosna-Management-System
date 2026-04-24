@@ -60,11 +60,6 @@ public class Tour {
     @OneToMany(mappedBy = "tour", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Expense> expenses = new ArrayList<>();
 
-    public void addBooking(Booking booking) {
-        booking.setTour(this);
-        this.bookings.add(booking);
-    }
-
     public void addExpense(Expense expense) {
         expense.setTour(this);
         this.expenses.add(expense);

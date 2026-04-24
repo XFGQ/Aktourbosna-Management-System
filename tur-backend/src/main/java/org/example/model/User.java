@@ -2,17 +2,15 @@ package org.example.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "users")
-@Inheritance(strategy = InheritanceType.JOINED)
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-public abstract class User {
+@Builder
+public class User {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,4 +29,14 @@ public abstract class User {
     @Enumerated(EnumType.STRING)
     @Column(name = "role", nullable = false, columnDefinition = "VARCHAR(20)")
     private UserRole role;
+
+    // User owns the FK → guides table
+    @OneToOne
+    @JoinColumn(name = "guide_id", referencedColumnName = "guide_id")
+    private Guide guide;
+
+    // User owns the FK → admins table
+    @OneToOne
+    @JoinColumn(name = "admin_id", referencedColumnName = "admin_id")
+    private Admin admin;
 }
