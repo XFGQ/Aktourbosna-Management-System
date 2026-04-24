@@ -2,19 +2,23 @@ package org.example.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
+
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "guides")
-@PrimaryKeyJoinColumn(name = "user_id")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@SuperBuilder
-public class Guide extends User {
+@Builder
+public class Guide {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "guide_id")
+    private Long id;
 
     @Column(name = "full_name")
     private String fullName;
@@ -40,21 +44,29 @@ public class Guide extends User {
     private Double rating;
     private String currency;
 
+    // Inverse side — User owns the FK
+    @OneToOne(mappedBy = "guide")
+    private User user;
+
     @ElementCollection
-    @CollectionTable(name = "guide_languages", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_languages", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "language")
+    @Builder.Default
     private List<String> languages = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "guide_countries", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_countries", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "country")
+    @Builder.Default
     private List<String> countries = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "guide_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_skills", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "skill")
+    @Builder.Default
     private List<String> skills = new ArrayList<>();
 
     @OneToMany(mappedBy = "guide", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Tour> tours = new ArrayList<>();
 }
