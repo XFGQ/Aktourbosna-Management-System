@@ -14,7 +14,7 @@ public class TourController {
     public TourController(TourRepository tourRepository){
         this.tourRepository=tourRepository;
     }
-    @GetMapping  // bind to method that coming from web
+    @GetMapping
     public List<Tour> getAllTours(){
         return tourRepository.findAll();
     }
