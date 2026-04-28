@@ -2,19 +2,24 @@ package org.example.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.annotation.JsonIgnore;
+
 @Entity
 @Table(name = "guides")
-@PrimaryKeyJoinColumn(name = "user_id")
 @Getter @Setter @NoArgsConstructor @AllArgsConstructor
-@SuperBuilder
-public class Guide extends User {
+@Builder
+public class Guide {
 
-    private String fullName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
+
     private String phone;
     private String jobTitle;
 
@@ -29,19 +34,19 @@ public class Guide extends User {
     private String currency;
 
     @ElementCollection
-    @CollectionTable(name = "guide_languages", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_languages", joinColumns = @JoinColumn(name = "guide_id")) // user_id yerine guide_id yaptık
     @Column(name = "language")
     @Builder.Default
     private List<String> languages = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "guide_countries", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_countries", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "country")
     @Builder.Default
     private List<String> countries = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "guide_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_skills", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "skill")
     @Builder.Default
     private List<String> skills = new ArrayList<>();

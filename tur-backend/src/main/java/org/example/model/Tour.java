@@ -27,7 +27,7 @@ public class Tour {
     private Double calculatedPrice = 0.0;
 
     @Builder.Default
-    private Double finalPrice = 0.0; // Rehberin manuel müdahalesi
+    private Double finalPrice = 0.0;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "guide_id", nullable = false)

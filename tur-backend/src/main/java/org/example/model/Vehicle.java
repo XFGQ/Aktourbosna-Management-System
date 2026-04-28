@@ -16,7 +16,11 @@ import java.util.List;
 public class Vehicle {
 
     @Id
-    @Column(name = "vehicle_id", length = 50)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private Long id;
+
+    @Column(name = "vehicle_id", length = 50,unique = true)
     private String vehicleId;
 
     @Column(name = "brand", nullable = false, length = 100)
@@ -33,9 +37,6 @@ public class Vehicle {
 
     @Column(name = "plate_number", nullable = false, unique = true, length = 20)
     private String plateNumber;
-
-    @Column(name = "capacity")
-    private Integer capacity;
 
     @Column(name = "seat_capacity")
     private Integer seatCapacity;
