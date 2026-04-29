@@ -1,4 +1,4 @@
-package org.example.model
+package org.example.model ;
 public class Toll {
 
     private int tollId;

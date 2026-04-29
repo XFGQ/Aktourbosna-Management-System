@@ -33,6 +33,9 @@ public class DashboardController {
     public void initialize() {
         colTourName.setCellValueFactory(new PropertyValueFactory<>("tourName"));
         colDestination.setCellValueFactory(new PropertyValueFactory<>("destination"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        colGuide.setCellValueFactory(new PropertyValueFactory<>("guideName"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
         loadData();
     }
@@ -43,7 +46,6 @@ public class DashboardController {
             recentToursTable.getItems().setAll(tours);
             totalToursValue.setText(String.valueOf(tours.size()));
         } catch (Exception e) {
-            // Backend not running — load mock data for UI development
             loadMockData();
         }
     }
@@ -58,16 +60,23 @@ public class DashboardController {
         vehiclesStatus.setText("In fleet");
 
         recentToursTable.getItems().setAll(
-            new Tour("Sarajevo City Tour",     "Sarajevo, BiH",    null),
-            new Tour("Mostar Heritage Walk",   "Mostar, BiH",      null),
-            new Tour("Balkan Mountains Trek",  "Foča, BiH",        null),
-            new Tour("Dubrovnik Day Trip",     "Dubrovnik, HR",    null),
-            new Tour("Banja Luka Cultural",    "Banja Luka, BiH",  null)
+            makeTour("Sarajevo City Tour",    "Sarajevo, BiH",    "2025-05-02", "Marko Petrović", "Active"),
+            makeTour("Mostar Heritage Walk",  "Mostar, BiH",      "2025-05-05", "Amir Hodžić",    "Upcoming"),
+            makeTour("Balkan Mountains Trek", "Foča, BiH",        "2025-05-10", "Selma Kovač",    "Upcoming"),
+            makeTour("Dubrovnik Day Trip",    "Dubrovnik, HR",    "2025-05-14", "Marko Petrović", "Upcoming"),
+            makeTour("Banja Luka Cultural",   "Banja Luka, BiH",  "2025-04-20", "Amir Hodžić",    "Completed")
         );
+    }
+
+    private Tour makeTour(String name, String dest, String date, String guide, String status) {
+        Tour t = new Tour(name, dest, date);
+        t.setGuideName(guide);
+        t.setStatus(status);
+        return t;
     }
 
     @FXML
     private void onViewAllTours() {
-        // Will navigate to Tour Management when that view is implemented
+        // Tour Management ekranına navigate et
     }
 }
