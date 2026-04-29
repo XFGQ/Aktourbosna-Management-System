@@ -2,7 +2,6 @@ package org.example.controller;
 
 import org.example.application.dto.GuideDTO;
 import org.example.service.GuideService;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,17 +26,14 @@ public class GuideController {
     public ResponseEntity<GuideDTO> getGuideById(@PathVariable Long id) {
         return ResponseEntity.ok(guideService.getGuideById(id));
     }
-
-    @PostMapping
-    public ResponseEntity<GuideDTO> createGuide(@RequestBody GuideDTO guideDTO) {
-        return new ResponseEntity<>(guideService.createGuide(guideDTO), HttpStatus.CREATED);
-    }
-
     @PutMapping("/{id}")
     public ResponseEntity<GuideDTO> updateGuide(@PathVariable Long id, @RequestBody GuideDTO guideDTO) {
         return ResponseEntity.ok(guideService.updateGuide(id, guideDTO));
     }
-
+    @PostMapping
+    public ResponseEntity<GuideDTO> createGuide(@RequestBody GuideDTO guideDTO) {
+        return ResponseEntity.ok(guideService.createGuide(guideDTO));
+    }
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGuide(@PathVariable Long id) {
         guideService.deleteGuide(id);

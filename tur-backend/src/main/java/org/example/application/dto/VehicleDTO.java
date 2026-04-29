@@ -3,9 +3,10 @@ package org.example.application.dto;
 import lombok.Data;
 
 import java.time.LocalDate;
-
+import com.fasterxml.jackson.annotation.JsonProperty;
 @Data
 public class VehicleDTO {
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long id;
     private String brand;
     private String model;

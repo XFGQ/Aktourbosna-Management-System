@@ -44,7 +44,7 @@ public class VehicleService {
                 .orElseThrow(() -> new RuntimeException("Güncellenecek araç bulunamadı. ID: " + id));
 
          vehicleMapper.updateEntityFromDto(vehicleDTO, existingVehicle);
-
+ 
          Vehicle savedVehicle = vehicleRepository.save(existingVehicle);
         return vehicleMapper.toDto(savedVehicle);
     }
