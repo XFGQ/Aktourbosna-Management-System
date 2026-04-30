@@ -2,59 +2,57 @@ package org.example.model;
 
 import jakarta.persistence.*;
 import lombok.*;
-import lombok.experimental.SuperBuilder;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import java.util.ArrayList;
 import java.util.List;
 
 @Entity
 @Table(name = "guides")
-@PrimaryKeyJoinColumn(name = "user_id")
-@Getter
-@Setter
-@NoArgsConstructor
-@AllArgsConstructor
-@SuperBuilder
-public class Guide extends User {
+@Getter @Setter @NoArgsConstructor @AllArgsConstructor
+@Builder
+public class Guide {
 
-    @Column(name = "full_name")
-    private String fullName;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @OneToOne
+    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
+    private User user;
 
     private String phone;
-
-    @Column(name = "job_title")
     private String jobTitle;
 
-    @Column(name = "partner_code", unique = true)
+    @Column(unique = true)
     private String partnerCode;
 
-    @Column(name = "base_city")
     private String baseCity;
-
-    @Column(name = "license_no")
     private String licenseNo;
-
-    @Column(name = "daily_fee")
     private Double dailyFee;
-
     private Integer experience;
     private Double rating;
     private String currency;
 
     @ElementCollection
-    @CollectionTable(name = "guide_languages", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_languages", joinColumns = @JoinColumn(name = "guide_id")) // user_id yerine guide_id yaptık
     @Column(name = "language")
+    @Builder.Default
     private List<String> languages = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "guide_countries", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_countries", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "country")
+    @Builder.Default
     private List<String> countries = new ArrayList<>();
 
     @ElementCollection
-    @CollectionTable(name = "guide_skills", joinColumns = @JoinColumn(name = "user_id"))
+    @CollectionTable(name = "guide_skills", joinColumns = @JoinColumn(name = "guide_id"))
     @Column(name = "skill")
+    @Builder.Default
     private List<String> skills = new ArrayList<>();
 
+    @JsonIgnore
     @OneToMany(mappedBy = "guide", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @Builder.Default
     private List<Tour> tours = new ArrayList<>();
 }
