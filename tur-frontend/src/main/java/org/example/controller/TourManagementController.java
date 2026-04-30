@@ -1,11 +1,18 @@
 package org.example.controller;
 
+import javafx.beans.property.SimpleObjectProperty;
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.model.Tour;
+import org.example.service.ExpenseService;
+import org.example.service.TourService;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TourManagementController {
 
@@ -22,7 +29,7 @@ public class TourManagementController {
     @FXML private TableColumn<Tour, String> colRecentHotel;
     @FXML private TableColumn<Tour, String> colRecentVehicle;
     @FXML private TableColumn<Tour, String> colRecentGuide;
-    @FXML private TableColumn<Tour, Double> colRecentPrice;
+    @FXML private TableColumn<Tour, Number> colRecentPrice;
     @FXML private TableColumn<Tour, String> colRecentStatus;
 
     @FXML private TableView<Tour> upcomingToursTable;
@@ -33,65 +40,84 @@ public class TourManagementController {
     @FXML private TableColumn<Tour, String> colUpcomingHotel;
     @FXML private TableColumn<Tour, String> colUpcomingVehicle;
     @FXML private TableColumn<Tour, String> colUpcomingGuide;
-    @FXML private TableColumn<Tour, Double> colUpcomingPrice;
+    @FXML private TableColumn<Tour, Number> colUpcomingPrice;
     @FXML private TableColumn<Tour, String> colUpcomingStatus;
+
+    private final TourService tourService = new TourService();
+    private final ExpenseService expenseService = new ExpenseService();
 
     @FXML
     public void initialize() {
-        colRecentName.setCellValueFactory(new PropertyValueFactory<>("tourName"));
-        colRecentDeparture.setCellValueFactory(new PropertyValueFactory<>("departureCity"));
-        colRecentDestination.setCellValueFactory(new PropertyValueFactory<>("destination"));
-        colRecentDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        colRecentHotel.setCellValueFactory(new PropertyValueFactory<>("hotelName"));
-        colRecentVehicle.setCellValueFactory(new PropertyValueFactory<>("vehicle"));
-        colRecentGuide.setCellValueFactory(new PropertyValueFactory<>("guideName"));
-        colRecentPrice.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
-        colRecentStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        bindColumns(colRecentName, colRecentDeparture, colRecentDestination, colRecentDate,
+                colRecentHotel, colRecentVehicle, colRecentGuide, colRecentPrice, colRecentStatus);
 
-        colUpcomingName.setCellValueFactory(new PropertyValueFactory<>("tourName"));
-        colUpcomingDeparture.setCellValueFactory(new PropertyValueFactory<>("departureCity"));
-        colUpcomingDestination.setCellValueFactory(new PropertyValueFactory<>("destination"));
-        colUpcomingDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        colUpcomingHotel.setCellValueFactory(new PropertyValueFactory<>("hotelName"));
-        colUpcomingVehicle.setCellValueFactory(new PropertyValueFactory<>("vehicle"));
-        colUpcomingGuide.setCellValueFactory(new PropertyValueFactory<>("guideName"));
-        colUpcomingPrice.setCellValueFactory(new PropertyValueFactory<>("totalPrice"));
-        colUpcomingStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        bindColumns(colUpcomingName, colUpcomingDeparture, colUpcomingDestination, colUpcomingDate,
+                colUpcomingHotel, colUpcomingVehicle, colUpcomingGuide, colUpcomingPrice, colUpcomingStatus);
 
-        loadMockData();
+        loadData();
     }
 
-    private Tour tour(String name, String departure, String dest, String date, String hotel, String vehicle, String guide, Double price, String status) {
-        Tour t = new Tour(name, dest, date, hotel, price, status);
-        t.setDepartureCity(departure);
-        t.setVehicle(vehicle);
-        t.setGuideName(guide);
-        return t;
+    private void bindColumns(TableColumn<Tour, String> name, TableColumn<Tour, String> departure,
+                             TableColumn<Tour, String> destination, TableColumn<Tour, String> date,
+                             TableColumn<Tour, String> hotel, TableColumn<Tour, String> vehicle,
+                             TableColumn<Tour, String> guide, TableColumn<Tour, Number> price,
+                             TableColumn<Tour, String> status) {
+        name.setCellValueFactory(new PropertyValueFactory<>("tourName"));
+        departure.setCellValueFactory(new PropertyValueFactory<>("departureCity"));
+        destination.setCellValueFactory(new PropertyValueFactory<>("destination"));
+        date.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        hotel.setCellValueFactory(new PropertyValueFactory<>("hotelName"));
+        status.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        guide.setCellValueFactory(cd ->
+                new SimpleStringProperty(tourService.getGuideName(cd.getValue())));
+        vehicle.setCellValueFactory(cd ->
+                new SimpleStringProperty(tourService.getVehicleDisplayName(cd.getValue())));
+        price.setCellValueFactory(cd ->
+                new SimpleObjectProperty<>(cd.getValue().getTotalCost()));
     }
 
-    private void loadMockData() {
-        totalToursValue.setText("8");
-        revenueValue.setText("€10,110");
-        expensesValue.setText("€4,250");
-        netProfitValue.setText("€5,860");
+    private void loadData() {
+        try {
+            List<Tour> tours = tourService.getAllTours();
 
-        recentToursTable.getItems().setAll(
-            tour("Banja Luka Cultural", "Sarajevo Airport", "Banja Luka, BiH", "2025-04-20", "Hotel Jelena",  "Sprinter 2022 · BA-201-K", "Amir Hodžić",   870.0,  "Completed"),
-            tour("Trebinje Wine Tour",  "Mostar Airport",   "Trebinje, BiH",   "2025-04-15", "Hotel Platani", "Transit 2023 · BA-112-A",  "Selma Kovač",   990.0,  "Completed"),
-            tour("Sarajevo City Tour",  "Sarajevo Airport", "Sarajevo, BiH",   "2025-05-02", "Hotel Europe",  "Sprinter 2021 · BA-445-J", "Marko Petrović",1200.0, "Active")
-        );
+            // Tamamlanmış ve aktif turlar
+            List<Tour> recent = tours.stream()
+                    .filter(t -> "Completed".equals(t.getStatus()) || "Active".equals(t.getStatus()))
+                    .collect(Collectors.toList());
 
-        upcomingToursTable.getItems().setAll(
-            tour("Mostar Heritage Walk",  "Sarajevo Airport", "Mostar, BiH",   "2025-05-05", "Hotel Mepas",           "Sprinter 2022 · BA-338-L", "Amir Hodžić",    950.0,  "Upcoming"),
-            tour("Balkan Mountains Trek", "Sarajevo Airport", "Foča, BiH",     "2025-05-10", "Hotel Zelengora",        "Transit 2023 · BA-112-A",  "Selma Kovač",   1500.0, "Upcoming"),
-            tour("Dubrovnik Day Trip",    "Mostar Airport",   "Dubrovnik, HR", "2025-05-14", "Hotel Rixos",           "Sprinter 2022 · BA-201-K", "Marko Petrović",1800.0, "Upcoming"),
-            tour("Tara Canyon Hike",     "Sarajevo Airport", "Tara, MNE",     "2025-05-18", "Hotel Tara",            "Sprinter 2021 · BA-445-J", "Amir Hodžić",   1650.0, "Upcoming"),
-            tour("Belgrade Day Tour",    "Sarajevo Airport", "Belgrade, SRB", "2025-05-22", "Hotel Metropol Palace", "Sprinter 2022 · BA-338-L", "Selma Kovač",   2100.0, "Upcoming")
-        );
+            // Yaklaşan turlar
+            List<Tour> upcoming = tours.stream()
+                    .filter(t -> "Upcoming".equals(t.getStatus()))
+                    .collect(Collectors.toList());
+
+            recentToursTable.getItems().setAll(recent);
+            upcomingToursTable.getItems().setAll(upcoming);
+
+            // İstatistikler
+            totalToursValue.setText(String.valueOf(tours.size()));
+
+            double revenue = tourService.calculateTotalRevenue(tours);
+            revenueValue.setText("€" + String.format("%,.0f", revenue));
+
+            double totalExpenses = tours.stream()
+                    .mapToDouble(t -> expenseService.calculateTotal(expenseService.getExpensesForTour(t)))
+                    .sum();
+            expensesValue.setText("€" + String.format("%,.0f", totalExpenses));
+
+            netProfitValue.setText("€" + String.format("%,.0f", revenue - totalExpenses));
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            totalToursValue.setText("—");
+            revenueValue.setText("—");
+            expensesValue.setText("—");
+            netProfitValue.setText("—");
+        }
     }
 
     @FXML
     private void onAddTour() {
-        // Will open Add Tour dialog when implemented
+        // Add Tour dialog - ileride
     }
 }

@@ -1,12 +1,15 @@
 package org.example.controller;
 
+import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.model.Tour;
-import org.example.service.ApiService;
+import org.example.service.GuideService;
+import org.example.service.TourService;
+import org.example.service.VehicleService;
 
 import java.util.List;
 
@@ -27,47 +30,51 @@ public class DashboardController {
     @FXML private TableColumn<Tour, String> colGuide;
     @FXML private TableColumn<Tour, String> colStatus;
 
-    private final ApiService apiService = new ApiService();
+    private final TourService tourService = new TourService();
+    private final GuideService guideService = new GuideService();
+    private final VehicleService vehicleService = new VehicleService();
 
     @FXML
     public void initialize() {
         colTourName.setCellValueFactory(new PropertyValueFactory<>("tourName"));
         colDestination.setCellValueFactory(new PropertyValueFactory<>("destination"));
+        colDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
+        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+
+        // Guide objesinden fullName çekmek için custom cell value factory
+        colGuide.setCellValueFactory(cellData ->
+                new SimpleStringProperty(tourService.getGuideName(cellData.getValue())));
 
         loadData();
     }
 
     private void loadData() {
         try {
-            List<Tour> tours = apiService.fetchTours();
+            List<Tour> tours = tourService.getAllTours();
             recentToursTable.getItems().setAll(tours);
-            totalToursValue.setText(String.valueOf(tours.size()));
+
+            totalToursValue.setText(String.valueOf(tourService.countTours(tours)));
+            totalToursChange.setText("");
+
+            revenueValue.setText("€" + String.format("%,.0f", tourService.calculateTotalRevenue(tours)));
+            revenueChange.setText("");
+
+            guidesValue.setText(String.valueOf(guideService.countGuides(guideService.getAllGuides())));
+
+            var vehicles = vehicleService.getAllVehicles();
+            vehiclesValue.setText(String.valueOf(vehicles.size()));
+            vehiclesStatus.setText(vehicleService.countAvailable(vehicles) + " available");
         } catch (Exception e) {
-            // Backend not running — load mock data for UI development
-            loadMockData();
+            e.printStackTrace();
+            totalToursValue.setText("—");
+            revenueValue.setText("—");
+            guidesValue.setText("—");
+            vehiclesValue.setText("—");
         }
-    }
-
-    private void loadMockData() {
-        totalToursValue.setText("24");
-        totalToursChange.setText("+12% this month");
-        revenueValue.setText("€18,450");
-        revenueChange.setText("+8% vs last month");
-        guidesValue.setText("6");
-        vehiclesValue.setText("9");
-        vehiclesStatus.setText("In fleet");
-
-        recentToursTable.getItems().setAll(
-            new Tour("Sarajevo City Tour",     "Sarajevo, BiH",    null),
-            new Tour("Mostar Heritage Walk",   "Mostar, BiH",      null),
-            new Tour("Balkan Mountains Trek",  "Foča, BiH",        null),
-            new Tour("Dubrovnik Day Trip",     "Dubrovnik, HR",    null),
-            new Tour("Banja Luka Cultural",    "Banja Luka, BiH",  null)
-        );
     }
 
     @FXML
     private void onViewAllTours() {
-        // Will navigate to Tour Management when that view is implemented
+        // Tour Management'a yönlendir
     }
 }
