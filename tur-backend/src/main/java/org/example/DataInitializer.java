@@ -10,5 +10,6 @@ public class DataInitializer implements CommandLineRunner {
     public void run(String... args) throws Exception {
 
     System.out.println("DataInitializer running");
+    System.out.println("localhost:8080/swagger");
     }
 }

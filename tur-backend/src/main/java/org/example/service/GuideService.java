@@ -23,34 +23,24 @@ public class GuideService {
         this.guideMapper = guideMapper;
         this.userRepository = userRepository;
     }
-
-
     public List<GuideDTO> getAllGuides() {
         return guideRepository.findAll().stream()
                 .map(guideMapper::toDto)
                 .collect(Collectors.toList());
     }
-
-
+    public GuideDTO createGuide(GuideDTO guideDTO) {
+        Guide guide = guideMapper.toEntity(guideDTO);
+        User user = userRepository.findById(guideDTO.getUserId())
+                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı. ID: " + guideDTO.getUserId()));
+        guide.setUser(user);
+        Guide savedGuide = guideRepository.save(guide);
+        return guideMapper.toDto(savedGuide);
+    }
     public GuideDTO getGuideById(Long id) {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Rehber bulunamadı. ID: " + id));
         return guideMapper.toDto(guide);
     }
-
-
-    public GuideDTO createGuide(GuideDTO guideDTO) {
-        Guide guide = guideMapper.toEntity(guideDTO);
-
-        User user = userRepository.findById(guideDTO.getUserId())
-                .orElseThrow(() -> new RuntimeException("Kullanıcı bulunamadı"));
-
-        guide.setUser(user);
-
-        Guide savedGuide = guideRepository.save(guide);
-        return guideMapper.toDto(savedGuide);
-    }
-
     public GuideDTO updateGuide(Long id, GuideDTO guideDTO) {
         Guide existingGuide = guideRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Güncellenecek rehber bulunamadı. ID: " + id));
@@ -59,8 +49,6 @@ public class GuideService {
         Guide updatedGuide = guideRepository.save(existingGuide);
         return guideMapper.toDto(updatedGuide);
     }
-
-
     public void deleteGuide(Long id) {
         if (!guideRepository.existsById(id)) {
             throw new RuntimeException("Silinecek rehber bulunamadı. ID: " + id);
