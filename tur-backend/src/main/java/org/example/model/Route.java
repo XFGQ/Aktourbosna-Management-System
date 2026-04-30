@@ -2,6 +2,7 @@ package org.example.model;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -11,13 +12,16 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
-@Builder
+@SuperBuilder
 public class Route {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "route_id")
     private Long routeId;
+
+    @Column(name = "route_name", nullable = false, length = 200)
+    private String routeName;
 
     @Column(name = "start_city", nullable = false, length = 100)
     private String startCity;
@@ -28,14 +32,20 @@ public class Route {
     @Column(name = "country", length = 100)
     private String country;
 
-    @Column(name = "distance")
     private Float distance;
 
     @Column(name = "base_price")
-    private Float basePrice = 0.0f;
+    @Builder.Default
+    private Double basePrice = 0.0;
 
-    @OneToMany(mappedBy = "route", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Waypoint> waypoints = new ArrayList<>();
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+            name = "route_waypoints_mapping",
+            joinColumns = @JoinColumn(name = "route_id"),
+            inverseJoinColumns = @JoinColumn(name = "waypoint_id")
+    )
+    @Builder.Default
+    private List<Waypoint> defaultWaypoints = new ArrayList<>();
 
     @ManyToMany
     @JoinTable(
@@ -43,16 +53,6 @@ public class Route {
             joinColumns = @JoinColumn(name = "route_id"),
             inverseJoinColumns = @JoinColumn(name = "toll_id")
     )
+    @Builder.Default
     private List<Toll> tolls = new ArrayList<>();
-
-    @ManyToMany(mappedBy = "routes")
-    private List<Tour> tours = new ArrayList<>();
-
-    public void addWaypoint(Waypoint waypoint) {
-        if (this.waypoints == null) {
-            this.waypoints = new ArrayList<>();
-        }
-        this.waypoints.add(waypoint);
-        waypoint.setRoute(this);
-    }
 }

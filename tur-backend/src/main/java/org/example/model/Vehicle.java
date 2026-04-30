@@ -16,7 +16,11 @@ import java.util.List;
 public class Vehicle {
 
     @Id
-    @Column(name = "vehicle_id", length = 50)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name="id")
+    private Long id;
+
+    @Column(name = "vehicle_id", length = 50,unique = true)
     private String vehicleId;
 
     @Column(name = "brand", nullable = false, length = 100)
@@ -25,7 +29,7 @@ public class Vehicle {
     @Column(name = "model", nullable = false, length = 100)
     private String model;
 
-    @Column(name = "year")
+    @Column(name = "manufacture_year")
     private Integer year;
 
     @Column(name = "color", length = 50)
@@ -33,9 +37,6 @@ public class Vehicle {
 
     @Column(name = "plate_number", nullable = false, unique = true, length = 20)
     private String plateNumber;
-
-    @Column(name = "capacity")
-    private Integer capacity;
 
     @Column(name = "seat_capacity")
     private Integer seatCapacity;
@@ -58,8 +59,10 @@ public class Vehicle {
     @ElementCollection
     @CollectionTable(name = "vehicle_service_history", joinColumns = @JoinColumn(name = "vehicle_id"))
     @Column(name = "service_record", length = 500)
+    @Builder.Default
     private List<String> serviceHistory = new ArrayList<>();
 
     @OneToMany(mappedBy = "vehicle")
+    @Builder.Default
     private List<Tour> tours = new ArrayList<>();
 }
