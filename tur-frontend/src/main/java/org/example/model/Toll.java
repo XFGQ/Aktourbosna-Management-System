@@ -1,32 +1,56 @@
-package org.example.model;
-
-import java.util.ArrayList;
-import java.util.List;
-
+package org.example.model
 public class Toll {
 
-    private Long tollId;
+    private int tollId;
     private String name;
     private String location;
-    private Float costCat1 = 0.0f;
-    private Float costCat2 = 0.0f;
-    private Float costCat3 = 0.0f;
-    private List<Route> routes = new ArrayList<>();
+    private float costCat1;
+    private float costCat2;
+    private float costCat3;
 
     public Toll() {}
 
-    public Long getTollId() { return tollId; }
-    public void setTollId(Long tollId) { this.tollId = tollId; }
+    public Toll(int tollId, String name, String location,
+                float costCat1, float costCat2, float costCat3) {
+        this.tollId = tollId;
+        this.name = name;
+        this.location = location;
+        this.costCat1 = costCat1;
+        this.costCat2 = costCat2;
+        this.costCat3 = costCat3;
+    }
+
+    public float getCostForType(String vehicleType) {
+        switch (vehicleType.toUpperCase()) {
+            case "CAT1": return costCat1;
+            case "CAT2": return costCat2;
+            case "CAT3": return costCat3;
+            default: return costCat1;
+        }
+    }
+
+    public String getDetails() {
+        return "Toll: " + name + " | Location: " + location
+                + " | Cat1: " + costCat1
+                + " | Cat2: " + costCat2
+                + " | Cat3: " + costCat3;
+    }
+
+    public int getTollId() { return tollId; }
+    public void setTollId(int tollId) { this.tollId = tollId; }
+
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
+
     public String getLocation() { return location; }
     public void setLocation(String location) { this.location = location; }
-    public Float getCostCat1() { return costCat1; }
-    public void setCostCat1(Float costCat1) { this.costCat1 = costCat1; }
-    public Float getCostCat2() { return costCat2; }
-    public void setCostCat2(Float costCat2) { this.costCat2 = costCat2; }
-    public Float getCostCat3() { return costCat3; }
-    public void setCostCat3(Float costCat3) { this.costCat3 = costCat3; }
-    public List<Route> getRoutes() { return routes; }
-    public void setRoutes(List<Route> routes) { this.routes = routes; }
+
+    public float getCostCat1() { return costCat1; }
+    public void setCostCat1(float costCat1) { this.costCat1 = costCat1; }
+
+    public float getCostCat2() { return costCat2; }
+    public void setCostCat2(float costCat2) { this.costCat2 = costCat2; }
+
+    public float getCostCat3() { return costCat3; }
+    public void setCostCat3(float costCat3) { this.costCat3 = costCat3; }
 }

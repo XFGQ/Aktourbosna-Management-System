@@ -1,63 +1,79 @@
 package org.example.model;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 public class Tour {
-
-    // Backend alanları
-    private Long tourId;
     private String tourName;
-    private LocalDate startDate;
-    private LocalDate endDate;
-    private Float totalCost = 0.0f;
-    private String hotelName;
-    private Guide guide;
-    private Vehicle vehicle;
-    private List<Route> routes = new ArrayList<>();
-    private List<TourWaypoint> tourWaypoints = new ArrayList<>();
-    private List<Booking> bookings = new ArrayList<>();
-    private List<Expense> expenses = new ArrayList<>();
-
-    // UI alanları (frontend gösterimi için)
     private String destination;
-    private String departureCity;
-    private String groupSize;
+    private Double totalPrice;
+    private String hotelName;
+    private String startDate;
     private String status;
-
+    private String groupSize;
+    private String vehicle;
+    private String departureCity;
+    private String guideName;
+    //id eklenecek
+    //variables must be same with backend
+    // empty constructor for GSON/Jackson needed
     public Tour() {}
 
-    public Long getTourId() { return tourId; }
-    public void setTourId(Long tourId) { this.tourId = tourId; }
-    public String getTourName() { return tourName; }
+    public Tour(String tourName, String destination, Double totalPrice) {
+        this.tourName = tourName;
+        this.destination = destination;
+        this.totalPrice = totalPrice;
+    }
+
+    public Tour(String tourName, String destination, Double totalPrice, String hotelName) {
+        this.tourName = tourName;
+        this.destination = destination;
+        this.totalPrice = totalPrice;
+        this.hotelName = hotelName;
+    }
+
+    public Tour(String tourName, String destination, String startDate, String hotelName, Double totalPrice, String status) {
+        this.tourName = tourName;
+        this.destination = destination;
+        this.startDate = startDate;
+        this.hotelName = hotelName;
+        this.totalPrice = totalPrice;
+        this.status = status;
+    }
+
+    public Tour(String tourName, String destination, String startDate, String hotelName, String groupSize, String status) {
+        this.tourName = tourName;
+        this.destination = destination;
+        this.startDate = startDate;
+        this.hotelName = hotelName;
+        this.groupSize = groupSize;
+        this.status = status;
+    }
+
+    public String getTourName()       { return tourName; }
     public void setTourName(String tourName) { this.tourName = tourName; }
-    public LocalDate getStartDate() { return startDate; }
-    public void setStartDate(LocalDate startDate) { this.startDate = startDate; }
-    public LocalDate getEndDate() { return endDate; }
-    public void setEndDate(LocalDate endDate) { this.endDate = endDate; }
-    public Float getTotalCost() { return totalCost; }
-    public void setTotalCost(Float totalCost) { this.totalCost = totalCost; }
-    public String getHotelName() { return hotelName; }
-    public void setHotelName(String hotelName) { this.hotelName = hotelName; }
-    public Guide getGuide() { return guide; }
-    public void setGuide(Guide guide) { this.guide = guide; }
-    public Vehicle getVehicle() { return vehicle; }
-    public void setVehicle(Vehicle vehicle) { this.vehicle = vehicle; }
-    public List<Route> getRoutes() { return routes; }
-    public void setRoutes(List<Route> routes) { this.routes = routes; }
-    public List<TourWaypoint> getTourWaypoints() { return tourWaypoints; }
-    public void setTourWaypoints(List<TourWaypoint> tourWaypoints) { this.tourWaypoints = tourWaypoints; }
-    public List<Booking> getBookings() { return bookings; }
-    public void setBookings(List<Booking> bookings) { this.bookings = bookings; }
-    public List<Expense> getExpenses() { return expenses; }
-    public void setExpenses(List<Expense> expenses) { this.expenses = expenses; }
-    public String getDestination() { return destination; }
+
+    public String getDestination()    { return destination; }
     public void setDestination(String destination) { this.destination = destination; }
-    public String getDepartureCity() { return departureCity; }
-    public void setDepartureCity(String departureCity) { this.departureCity = departureCity; }
-    public String getGroupSize() { return groupSize; }
-    public void setGroupSize(String groupSize) { this.groupSize = groupSize; }
-    public String getStatus() { return status; }
+
+    public Double getTotalPrice()     { return totalPrice; }
+    public void setTotalPrice(Double totalPrice) { this.totalPrice = totalPrice; }
+
+    public String getHotelName()      { return hotelName; }
+    public void setHotelName(String hotelName) { this.hotelName = hotelName; }
+
+    public String getStartDate()      { return startDate; }
+    public void setStartDate(String startDate) { this.startDate = startDate; }
+
+    public String getStatus()         { return status; }
     public void setStatus(String status) { this.status = status; }
+
+    public String getGroupSize()      { return groupSize; }
+    public void setGroupSize(String groupSize) { this.groupSize = groupSize; }
+
+    public String getVehicle()        { return vehicle; }
+    public void setVehicle(String vehicle) { this.vehicle = vehicle; }
+
+    public String getDepartureCity()  { return departureCity; }
+    public void setDepartureCity(String departureCity) { this.departureCity = departureCity; }
+
+    public String getGuideName()      { return guideName; }
+    public void setGuideName(String guideName) { this.guideName = guideName; }
 }

@@ -6,9 +6,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.model.Tour;
-import org.example.service.TourService;
-
-import java.util.List;
 
 public class GuideDashboardController {
 
@@ -31,44 +28,32 @@ public class GuideDashboardController {
     @FXML private TableColumn<Tour, String> colHotel;
     @FXML private TableColumn<Tour, String> colGroupSize;
 
-    private final TourService tourService = new TourService();
-
     @FXML
     public void initialize() {
         colTourName.setCellValueFactory(new PropertyValueFactory<>("tourName"));
         colDestination.setCellValueFactory(new PropertyValueFactory<>("destination"));
         colHotel.setCellValueFactory(new PropertyValueFactory<>("hotelName"));
-        colDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        colGroupSize.setCellValueFactory(new PropertyValueFactory<>("groupSize"));
-
-        loadData();
+        loadMockData();
     }
 
-    private void loadData() {
-        try {
-            List<Tour> tours = tourService.getAllTours();
+    private void loadMockData() {
+        toursThisWeekValue.setText("4");
+        customersValue.setText("52");
+        completedToursValue.setText("18");
+        nextTourValue.setText("Tomorrow 09:00");
 
-            upcomingToursTable.getItems().setAll(tours);
-            toursThisWeekValue.setText(String.valueOf(tours.size()));
-            customersValue.setText("—");
-            completedToursValue.setText("—");
-            nextTourValue.setText(tours.isEmpty() ? "—" : tours.get(0).getTourName());
+        todayTourName.setText("Sarajevo City Tour");
+        todayTourTime.setText("10:00 – 14:00");
+        todayHotel.setText("Hotel Europe");
+        todayDestination.setText("Sarajevo, BiH");
+        todayGroupSize.setText("12 guests");
+        todayVehicle.setText("Minibus — BA 201-K-451");
 
-            if (!tours.isEmpty()) {
-                Tour today = tours.get(0);
-                todayTourName.setText(today.getTourName());
-                todayHotel.setText(today.getHotelName());
-                todayDestination.setText(today.getDestination());
-                todayGroupSize.setText(today.getGroupSize());
-                todayVehicle.setText(tourService.getVehicleDisplayName(today));
-                todayTourTime.setText(today.getStartDate() != null ? today.getStartDate().toString() : "—");
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-            toursThisWeekValue.setText("—");
-            customersValue.setText("—");
-            completedToursValue.setText("—");
-            nextTourValue.setText("—");
-        }
+        upcomingToursTable.getItems().setAll(
+            new Tour("Mostar Heritage Walk",  "Mostar, BiH",     null, "Hotel Mepas"),
+            new Tour("Balkan Mountains Trek", "Foča, BiH",       null, "Hotel & Spa & Resort & Grad"),
+            new Tour("Dubrovnik Day Trip",    "Dubrovnik, HR",   null, "Hotel Rixos"),
+            new Tour("Banja Luka Cultural",   "Banja Luka, BiH", null, "Hotel Jelena")
+        );
     }
 }
