@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.layout.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.text.*?>
+<?import javafx.geometry.*?>
+
+<HBox xmlns="http://javafx.com/javafx"
+      xmlns:fx="http://javafx.com/fxml"
+      fx:controller="org.example.controller.LoginController"
+      prefWidth="900" prefHeight="580"
+      stylesheets="@../styles/styles.css">
+
+
+    <VBox styleClass="login-brand-panel" HBox.hgrow="ALWAYS" prefWidth="420">
+        <VBox.margin><Insets/></VBox.margin>
+        <padding><Insets top="60" right="50" bottom="60" left="50"/></padding>
+
+
+        <VBox spacing="6">
+            <Label text="AKTOUR" styleClass="login-brand-title"/>
+            <Label text="ViaBalkan" styleClass="login-brand-subtitle"/>
+            <Label text="Management System" styleClass="login-brand-sub"/>
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+
+        <VBox spacing="18">
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="✦" styleClass="login-bullet"/>
+                <Label text="Tour &amp; Route Management" styleClass="login-feature"/>
+            </HBox>
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="✦" styleClass="login-bullet"/>
+                <Label text="Guide &amp; Vehicle Tracking" styleClass="login-feature"/>
+            </HBox>
+            <HBox spacing="14" alignment="CENTER_LEFT">
+                <Label text="✦" styleClass="login-bullet"/>
+                <Label text="Expense &amp; Toll Reports" styleClass="login-feature"/>
+            </HBox>
+        </VBox>
+
+        <Region VBox.vgrow="ALWAYS"/>
+
+        <Label text="© 2025 Aktour ViaBalkan" styleClass="login-brand-footer"/>
+    </VBox>
+
+
+    <VBox styleClass="login-form-panel" HBox.hgrow="ALWAYS" prefWidth="480"
+          alignment="CENTER">
+        <padding><Insets top="60" right="70" bottom="60" left="70"/></padding>
+
+        <VBox spacing="8" alignment="CENTER">
+            <Label text="Welcome back" styleClass="login-heading"/>
+            <Label text="Sign in to your account" styleClass="login-subheading"/>
+        </VBox>
+
+        <Region prefHeight="40"/>
+
+
+        <VBox spacing="7">
+            <Label text="USERNAME" styleClass="login-field-label"/>
+            <TextField fx:id="usernameField"
+                       promptText="Enter your username"
+                       styleClass="login-text-field"/>
+        </VBox>
+
+        <Region prefHeight="20"/>
+
+
+        <VBox spacing="7">
+            <Label text="PASSWORD" styleClass="login-field-label"/>
+            <PasswordField fx:id="passwordField"
+                           promptText="Enter your password"
+                           styleClass="login-text-field"/>
+        </VBox>
+
+        <Region prefHeight="10"/>
+
+
+        <Label fx:id="errorLabel" text="" styleClass="login-error-label"
+               wrapText="true" maxWidth="340"/>
+
+        <Region prefHeight="20"/>
+
+        <Button fx:id="loginButton"
+                text="Sign In"
+                styleClass="login-btn"
+                maxWidth="Infinity"
+                onAction="#handleLogin"/>
+
+        <Region prefHeight="24"/>
+
+        <Label text="Aktour ViaBalkan · Secure Access" styleClass="login-hint"/>
+
+    </VBox>
+</HBox>

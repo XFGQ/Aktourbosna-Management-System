@@ -2,7 +2,6 @@ package org.example;
 
 
 import javafx.application.Application;
-import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -18,11 +17,11 @@ public class Main  extends Application   // we added because of javafx GUI its m
 
     }
     public void start(Stage primStage) throws Exception{
-        Parent root = FXMLLoader.load(getClass().getResource("/fxml/main.fxml"));
-        primStage.setTitle("Aktour ViaBalkan Management System");
-        primStage.setScene(new Scene(root,800,800));
+        Parent root = FXMLLoader.load(getClass().getResource("/fxml/login.fxml"));
+        primStage.setTitle("Aktour ViaBalkan — Sign In");
+        primStage.setScene(new Scene(root, 900, 580));
+        primStage.setResizable(false);
         primStage.show();
-
     }
 
 }
