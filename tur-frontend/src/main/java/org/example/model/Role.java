@@ -1,6 +1,5 @@
 package org.example.model;
-
-public enum UserRole {
+public enum Role {
     ADMIN,
     GUIDE
 }

@@ -1,46 +1,88 @@
 package org.example.model;
 
-import java.time.LocalDate;
+import java.util.Date;
+import java.util.List;
 
 public class Vehicle {
 
-    private Long id;
+    private int vehicleId;
     private String brand;
     private String model;
-    private Integer year;
+    private int year;
     private String color;
     private String plateNumber;
-    private Integer seatCapacity;
+    private int capacity;
     private String fuelType;
-    private Float avgFuelConsumption;
-    private Float currentMileage;
-    private LocalDate lastMinorService;
-    private Boolean isAvailable;
+    private float avgFuelConsumption;
+    private float currentMileage;
+    private Date lastMaintenanceService;
+    private List<String> serviceHistory;
 
     public Vehicle() {}
 
-    public Long getId() { return id; }
-    public void setId(Long id) { this.id = id; }
+    public Vehicle(int vehicleId, String brand, String model, int year,
+                   String color, String plateNumber, int capacity,
+                   String fuelType, float avgFuelConsumption,
+                   float currentMileage, Date lastMaintenanceService,
+                   List<String> serviceHistory) {
+        this.vehicleId = vehicleId;
+        this.brand = brand;
+        this.model = model;
+        this.year = year;
+        this.color = color;
+        this.plateNumber = plateNumber;
+        this.capacity = capacity;
+        this.fuelType = fuelType;
+        this.avgFuelConsumption = avgFuelConsumption;
+        this.currentMileage = currentMileage;
+        this.lastMaintenanceService = lastMaintenanceService;
+        this.serviceHistory = serviceHistory;
+    }
+
+    public boolean isAvailable() { return true; }
+
+    public void addServiceRecord() {}
+
+    public String getDetails() {
+        return year + " " + brand + " " + model
+                + " | Plate: " + plateNumber
+                + " | Capacity: " + capacity
+                + " | Fuel: " + fuelType;
+    }
+
+    public int getVehicleId() { return vehicleId; }
+    public void setVehicleId(int vehicleId) { this.vehicleId = vehicleId; }
+
     public String getBrand() { return brand; }
     public void setBrand(String brand) { this.brand = brand; }
+
     public String getModel() { return model; }
     public void setModel(String model) { this.model = model; }
-    public Integer getYear() { return year; }
-    public void setYear(Integer year) { this.year = year; }
+
+    public int getYear() { return year; }
+    public void setYear(int year) { this.year = year; }
+
     public String getColor() { return color; }
     public void setColor(String color) { this.color = color; }
+
     public String getPlateNumber() { return plateNumber; }
     public void setPlateNumber(String plateNumber) { this.plateNumber = plateNumber; }
-    public Integer getSeatCapacity() { return seatCapacity; }
-    public void setSeatCapacity(Integer seatCapacity) { this.seatCapacity = seatCapacity; }
+
+    public int getCapacity() { return capacity; }
+    public void setCapacity(int capacity) { this.capacity = capacity; }
+
     public String getFuelType() { return fuelType; }
     public void setFuelType(String fuelType) { this.fuelType = fuelType; }
-    public Float getAvgFuelConsumption() { return avgFuelConsumption; }
-    public void setAvgFuelConsumption(Float avgFuelConsumption) { this.avgFuelConsumption = avgFuelConsumption; }
-    public Float getCurrentMileage() { return currentMileage; }
-    public void setCurrentMileage(Float currentMileage) { this.currentMileage = currentMileage; }
-    public LocalDate getLastMinorService() { return lastMinorService; }
-    public void setLastMinorService(LocalDate lastMinorService) { this.lastMinorService = lastMinorService; }
-    public Boolean getIsAvailable() { return isAvailable; }
-    public void setIsAvailable(Boolean isAvailable) { this.isAvailable = isAvailable; }
+
+    public float getAvgFuelConsumption() { return avgFuelConsumption; }
+    public void setAvgFuelConsumption(float avgFuelConsumption) { this.avgFuelConsumption = avgFuelConsumption; }
+
+    public float getCurrentMileage() { return currentMileage; }
+    public void setCurrentMileage(float currentMileage) { this.currentMileage = currentMileage; }
+
+    public Date getLastMaintenanceService() { return lastMaintenanceService; }
+    public void setLastMaintenanceService(Date lastMaintenanceService) { this.lastMaintenanceService = lastMaintenanceService; }
+
+    public List<String> getServiceHistory() { return serviceHistory; }
+    public void setServiceHistory(List<String> serviceHistory) { this.serviceHistory = serviceHistory; }
 }
