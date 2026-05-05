@@ -1,6 +1,7 @@
 package org.example.application.mapper;
 
 import org.example.application.dto.GuideDTO;
+import org.example.application.dto.GuideSummaryDTO;
 import org.example.model.Guide;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -23,4 +24,7 @@ public interface GuideMapper {
     @Mapping(target = "user", ignore = true)
     @Mapping(target = "id", ignore = true)
     void updateEntityFromDto(GuideDTO dto, @MappingTarget Guide entity);
+
+    @Mapping(source = "user.username", target = "fullName")
+    GuideSummaryDTO toSummaryDto(Guide guide);
 }

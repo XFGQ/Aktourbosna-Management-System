@@ -6,6 +6,9 @@ import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "users")
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype", discriminatorType = DiscriminatorType.STRING)
+@DiscriminatorValue("User")
 @Getter
 @Setter
 @NoArgsConstructor
