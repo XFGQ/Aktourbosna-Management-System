@@ -1,26 +1,52 @@
 package org.example.service;
 
-import com.google.gson.Gson;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import org.example.model.Guide;
+import org.example.model.Tour;
+import org.example.model.Vehicle;
+
 import java.net.URI;
 import java.net.http.*;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
-import org.example.model.Tour; // Model sınıfını buraya da kopyala
 
 public class ApiService {
+
+    private static final String BASE_URL = "http://localhost:8080/api";
+
     private final HttpClient client = HttpClient.newHttpClient();
-    private final Gson gson = new Gson();
-    private final String BASE_URL = "http://localhost:8080/api/tours";
+
+    private final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>)
+                    (json, type, ctx) -> LocalDate.parse(json.getAsString()))
+            .registerTypeAdapter(LocalDateTime.class, (JsonDeserializer<LocalDateTime>)
+                    (json, type, ctx) -> LocalDateTime.parse(json.getAsString()))
+            .create();
 
     public List<Tour> fetchTours() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/tours"),
+                new TypeToken<List<Tour>>() {}.getType());
+    }
+
+    public List<Vehicle> fetchVehicles() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/vehicles"),
+                new TypeToken<List<Vehicle>>() {}.getType());
+    }
+
+    public List<Guide> fetchGuides() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/guides"),
+                new TypeToken<List<Guide>>() {}.getType());
+    }
+
+    private String get(String url) throws Exception {
         HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(BASE_URL))
+                .uri(URI.create(url))
                 .GET()
                 .build();
-
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-        // Gelen JSON metnini Java Listesine çeviriyoruz
-        return gson.fromJson(response.body(), new TypeToken<List<Tour>>(){}.getType());
+        HttpResponse<String> response = client.send(request,
+                HttpResponse.BodyHandlers.ofString());
+        return response.body();
     }
 }
