@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-area"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.ExpenseTrackerController">
+
+    <VBox spacing="20.0">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+        </padding>
+
+        <Label styleClass="page-title" text="Expense Tracker" />
+        <Label styleClass="page-subtitle" text="Track all tour-related expenses" />
+
+        <HBox spacing="16.0">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Expenses" />
+                <Label fx:id="totalExpensesValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Amount" />
+                <Label fx:id="totalAmountValue" styleClass="stat-value" text="—" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Tours" />
+                <Label fx:id="toursWithExpensesValue" styleClass="stat-value" text="—" />
+            </VBox>
+        </HBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                <Label styleClass="panel-title" text="All Expenses" />
+            </HBox>
+            <TableView fx:id="expensesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
+                       prefHeight="320.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colExpTour" text="Tour" prefWidth="180.0" />
+                    <TableColumn fx:id="colExpCategory" text="Category" prefWidth="140.0" />
+                    <TableColumn fx:id="colExpAmount" text="Amount" prefWidth="120.0" />
+                    <TableColumn fx:id="colExpDate" text="Date" prefWidth="120.0" />
+                    <TableColumn fx:id="colExpReceipt" text="Receipt" prefWidth="160.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

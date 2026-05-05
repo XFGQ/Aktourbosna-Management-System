@@ -31,13 +31,13 @@ public class SidebarController {
 
     @FXML
     private void onExpenseTracker() {
-        // appController.navigateTo("expense-tracker.fxml");
+        appController.navigateTo("expenseTracker.fxml");
         setActive(btnExpenseTracker);
     }
 
     @FXML
     private void onVehiclesGuides() {
-       
+        appController.navigateTo("vehiclesGuides.fxml");
         setActive(btnVehiclesGuides);
     }
 

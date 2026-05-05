@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-area"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.VehiclesGuidesController">
+
+    <VBox spacing="20.0">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+        </padding>
+
+        <Label styleClass="page-title" text="Vehicles &amp; Guides" />
+        <Label styleClass="page-subtitle" text="Overview of all vehicles and guides" />
+
+        <HBox spacing="16.0">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Vehicles" />
+                <Label fx:id="totalVehiclesValue" styleClass="stat-value" text="—" />
+                <Label fx:id="vehiclesAvailable" styleClass="stat-sub" text="" />
+            </VBox>
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Guides" />
+                <Label fx:id="totalGuidesValue" styleClass="stat-value" text="—" />
+            </VBox>
+        </HBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                <Label styleClass="panel-title" text="Vehicles" />
+            </HBox>
+            <TableView fx:id="vehiclesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
+                       prefHeight="260.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colVehBrand" text="Brand" prefWidth="120.0" />
+                    <TableColumn fx:id="colVehModel" text="Model" prefWidth="120.0" />
+                    <TableColumn fx:id="colVehYear" text="Year" prefWidth="80.0" />
+                    <TableColumn fx:id="colVehColor" text="Color" prefWidth="90.0" />
+                    <TableColumn fx:id="colVehPlate" text="Plate" prefWidth="120.0" />
+                    <TableColumn fx:id="colVehSeats" text="Seats" prefWidth="70.0" />
+                    <TableColumn fx:id="colVehFuel" text="Fuel" prefWidth="90.0" />
+                    <TableColumn fx:id="colVehStatus" text="Status" prefWidth="100.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+                <Label styleClass="panel-title" text="Guides" />
+            </HBox>
+            <TableView fx:id="guidesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
+                       prefHeight="260.0" fixedCellSize="42.0">
+                <columns>
+                    <TableColumn fx:id="colGuideName" text="Full Name" prefWidth="160.0" />
+                    <TableColumn fx:id="colGuideEmail" text="Email" prefWidth="180.0" />
+                    <TableColumn fx:id="colGuidePhone" text="Phone" prefWidth="130.0" />
+                    <TableColumn fx:id="colGuideCity" text="Base City" prefWidth="120.0" />
+                    <TableColumn fx:id="colGuideLicense" text="License No" prefWidth="120.0" />
+                    <TableColumn fx:id="colGuideExp" text="Experience" prefWidth="100.0" />
+                    <TableColumn fx:id="colGuideFee" text="Daily Fee" prefWidth="100.0" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>
