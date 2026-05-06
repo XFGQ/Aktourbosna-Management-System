@@ -32,7 +32,7 @@
         <Separator styleClass="sidebar-separator">
             <VBox.margin><Insets bottom="10.0" /></VBox.margin>
         </Separator>
-        <Button maxWidth="Infinity" styleClass="logout-button" text="  Logout" />
+        <Button maxWidth="Infinity" styleClass="logout-button" text="  Logout" onAction="#onLogout" />
     </VBox>
 
 </VBox>

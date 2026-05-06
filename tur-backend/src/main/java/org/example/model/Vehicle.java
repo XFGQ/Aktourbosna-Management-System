@@ -20,9 +20,6 @@ public class Vehicle {
     @Column(name="id")
     private Long id;
 
-    @Column(name = "vehicle_id", length = 50,unique = true)
-    private String vehicleId;
-
     @Column(name = "brand", nullable = false, length = 100)
     private String brand;
 
@@ -54,7 +51,7 @@ public class Vehicle {
     private LocalDate lastMinorService;
 
     @Column(name = "is_available")
-    private Boolean isAvailable = true;
+    private Boolean available = true;
 
     @ElementCollection
     @CollectionTable(name = "vehicle_service_history", joinColumns = @JoinColumn(name = "vehicle_id"))

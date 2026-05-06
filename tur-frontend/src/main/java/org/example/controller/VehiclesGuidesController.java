@@ -1,0 +1,260 @@
+package org.example.controller;
+
+import javafx.application.Platform;
+import javafx.beans.property.ReadOnlyObjectWrapper;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
+import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.example.model.Guide;
+import org.example.model.Vehicle;
+import org.example.service.GuideService;
+import org.example.service.VehicleService;
+
+import java.util.List;
+import java.util.Optional;
+
+public class VehiclesGuidesController {
+
+    @FXML private Label totalVehiclesValue;
+    @FXML private Label vehiclesAvailable;
+    @FXML private Label totalGuidesValue;
+
+    @FXML private TableView<Vehicle> vehiclesTable;
+    @FXML private TableColumn<Vehicle, String> colVehBrand;
+    @FXML private TableColumn<Vehicle, String> colVehModel;
+    @FXML private TableColumn<Vehicle, Integer> colVehYear;
+    @FXML private TableColumn<Vehicle, String> colVehColor;
+    @FXML private TableColumn<Vehicle, String> colVehPlate;
+    @FXML private TableColumn<Vehicle, Integer> colVehSeats;
+    @FXML private TableColumn<Vehicle, String> colVehFuel;
+    @FXML private TableColumn<Vehicle, String> colVehStatus;
+    @FXML private TableColumn<Vehicle, Vehicle> colVehActions;
+
+    @FXML private TableView<Guide> guidesTable;
+    @FXML private TableColumn<Guide, String> colGuideName;
+    @FXML private TableColumn<Guide, String> colGuideEmail;
+    @FXML private TableColumn<Guide, String> colGuidePhone;
+    @FXML private TableColumn<Guide, String> colGuideCity;
+    @FXML private TableColumn<Guide, String> colGuideLicense;
+    @FXML private TableColumn<Guide, Integer> colGuideExp;
+    @FXML private TableColumn<Guide, String> colGuideFee;
+
+    private final VehicleService vehicleService = new VehicleService();
+    private final GuideService guideService = new GuideService();
+
+    @FXML
+    public void initialize() {
+        colVehBrand.setCellValueFactory(new PropertyValueFactory<>("brand"));
+        colVehModel.setCellValueFactory(new PropertyValueFactory<>("model"));
+        colVehYear.setCellValueFactory(new PropertyValueFactory<>("year"));
+        colVehColor.setCellValueFactory(new PropertyValueFactory<>("color"));
+        colVehPlate.setCellValueFactory(new PropertyValueFactory<>("plateNumber"));
+        colVehSeats.setCellValueFactory(new PropertyValueFactory<>("seatCapacity"));
+        colVehFuel.setCellValueFactory(new PropertyValueFactory<>("fuelType"));
+        colVehStatus.setCellValueFactory(cd ->
+                new SimpleStringProperty(Boolean.TRUE.equals(cd.getValue().getIsAvailable()) ? "Available" : "Not Available"));
+
+        colVehActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+        colVehActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("Edit");
+            private final Button deleteBtn = new Button("Delete");
+            private final HBox box = new HBox(6, editBtn, deleteBtn);
+            {
+                box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
+                deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e -> {
+                    Vehicle v = getTableView().getItems().get(getIndex());
+                    onEditVehicle(v);
+                });
+                deleteBtn.setOnAction(e -> {
+                    Vehicle v = getTableView().getItems().get(getIndex());
+                    onDeleteVehicle(v);
+                });
+            }
+            @Override
+            protected void updateItem(Vehicle item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty || item == null ? null : box);
+            }
+        });
+
+        colGuideName.setCellValueFactory(cd ->
+                new SimpleStringProperty(guideService.getDisplayName(cd.getValue())));
+        colGuideEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+        colGuidePhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+        colGuideCity.setCellValueFactory(new PropertyValueFactory<>("baseCity"));
+        colGuideLicense.setCellValueFactory(new PropertyValueFactory<>("licenseNo"));
+        colGuideExp.setCellValueFactory(new PropertyValueFactory<>("experience"));
+        colGuideFee.setCellValueFactory(cd -> {
+            Double fee = cd.getValue().getDailyFee();
+            return new SimpleStringProperty(fee != null ? "€" + String.format("%,.0f", fee) : "—");
+        });
+
+        loadData();
+    }
+
+    @FXML
+    public void refresh() {
+        loadData();
+    }
+
+    private void loadData() {
+        try {
+            List<Vehicle> vehicles = vehicleService.getAllVehicles();
+            vehiclesTable.getItems().setAll(vehicles);
+            totalVehiclesValue.setText(String.valueOf(vehicles.size()));
+            vehiclesAvailable.setText(vehicleService.countAvailable(vehicles) + " available");
+
+            List<Guide> guides = guideService.getAllGuides();
+            guidesTable.getItems().setAll(guides);
+            totalGuidesValue.setText(String.valueOf(guides.size()));
+        } catch (Exception e) {
+            e.printStackTrace();
+            totalVehiclesValue.setText("—");
+            vehiclesAvailable.setText("");
+            totalGuidesValue.setText("—");
+        }
+    }
+
+    @FXML
+    private void onAddVehicle() {
+        Vehicle newVehicle = AddVehicleDialog.show();
+        if (newVehicle == null) return;
+        runInBackground(
+                () -> vehicleService.addVehicle(newVehicle),
+                "Adding vehicle...",
+                "Vehicle added successfully.",
+                "Failed to add vehicle"
+        );
+    }
+
+    private void onEditVehicle(Vehicle vehicle) {
+        Vehicle updated = AddVehicleDialog.show(vehicle);
+        if (updated == null) return;
+        runInBackground(
+                () -> vehicleService.updateVehicle(vehicle.getId(), updated),
+                "Updating vehicle...",
+                "Vehicle updated successfully.",
+                "Failed to update vehicle"
+        );
+    }
+
+    private void onDeleteVehicle(Vehicle vehicle) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Delete vehicle \"" + vehicle.getBrand() + " " + vehicle.getModel()
+                        + " (" + vehicle.getPlateNumber() + ")\"?",
+                ButtonType.OK, ButtonType.CANCEL);
+        confirm.setHeaderText("Confirm deletion");
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+
+        runInBackground(
+                () -> vehicleService.deleteVehicle(vehicle.getId()),
+                "Deleting vehicle...",
+                "Vehicle deleted.",
+                "Failed to delete vehicle"
+        );
+    }
+
+    @FXML
+    private void onAddGuide() {
+        Guide newGuide = AddGuideDialog.show();
+        if (newGuide == null) return;
+        runInBackground(
+                () -> guideService.addGuide(newGuide),
+                "Adding guide...",
+                "Guide added successfully.",
+                "Failed to add guide"
+        );
+    }
+
+    /**
+     * 1) Loading penceresi göster
+     * 2) Arka planda HTTP işlemi + yeni veri çekme
+     * 3) Loading kapanınca UI güncelle, başarı mesajı göster
+     * 4) Diğer ekranları "kirli" işaretle - kullanıcı geçince yenilenecekler
+     */
+    private void runInBackground(BackgroundOp op, String loadingMsg, String successMsg, String errorTitle) {
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.initStyle(StageStyle.UNDECORATED);
+        loadingStage.setResizable(false);
+
+        ProgressIndicator spinner = new ProgressIndicator();
+        spinner.setPrefSize(40, 40);
+        Label msg = new Label(loadingMsg);
+        msg.setStyle("-fx-font-size: 14px;");
+        VBox box = new VBox(12, spinner, msg);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(24));
+        box.setStyle("-fx-background-color: white; -fx-border-color: #BDBDBD; -fx-border-width: 1px;");
+
+        loadingStage.setScene(new javafx.scene.Scene(box));
+        loadingStage.show();
+
+        Task<RefreshedData> task = new Task<>() {
+            @Override
+            protected RefreshedData call() throws Exception {
+                op.run();
+                RefreshedData data = new RefreshedData();
+                try {
+                    data.vehicles = vehicleService.getAllVehicles();
+                } catch (Exception ignored) {}
+                try {
+                    data.guides = guideService.getAllGuides();
+                } catch (Exception ignored) {}
+                return data;
+            }
+        };
+
+        task.setOnSucceeded(e -> {
+            RefreshedData data = task.getValue();
+            if (data.vehicles != null) {
+                vehiclesTable.getItems().setAll(data.vehicles);
+                totalVehiclesValue.setText(String.valueOf(data.vehicles.size()));
+                vehiclesAvailable.setText(vehicleService.countAvailable(data.vehicles) + " available");
+            }
+            if (data.guides != null) {
+                guidesTable.getItems().setAll(data.guides);
+                totalGuidesValue.setText(String.valueOf(data.guides.size()));
+            }
+            AppController app = AppController.getInstance();
+            if (app != null) {
+                app.invalidateOtherViews("vehiclesGuides.fxml");
+            }
+            loadingStage.close();
+            new Alert(Alert.AlertType.INFORMATION, successMsg).show();
+        });
+
+        task.setOnFailed(e -> {
+            loadingStage.close();
+            Throwable ex = task.getException();
+            ex.printStackTrace();
+            new Alert(Alert.AlertType.ERROR, errorTitle + ": " + ex.getMessage()).show();
+        });
+
+        Thread t = new Thread(task);
+        t.setDaemon(true);
+        t.start();
+    }
+
+    private static class RefreshedData {
+        List<Vehicle> vehicles;
+        List<Guide> guides;
+    }
+
+    @FunctionalInterface
+    private interface BackgroundOp {
+        void run() throws Exception;
+    }
+}
