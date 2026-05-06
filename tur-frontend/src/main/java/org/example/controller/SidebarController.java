@@ -37,7 +37,7 @@ public class SidebarController {
 
     @FXML
     private void onVehiclesGuides() {
-        // appController.navigateTo("vehicles-guides.fxml");
+       
         setActive(btnVehiclesGuides);
     }
 

@@ -32,7 +32,7 @@ public class MainController {
             tourTable.getItems().setAll(tours);
         } catch (Exception e) {
             e.printStackTrace();
-            // Burada kullanıcıya hata mesajı gösteren bir Alert ekleyebiliriz
+          
         }
     }
 }
