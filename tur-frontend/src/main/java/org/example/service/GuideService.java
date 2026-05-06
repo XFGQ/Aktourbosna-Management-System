@@ -16,6 +16,14 @@ public class GuideService {
         return apiService.createGuide(guide);
     }
 
+    public Guide updateGuide(Long id, Guide guide) throws Exception {
+        return apiService.updateGuide(id, guide);
+    }
+
+    public void deleteGuide(Long id) throws Exception {
+        apiService.deleteGuide(id);
+    }
+
     public String getDisplayName(Guide guide) {
         if (guide == null) return "";
         return guide.getFullName() != null ? guide.getFullName() : "";

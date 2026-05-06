@@ -1,6 +1,5 @@
 package org.example.controller;
 
-import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.concurrent.Task;
@@ -47,6 +46,7 @@ public class VehiclesGuidesController {
     @FXML private TableColumn<Guide, String> colGuideLicense;
     @FXML private TableColumn<Guide, Integer> colGuideExp;
     @FXML private TableColumn<Guide, String> colGuideFee;
+    @FXML private TableColumn<Guide, Guide> colGuideActions;
 
     private final VehicleService vehicleService = new VehicleService();
     private final GuideService guideService = new GuideService();
@@ -98,6 +98,31 @@ public class VehiclesGuidesController {
         colGuideFee.setCellValueFactory(cd -> {
             Double fee = cd.getValue().getDailyFee();
             return new SimpleStringProperty(fee != null ? "€" + String.format("%,.0f", fee) : "—");
+        });
+
+        colGuideActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+        colGuideActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("Edit");
+            private final Button deleteBtn = new Button("Delete");
+            private final HBox box = new HBox(6, editBtn, deleteBtn);
+            {
+                box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
+                deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e -> {
+                    Guide g = getTableView().getItems().get(getIndex());
+                    onEditGuide(g);
+                });
+                deleteBtn.setOnAction(e -> {
+                    Guide g = getTableView().getItems().get(getIndex());
+                    onDeleteGuide(g);
+                });
+            }
+            @Override
+            protected void updateItem(Guide item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty || item == null ? null : box);
+            }
         });
 
         loadData();
@@ -175,6 +200,33 @@ public class VehiclesGuidesController {
                 "Adding guide...",
                 "Guide added successfully.",
                 "Failed to add guide"
+        );
+    }
+
+    private void onEditGuide(Guide guide) {
+        Guide updated = AddGuideDialog.show(guide);
+        if (updated == null) return;
+        runInBackground(
+                () -> guideService.updateGuide(guide.getId(), updated),
+                "Updating guide...",
+                "Guide updated successfully.",
+                "Failed to update guide"
+        );
+    }
+
+    private void onDeleteGuide(Guide guide) {
+        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+                "Delete guide \"" + guide.getFullName() + "\"?",
+                ButtonType.OK, ButtonType.CANCEL);
+        confirm.setHeaderText("Confirm deletion");
+        Optional<ButtonType> result = confirm.showAndWait();
+        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+
+        runInBackground(
+                () -> guideService.deleteGuide(guide.getId()),
+                "Deleting guide...",
+                "Guide deleted.",
+                "Failed to delete guide"
         );
     }
 

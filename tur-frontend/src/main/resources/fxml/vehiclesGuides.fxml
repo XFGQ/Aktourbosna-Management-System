@@ -68,6 +68,7 @@
                     <TableColumn fx:id="colGuideLicense" text="License No" prefWidth="120.0" />
                     <TableColumn fx:id="colGuideExp" text="Experience" prefWidth="100.0" />
                     <TableColumn fx:id="colGuideFee" text="Daily Fee" prefWidth="100.0" />
+                    <TableColumn fx:id="colGuideActions" text="Actions" prefWidth="160.0" sortable="false" />
                 </columns>
             </TableView>
         </VBox>

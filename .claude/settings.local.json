@@ -1,0 +1,30 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Recurse -Path \"c:\\\\Users\\\\etkin\\\\OneDrive\\\\Belgeler\\\\Assassin's Creed Odyssey\\\\Aktourbosna-Management-System\" -Directory)",
+      "Bash(Select-Object -First 50)",
+      "Bash(mvn spring-boot:run -q)",
+      "Bash(export JAVA_HOME=\"/c/Program Files/Java/jdk-21\")",
+      "Bash(export PATH=\"$JAVA_HOME/bin:$PATH\")",
+      "Bash(mvn clean *)",
+      "Bash(netstat.exe -ano)",
+      "Bash(awk '{print $5}')",
+      "Bash(cmd.exe /c \"netstat -ano | findstr :8080 | findstr LISTENING\")",
+      "Bash(netstat -tlnp)",
+      "Bash(mvn compile *)",
+      "Bash(git stash *)",
+      "Bash(git pull *)",
+      "Read(//mnt/c/Users/etkin/OneDrive/Belgeler/Assassin's Creed Odyssey/Aktourbosna-Management-System/**)",
+      "Bash(echo \"PID: $!\")",
+      "Bash(ls \"/mnt/c/Users/etkin/OneDrive/Belgeler/\" 2>&1 | head -10)",
+      "Read(//mnt/c/Users/etkin/OneDrive/**)",
+      "Bash(ls /mnt/c/Users/etkin/ 2>&1 | head -20)",
+      "Read(//mnt/c/Users/**)",
+      "Bash(mvn spring-boot:run)",
+      "Bash(echo \"Backend starting with PID $!\")",
+      "Read(//c/Program Files/Java//**)",
+      "Read(//c/Program Files/**)",
+      "Read(//c/Program Files//**)"
+    ]
+  }
+}

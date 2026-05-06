@@ -16,6 +16,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import org.example.controller.LoginController;
 
 public class Main extends Application {
 
@@ -31,65 +32,76 @@ public class Main extends Application {
         ProgressBar bar = (ProgressBar) splash.getScene().getRoot().lookup("#splashProgress");
         Label status = (Label) splash.getScene().getRoot().lookup("#splashStatus");
 
+        Platform.runLater(() -> {
+            javafx.scene.layout.Region track = (javafx.scene.layout.Region) bar.lookup(".track");
+            if (track != null)
+                track.setStyle("-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 5px;");
+            javafx.scene.layout.Region fill = (javafx.scene.layout.Region) bar.lookup(".bar");
+            if (fill != null)
+                fill.setStyle("-fx-background-color: #4FC3F7; -fx-background-radius: 5px; -fx-background-insets: 0; -fx-padding: 0;");
+        });
+
         // Bar'ı sürekli yumuşak şekilde dolduran animator
         ProgressAnimator animator = new ProgressAnimator(bar);
         animator.start();
 
-        // Asıl yükleme task'i
-        Task<Parent> loadTask = new Task<>() {
+        // Sadece animasyon - FXML yükleme FX thread'de yapılacak
+        Task<Void> loadTask = new Task<>() {
             @Override
-            protected Parent call() throws Exception {
+            protected Void call() throws Exception {
                 Platform.runLater(() -> status.setText("Loading components..."));
                 animator.target = 0.30;
-
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
-                
-                Platform.runLater(() -> status.setText("Building UI..."));
-                animator.target = 0.55;
-                
-                Parent root = loader.load();
-                
-                Platform.runLater(() -> status.setText("Connecting to server..."));
-                animator.target = 0.80;
-                
-                // Backend'in hazır olduğunu varsayalım, biraz bekle
-                Thread.sleep(400);
-                
-                Platform.runLater(() -> status.setText("Almost ready..."));
-                animator.target = 0.95;
-                
                 Thread.sleep(200);
-                
-                return root;
+
+                Platform.runLater(() -> status.setText("Building UI..."));
+                animator.target = 0.60;
+                Thread.sleep(200);
+
+                Platform.runLater(() -> status.setText("Almost ready..."));
+                animator.target = 0.90;
+                Thread.sleep(150);
+
+                return null;
             }
         };
 
         loadTask.setOnSucceeded(e -> {
             animator.target = 1.0;
             status.setText("Ready!");
-            // Bar tamamen dolsun diye küçük bir bekleme
             Task<Void> finishTask = new Task<>() {
                 @Override
                 protected Void call() throws Exception {
-                    Thread.sleep(300);
+                    Thread.sleep(250);
                     return null;
                 }
             };
             finishTask.setOnSucceeded(ev -> {
-                animator.stop();
-                Parent root = loadTask.getValue();
-                primaryStage.setTitle("Aktour ViaBalkan Management System");
-                primaryStage.setScene(new Scene(root, 1200, 800));
-                primaryStage.show();
-                splash.close();
+                try {
+                    animator.stop();
+                    splash.close();
+
+                    String[] auth = LoginController.showLoginScreen();
+                    if (auth == null) {
+                        Platform.exit();
+                        return;
+                    }
+
+                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+                    Parent root = loader.load();
+                    primaryStage.setTitle("Aktour ViaBalkan Management System");
+                    primaryStage.setScene(new Scene(root, 1200, 800));
+                    primaryStage.show();
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                    Platform.exit();
+                }
             });
             new Thread(finishTask).start();
         });
 
         loadTask.setOnFailed(e -> {
             animator.stop();
-            Throwable ex = loadTask.getException();
-            ex.printStackTrace();
+            loadTask.getException().printStackTrace();
             splash.close();
         });
 
@@ -119,8 +131,8 @@ public class Main extends Application {
         ProgressBar progressBar = new ProgressBar(0);
         progressBar.setId("splashProgress");
         progressBar.setPrefWidth(280);
-        progressBar.setPrefHeight(8);
-        progressBar.setStyle("-fx-accent: white;");
+        progressBar.setPrefHeight(10);
+        progressBar.setStyle("-fx-accent: #4FC3F7;");
 
         Label status = new Label("Initializing...");
         status.setId("splashStatus");

@@ -8,11 +8,16 @@ import org.example.model.Guide;
 public class AddGuideDialog {
 
     public static Guide show() {
-        Dialog<Guide> dialog = new Dialog<>();
-        dialog.setTitle("Add New Guide");
-        dialog.setHeaderText("Enter guide details");
+        return show(null);
+    }
 
-        ButtonType saveButton = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+    public static Guide show(Guide existing) {
+        Dialog<Guide> dialog = new Dialog<>();
+        boolean editMode = existing != null;
+        dialog.setTitle(editMode ? "Edit Guide" : "Add New Guide");
+        dialog.setHeaderText(editMode ? "Update guide details" : "Enter guide details");
+
+        ButtonType saveButton = new ButtonType(editMode ? "Update" : "Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveButton, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -35,20 +40,30 @@ public class AddGuideDialog {
         TextField dailyFee = new TextField();
         dailyFee.setPromptText("e.g. 150");
 
-        grid.add(new Label("Full Name:"), 0, 0);    grid.add(fullName, 1, 0);
-        grid.add(new Label("Email:"), 0, 1);        grid.add(email, 1, 1);
-        grid.add(new Label("Phone:"), 0, 2);        grid.add(phone, 1, 2);
-        grid.add(new Label("Base City:"), 0, 3);    grid.add(baseCity, 1, 3);
-        grid.add(new Label("License No:"), 0, 4);   grid.add(licenseNo, 1, 4);
-        grid.add(new Label("Experience (yrs):"), 0, 5); grid.add(experience, 1, 5);
-        grid.add(new Label("Daily Fee (€):"), 0, 6); grid.add(dailyFee, 1, 6);
+        if (editMode) {
+            fullName.setText(existing.getFullName() != null ? existing.getFullName() : "");
+            email.setText(existing.getEmail() != null ? existing.getEmail() : "");
+            phone.setText(existing.getPhone() != null ? existing.getPhone() : "");
+            baseCity.setText(existing.getBaseCity() != null ? existing.getBaseCity() : "");
+            licenseNo.setText(existing.getLicenseNo() != null ? existing.getLicenseNo() : "");
+            experience.setText(existing.getExperience() != null ? existing.getExperience().toString() : "");
+            dailyFee.setText(existing.getDailyFee() != null ? existing.getDailyFee().toString() : "");
+        }
+
+        grid.add(new Label("Full Name:"), 0, 0);         grid.add(fullName, 1, 0);
+        grid.add(new Label("Email:"), 0, 1);             grid.add(email, 1, 1);
+        grid.add(new Label("Phone:"), 0, 2);             grid.add(phone, 1, 2);
+        grid.add(new Label("Base City:"), 0, 3);         grid.add(baseCity, 1, 3);
+        grid.add(new Label("License No:"), 0, 4);        grid.add(licenseNo, 1, 4);
+        grid.add(new Label("Experience (yrs):"), 0, 5);  grid.add(experience, 1, 5);
+        grid.add(new Label("Daily Fee (€):"), 0, 6);     grid.add(dailyFee, 1, 6);
 
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(btn -> {
             if (btn == saveButton) {
                 try {
-                    Guide g = new Guide();
+                    Guide g = editMode ? existing : new Guide();
                     g.setFullName(fullName.getText().trim());
                     g.setEmail(email.getText().trim());
                     g.setPhone(phone.getText().trim());
