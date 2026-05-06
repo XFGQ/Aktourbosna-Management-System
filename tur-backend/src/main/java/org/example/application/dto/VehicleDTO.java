@@ -18,6 +18,6 @@ public class VehicleDTO {
     private Float avgFuelConsumption;
     private Float currentMileage;
     private LocalDate lastMinorService;
-    private boolean isAvailable;
+    private boolean available;
 
 }
