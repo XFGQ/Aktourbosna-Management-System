@@ -7,8 +7,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/tours")
-@CrossOrigin(origins="*") //frontend'den 3000 portu gibi erişim izni verir.
-
 public class TourController {
     private final TourRepository tourRepository;
     public TourController(TourRepository tourRepository){

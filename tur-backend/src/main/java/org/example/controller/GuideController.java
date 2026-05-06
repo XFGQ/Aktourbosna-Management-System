@@ -3,6 +3,7 @@ package org.example.controller;
 import org.example.application.dto.GuideDTO;
 import org.example.service.GuideService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,22 +19,30 @@ public class GuideController {
     }
 
     @GetMapping
-    public ResponseEntity<List<GuideDTO>> getAllGuides() {
-        return ResponseEntity.ok(guideService.getAllGuides());
+    public ResponseEntity<?> getAllGuides(Authentication authentication) {
+        boolean isAdmin = authentication.getAuthorities().stream()
+                .anyMatch(a -> a.getAuthority().equals("ROLE_ADMIN"));
+        if (isAdmin) {
+            return ResponseEntity.ok(guideService.getAllGuides());
+        }
+        return ResponseEntity.ok(guideService.getAllGuidesSummary());
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<GuideDTO> getGuideById(@PathVariable Long id) {
         return ResponseEntity.ok(guideService.getGuideById(id));
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<GuideDTO> updateGuide(@PathVariable Long id, @RequestBody GuideDTO guideDTO) {
         return ResponseEntity.ok(guideService.updateGuide(id, guideDTO));
     }
+
     @PostMapping
     public ResponseEntity<GuideDTO> createGuide(@RequestBody GuideDTO guideDTO) {
         return ResponseEntity.ok(guideService.createGuide(guideDTO));
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteGuide(@PathVariable Long id) {
         guideService.deleteGuide(id);
