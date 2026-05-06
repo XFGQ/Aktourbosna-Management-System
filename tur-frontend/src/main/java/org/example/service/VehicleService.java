@@ -13,6 +13,18 @@ public class VehicleService {
         return apiService.fetchVehicles();
     }
 
+    public Vehicle addVehicle(Vehicle vehicle) throws Exception {
+        return apiService.createVehicle(vehicle);
+    }
+
+    public Vehicle updateVehicle(Long id, Vehicle vehicle) throws Exception {
+        return apiService.updateVehicle(id, vehicle);
+    }
+
+    public void deleteVehicle(Long id) throws Exception {
+        apiService.deleteVehicle(id);
+    }
+
     public List<Vehicle> getAvailableVehicles(List<Vehicle> vehicles) {
         return vehicles.stream()
                 .filter(v -> Boolean.TRUE.equals(v.getIsAvailable()))

@@ -52,6 +52,11 @@ public class ExpenseTrackerController {
         loadData();
     }
 
+    @FXML
+    public void refresh() {
+        loadData();
+    }
+
     private void loadData() {
         try {
             List<Tour> tours = tourService.getAllTours();

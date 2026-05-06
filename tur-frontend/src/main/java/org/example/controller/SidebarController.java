@@ -1,5 +1,6 @@
 package org.example.controller;
 
+import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 
@@ -39,6 +40,12 @@ public class SidebarController {
     private void onVehiclesGuides() {
         appController.navigateTo("vehiclesGuides.fxml");
         setActive(btnVehiclesGuides);
+    }
+
+    @FXML
+    private void onLogout() {
+        Platform.exit();
+        System.exit(0);
     }
 
     private void setActive(Button active) {

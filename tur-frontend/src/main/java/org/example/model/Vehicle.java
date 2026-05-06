@@ -15,6 +15,7 @@ public class Vehicle {
     private Float avgFuelConsumption;
     private Float currentMileage;
     private LocalDate lastMinorService;
+    @com.google.gson.annotations.SerializedName("available")
     private Boolean isAvailable;
 
     public Vehicle() {}

@@ -31,27 +31,32 @@
         </HBox>
 
         <VBox styleClass="panel" spacing="0">
-            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10.0">
                 <Label styleClass="panel-title" text="Vehicles" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button styleClass="btn-primary" text="+ Add Vehicle" onAction="#onAddVehicle" />
             </HBox>
             <TableView fx:id="vehiclesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
-                       prefHeight="260.0" fixedCellSize="42.0">
+                       prefHeight="280.0" fixedCellSize="44.0">
                 <columns>
-                    <TableColumn fx:id="colVehBrand" text="Brand" prefWidth="120.0" />
-                    <TableColumn fx:id="colVehModel" text="Model" prefWidth="120.0" />
-                    <TableColumn fx:id="colVehYear" text="Year" prefWidth="80.0" />
-                    <TableColumn fx:id="colVehColor" text="Color" prefWidth="90.0" />
-                    <TableColumn fx:id="colVehPlate" text="Plate" prefWidth="120.0" />
-                    <TableColumn fx:id="colVehSeats" text="Seats" prefWidth="70.0" />
-                    <TableColumn fx:id="colVehFuel" text="Fuel" prefWidth="90.0" />
+                    <TableColumn fx:id="colVehBrand" text="Brand" prefWidth="110.0" />
+                    <TableColumn fx:id="colVehModel" text="Model" prefWidth="110.0" />
+                    <TableColumn fx:id="colVehYear" text="Year" prefWidth="70.0" />
+                    <TableColumn fx:id="colVehColor" text="Color" prefWidth="80.0" />
+                    <TableColumn fx:id="colVehPlate" text="Plate" prefWidth="110.0" />
+                    <TableColumn fx:id="colVehSeats" text="Seats" prefWidth="60.0" />
+                    <TableColumn fx:id="colVehFuel" text="Fuel" prefWidth="80.0" />
                     <TableColumn fx:id="colVehStatus" text="Status" prefWidth="100.0" />
+                    <TableColumn fx:id="colVehActions" text="Actions" prefWidth="160.0" sortable="false" />
                 </columns>
             </TableView>
         </VBox>
 
         <VBox styleClass="panel" spacing="0">
-            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10.0">
                 <Label styleClass="panel-title" text="Guides" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button styleClass="btn-primary" text="+ Add Guide" onAction="#onAddGuide" />
             </HBox>
             <TableView fx:id="guidesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
                        prefHeight="260.0" fixedCellSize="42.0">

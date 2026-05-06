@@ -12,6 +12,10 @@ public class GuideService {
         return apiService.fetchGuides();
     }
 
+    public Guide addGuide(Guide guide) throws Exception {
+        return apiService.createGuide(guide);
+    }
+
     public String getDisplayName(Guide guide) {
         if (guide == null) return "";
         return guide.getFullName() != null ? guide.getFullName() : "";

@@ -2,6 +2,8 @@ package org.example.controller;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -41,10 +43,14 @@ public class DashboardController {
         colDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
         colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
 
-        
         colGuide.setCellValueFactory(cd ->
                 new SimpleStringProperty(tourService.getGuideName(cd.getValue())));
 
+        loadData();
+    }
+
+    @FXML
+    public void refresh() {
         loadData();
     }
 
@@ -76,6 +82,11 @@ public class DashboardController {
 
     @FXML
     private void onViewAllTours() {
-      
+        if (recentToursTable.getScene() != null) {
+            Node btn = recentToursTable.getScene().lookup("#btnTourManagement");
+            if (btn instanceof Button) {
+                ((Button) btn).fire();
+            }
+        }
     }
 }

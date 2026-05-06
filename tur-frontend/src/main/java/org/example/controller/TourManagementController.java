@@ -57,6 +57,11 @@ public class TourManagementController {
         loadData();
     }
 
+    @FXML
+    public void refresh() {
+        loadData();
+    }
+
     private void bindColumns(TableColumn<Tour, String> name, TableColumn<Tour, String> departure,
                              TableColumn<Tour, String> destination, TableColumn<Tour, String> date,
                              TableColumn<Tour, String> hotel, TableColumn<Tour, String> vehicle,
@@ -115,6 +120,6 @@ public class TourManagementController {
 
     @FXML
     private void onAddTour() {
-      
+
     }
 }
