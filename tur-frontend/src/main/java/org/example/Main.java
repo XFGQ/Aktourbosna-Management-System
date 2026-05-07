@@ -76,25 +76,9 @@ public class Main extends Application {
                 }
             };
             finishTask.setOnSucceeded(ev -> {
-                try {
                     animator.stop();
                     splash.close();
-
-                    String[] auth = LoginController.showLoginScreen();
-                    if (auth == null) {
-                        Platform.exit();
-                        return;
-                    }
-
-                    FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
-                    Parent root = loader.load();
-                    primaryStage.setTitle("Aktour ViaBalkan Management System");
-                    primaryStage.setScene(new Scene(root, 1200, 800));
-                    primaryStage.show();
-                } catch (Exception ex) {
-                    ex.printStackTrace();
-                    Platform.exit();
-                }
+                    launchApp(primaryStage);
             });
             new Thread(finishTask).start();
         });
@@ -110,6 +94,30 @@ public class Main extends Application {
         t.start();
     }
 
+    private void launchApp(Stage primaryStage) {
+        try {
+            String[] auth = LoginController.showLoginScreen();
+            if (auth == null) { Platform.exit(); return; }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+            Parent root = loader.load();
+            org.example.controller.AppController appCtrl = loader.getController();
+            appCtrl.setRole(auth[1]);
+            appCtrl.setOnLogout(() -> {
+                org.example.service.ApiService.setToken(null);
+                primaryStage.hide();
+                launchApp(primaryStage);
+            });
+
+            primaryStage.setTitle("Aktour ViaBalkan Management System");
+            primaryStage.setScene(new Scene(root, 1200, 800));
+            primaryStage.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Platform.exit();
+        }
+    }
+
     private Stage createSplashScreen() {
         Stage splash = new Stage();
         splash.initStyle(StageStyle.UNDECORATED);
@@ -117,13 +125,13 @@ public class Main extends Application {
         VBox root = new VBox(15);
         root.setAlignment(Pos.CENTER);
         root.setPadding(new Insets(40));
-        root.setStyle("-fx-background-color: linear-gradient(to bottom right, #1A237E, #3949AB);");
+        root.setStyle("-fx-background-color: white;");
 
         Label logoText = new Label("Aktour ViaBalkan");
-        logoText.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
+        logoText.setStyle("-fx-text-fill: #1A237E; -fx-font-size: 32px; -fx-font-weight: bold;");
 
         Label subtitle = new Label("Management System");
-        subtitle.setStyle("-fx-text-fill: #B0BEC5; -fx-font-size: 14px;");
+        subtitle.setStyle("-fx-text-fill: #78909C; -fx-font-size: 14px;");
 
         VBox spacer = new VBox();
         spacer.setPrefHeight(30);
@@ -136,7 +144,7 @@ public class Main extends Application {
 
         Label status = new Label("Initializing...");
         status.setId("splashStatus");
-        status.setStyle("-fx-text-fill: #B0BEC5; -fx-font-size: 11px;");
+        status.setStyle("-fx-text-fill: #90A4AE; -fx-font-size: 11px;");
 
         Label version = new Label("v1.0");
         version.setStyle("-fx-text-fill: #757575; -fx-font-size: 10px;");

@@ -45,30 +45,34 @@ public class GuideDashboardController {
     }
 
     private void loadData() {
-        try {
-            List<Tour> tours = tourService.getAllTours();
-
-            upcomingToursTable.getItems().setAll(tours);
-            toursThisWeekValue.setText(String.valueOf(tours.size()));
-            customersValue.setText("—");
-            completedToursValue.setText("—");
-            nextTourValue.setText(tours.isEmpty() ? "—" : tours.get(0).getTourName());
-
-            if (!tours.isEmpty()) {
-                Tour today = tours.get(0);
-                todayTourName.setText(today.getTourName());
-                todayHotel.setText(today.getHotelName());
-                todayDestination.setText(today.getDestination());
-                todayGroupSize.setText(today.getGroupSize());
-                todayVehicle.setText(tourService.getVehicleDisplayName(today));
-                todayTourTime.setText(today.getStartDate() != null ? today.getStartDate().toString() : "—");
+        new Thread(() -> {
+            try {
+                List<Tour> tours = tourService.getAllTours();
+                javafx.application.Platform.runLater(() -> {
+                    upcomingToursTable.getItems().setAll(tours);
+                    toursThisWeekValue.setText(String.valueOf(tours.size()));
+                    customersValue.setText("—");
+                    completedToursValue.setText("—");
+                    nextTourValue.setText(tours.isEmpty() ? "—" : tours.get(0).getTourName());
+                    if (!tours.isEmpty()) {
+                        Tour today = tours.get(0);
+                        todayTourName.setText(today.getTourName());
+                        todayHotel.setText(today.getHotelName());
+                        todayDestination.setText(today.getDestination());
+                        todayGroupSize.setText(today.getGroupSize());
+                        todayVehicle.setText(tourService.getVehicleDisplayName(today));
+                        todayTourTime.setText(today.getStartDate() != null ? today.getStartDate().toString() : "—");
+                    }
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    toursThisWeekValue.setText("—");
+                    customersValue.setText("—");
+                    completedToursValue.setText("—");
+                    nextTourValue.setText("—");
+                });
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            toursThisWeekValue.setText("—");
-            customersValue.setText("—");
-            completedToursValue.setText("—");
-            nextTourValue.setText("—");
-        }
+        }).start();
     }
 }

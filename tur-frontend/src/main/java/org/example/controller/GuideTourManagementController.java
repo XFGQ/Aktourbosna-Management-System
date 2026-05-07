@@ -68,34 +68,33 @@ public class GuideTourManagementController {
     }
 
     private void loadData() {
-        try {
-            List<Tour> tours = tourService.getAllTours();
-
-            List<Tour> recent = tours.stream()
-                    .filter(t -> "Completed".equals(t.getStatus()) || "Active".equals(t.getStatus()))
-                    .collect(Collectors.toList());
-
-            List<Tour> upcoming = tours.stream()
-                    .filter(t -> "Upcoming".equals(t.getStatus()))
-                    .collect(Collectors.toList());
-
-            recentToursTable.getItems().setAll(recent);
-            upcomingToursTable.getItems().setAll(upcoming);
-
-            double totalEarnings = tourService.calculateTotalRevenue(tours);
-            totalEarningsValue.setText("€" + String.format("%,.0f", totalEarnings));
-
-            double monthlyEarnings = tourService.calculateTotalRevenue(recent);
-            monthlyEarningsValue.setText("€" + String.format("%,.0f", monthlyEarnings));
-
-            completedToursValue.setText(String.valueOf(recent.size()));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalEarningsValue.setText("—");
-            monthlyEarningsValue.setText("—");
-            completedToursValue.setText("—");
-        }
+        new Thread(() -> {
+            try {
+                List<Tour> tours = tourService.getAllTours();
+                List<Tour> recent = tours.stream()
+                        .filter(t -> "Completed".equals(t.getStatus()) || "Active".equals(t.getStatus()))
+                        .collect(Collectors.toList());
+                List<Tour> upcoming = tours.stream()
+                        .filter(t -> "Upcoming".equals(t.getStatus()))
+                        .collect(Collectors.toList());
+                double totalEarnings = tourService.calculateTotalRevenue(tours);
+                double monthlyEarnings = tourService.calculateTotalRevenue(recent);
+                javafx.application.Platform.runLater(() -> {
+                    recentToursTable.getItems().setAll(recent);
+                    upcomingToursTable.getItems().setAll(upcoming);
+                    totalEarningsValue.setText("€" + String.format("%,.0f", totalEarnings));
+                    monthlyEarningsValue.setText("€" + String.format("%,.0f", monthlyEarnings));
+                    completedToursValue.setText(String.valueOf(recent.size()));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalEarningsValue.setText("—");
+                    monthlyEarningsValue.setText("—");
+                    completedToursValue.setText("—");
+                });
+            }
+        }).start();
     }
 
     @FXML

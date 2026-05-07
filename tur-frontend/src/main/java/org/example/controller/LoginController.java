@@ -39,56 +39,56 @@ public class LoginController {
         stage.setResizable(false);
 
         StackPane root = new StackPane();
-        root.setPrefSize(860, 520);
+        root.setPrefSize(960, 540);
 
         HBox mainContent = new HBox();
-        mainContent.setPrefSize(860, 520);
+        mainContent.setPrefSize(960, 540);
 
         // ── LEFT PANEL ────────────────────────────────────────────────
         VBox leftPanel = new VBox();
-        leftPanel.setPrefWidth(430);
+        leftPanel.setPrefWidth(288);
         leftPanel.setAlignment(Pos.CENTER);
-        leftPanel.setPadding(new Insets(50, 50, 50, 50));
-        leftPanel.setStyle("-fx-background-color: linear-gradient(to bottom right, #1A237E, #3949AB);");
+        leftPanel.setPadding(new Insets(50, 30, 50, 30));
+        leftPanel.setStyle("-fx-background-color: white;");
 
         Label title = new Label("Aktour ViaBalkan");
-        title.setStyle("-fx-text-fill: white; -fx-font-size: 26px; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: #1A237E; -fx-font-size: 26px; -fx-font-weight: bold;");
 
         Label subtitle = new Label("Management System");
-        subtitle.setStyle("-fx-text-fill: #B0BEC5; -fx-font-size: 12px;");
+        subtitle.setStyle("-fx-text-fill: #78909C; -fx-font-size: 12px;");
 
         Region spacerTop = new Region();
         spacerTop.setPrefHeight(32);
 
         Label userLabel = new Label("Username");
-        userLabel.setStyle("-fx-text-fill: #B0BEC5; -fx-font-size: 12px;");
+        userLabel.setStyle("-fx-text-fill: #546E7A; -fx-font-size: 12px;");
 
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter username");
-        usernameField.setPrefWidth(300);
+        usernameField.setPrefWidth(220);
         usernameField.setStyle("-fx-background-radius: 6; -fx-padding: 9; -fx-font-size: 13px;");
 
         Region gap1 = new Region();
         gap1.setPrefHeight(10);
 
         Label passLabel = new Label("Password");
-        passLabel.setStyle("-fx-text-fill: #B0BEC5; -fx-font-size: 12px;");
+        passLabel.setStyle("-fx-text-fill: #546E7A; -fx-font-size: 12px;");
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter password");
-        passwordField.setPrefWidth(300);
+        passwordField.setPrefWidth(220);
         passwordField.setStyle("-fx-background-radius: 6; -fx-padding: 9; -fx-font-size: 13px;");
 
         Region gap2 = new Region();
         gap2.setPrefHeight(14);
 
         Label errorLabel = new Label("");
-        errorLabel.setStyle("-fx-text-fill: #EF9A9A; -fx-font-size: 11px;");
+        errorLabel.setStyle("-fx-text-fill: #E53935; -fx-font-size: 11px;");
         errorLabel.setMaxWidth(300);
         errorLabel.setWrapText(true);
 
         Button loginBtn = new Button("Login");
-        loginBtn.setPrefWidth(300);
+        loginBtn.setPrefWidth(220);
         loginBtn.setStyle("-fx-background-color: #4FC3F7; -fx-text-fill: #1A237E; -fx-font-weight: bold; " +
                 "-fx-background-radius: 6; -fx-padding: 10; -fx-font-size: 13px;");
 
@@ -98,7 +98,7 @@ public class LoginController {
                 passLabel, passwordField,
                 gap2,
                 errorLabel, loginBtn);
-        formBox.setMaxWidth(300);
+        formBox.setMaxWidth(220);
         formBox.setAlignment(Pos.CENTER_LEFT);
 
         leftPanel.getChildren().addAll(title, subtitle, spacerTop, formBox);
@@ -109,9 +109,9 @@ public class LoginController {
         VBox.setVgrow(slidesPane, javafx.scene.layout.Priority.ALWAYS);
         slidesPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
 
-        StackPane[] slides = new StackPane[CITIES.length];
+        javafx.scene.layout.AnchorPane[] slides = new javafx.scene.layout.AnchorPane[CITIES.length];
         for (int i = 0; i < CITIES.length; i++) {
-            StackPane slide = buildSlide(CITIES[i][0], CITIES[i][1], CITIES[i][2], CITIES[i][3], CITIES[i][4]);
+            javafx.scene.layout.AnchorPane slide = buildSlide(CITIES[i][0], CITIES[i][1], CITIES[i][2], CITIES[i][3], CITIES[i][4]);
             slide.setOpacity(i == 0 ? 1.0 : 0.0);
             slide.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
             slides[i] = slide;
@@ -131,7 +131,7 @@ public class LoginController {
         }
 
         VBox rightPanel = new VBox();
-        rightPanel.setPrefSize(430, 520);
+        rightPanel.setPrefSize(672, 540);
         rightPanel.getChildren().addAll(slidesPane, dots);
 
         int[] current = {0};
@@ -233,36 +233,42 @@ public class LoginController {
         stage.setScene(scene);
 
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-        stage.setX((screen.getWidth() - 860) / 2);
-        stage.setY((screen.getHeight() - 520) / 2);
+        stage.setX((screen.getWidth() - 960) / 2);
+        stage.setY((screen.getHeight() - 540) / 2);
 
         stage.showAndWait();
         return result[0];
     }
 
-    private static StackPane buildSlide(String city, String country, String c1, String c2, String imagePath) {
-        StackPane slide = new StackPane();
+    private static javafx.scene.layout.AnchorPane buildSlide(String city, String country, String c1, String c2, String imagePath) {
+        javafx.scene.layout.AnchorPane slide = new javafx.scene.layout.AnchorPane();
         slide.setStyle("-fx-background-color: linear-gradient(to bottom right, " + c1 + ", " + c2 + ");");
 
         java.net.URL imgUrl = LoginController.class.getResource(imagePath);
         if (imgUrl != null) {
             javafx.scene.image.ImageView iv = new javafx.scene.image.ImageView(
-                    new javafx.scene.image.Image(imgUrl.toString(), 430, 500, false, true));
+                    new javafx.scene.image.Image(imgUrl.toString(), 680, 540, false, true));
             iv.setPreserveRatio(false);
             iv.fitWidthProperty().bind(slide.widthProperty());
             iv.fitHeightProperty().bind(slide.heightProperty());
+            javafx.scene.layout.AnchorPane.setTopAnchor(iv, 0.0);
+            javafx.scene.layout.AnchorPane.setBottomAnchor(iv, 0.0);
+            javafx.scene.layout.AnchorPane.setLeftAnchor(iv, 0.0);
+            javafx.scene.layout.AnchorPane.setRightAnchor(iv, 0.0);
             slide.getChildren().add(iv);
         }
 
-        // bottom gradient overlay — no box, just fade to dark at bottom
         javafx.scene.layout.Region bottomGrad = new javafx.scene.layout.Region();
         bottomGrad.setStyle("-fx-background-color: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 45%);");
+        javafx.scene.layout.AnchorPane.setTopAnchor(bottomGrad, 0.0);
+        javafx.scene.layout.AnchorPane.setBottomAnchor(bottomGrad, 0.0);
+        javafx.scene.layout.AnchorPane.setLeftAnchor(bottomGrad, 0.0);
+        javafx.scene.layout.AnchorPane.setRightAnchor(bottomGrad, 0.0);
         slide.getChildren().add(bottomGrad);
 
         VBox info = new VBox(2);
-        info.setAlignment(Pos.CENTER_LEFT);
-        StackPane.setAlignment(info, Pos.BOTTOM_LEFT);
-        StackPane.setMargin(info, new Insets(0, 0, 28, 24));
+        javafx.scene.layout.AnchorPane.setBottomAnchor(info, 32.0);
+        javafx.scene.layout.AnchorPane.setLeftAnchor(info, 20.0);
 
         Label cityLabel = new Label(city);
         cityLabel.setStyle("-fx-text-fill: white; -fx-font-size: 22px; -fx-font-weight: bold;");

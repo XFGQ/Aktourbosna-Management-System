@@ -28,16 +28,28 @@ public class AppController {
     public void initialize() {
         instance = this;
         sidebarController.setAppController(this);
-        navigateTo("dashboard.fxml");
+    }
 
+    public void setRole(String role) {
+        sidebarController.setRole(role);
+        boolean isGuide = "GUIDE".equals(role);
+        navigateTo(isGuide ? "guideDashboard.fxml" : "dashboard.fxml");
         new Thread(() -> {
             try { Thread.sleep(500); } catch (InterruptedException ignored) {}
             Platform.runLater(() -> {
-                preload("tourManagement.fxml");
-                preload("expenseTracker.fxml");
-                preload("vehiclesGuides.fxml");
+                if (isGuide) {
+                    preload("guideTourManagement.fxml");
+                } else {
+                    preload("tourManagement.fxml");
+                    preload("expenseTracker.fxml");
+                    preload("vehiclesGuides.fxml");
+                }
             });
         }).start();
+    }
+
+    public void setOnLogout(Runnable onLogout) {
+        sidebarController.setOnLogout(onLogout);
     }
 
     private void preload(String fxmlFile) {

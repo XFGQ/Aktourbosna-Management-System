@@ -12,21 +12,37 @@ public class SidebarController {
     @FXML private Button btnVehiclesGuides;
 
     private AppController appController;
+    private String role = "ADMIN";
+    private Runnable onLogout;
 
     public void setAppController(AppController appController) {
         this.appController = appController;
         setActive(btnDashboard);
     }
 
+    public void setRole(String role) {
+        this.role = role;
+        if ("GUIDE".equals(role)) {
+            btnExpenseTracker.setVisible(false);
+            btnExpenseTracker.setManaged(false);
+            btnVehiclesGuides.setVisible(false);
+            btnVehiclesGuides.setManaged(false);
+        }
+    }
+
+    public void setOnLogout(Runnable onLogout) {
+        this.onLogout = onLogout;
+    }
+
     @FXML
     private void onDashboard() {
-        appController.navigateTo("dashboard.fxml");
+        appController.navigateTo("GUIDE".equals(role) ? "guideDashboard.fxml" : "dashboard.fxml");
         setActive(btnDashboard);
     }
 
     @FXML
     private void onTourManagement() {
-        appController.navigateTo("tourManagement.fxml");
+        appController.navigateTo("GUIDE".equals(role) ? "guideTourManagement.fxml" : "tourManagement.fxml");
         setActive(btnTourManagement);
     }
 
@@ -44,8 +60,8 @@ public class SidebarController {
 
     @FXML
     private void onLogout() {
-        Platform.exit();
-        System.exit(0);
+        if (onLogout != null) onLogout.run();
+        else { Platform.exit(); System.exit(0); }
     }
 
     private void setActive(Button active) {
