@@ -91,7 +91,7 @@ public class ApiService {
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         if (response.statusCode() >= 400) {
-            throw new RuntimeException("Kullanıcı adı veya şifre hatalı.");
+            throw new RuntimeException("Invalid username or password.");
         }
         JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
         String token = json.get("token").getAsString();

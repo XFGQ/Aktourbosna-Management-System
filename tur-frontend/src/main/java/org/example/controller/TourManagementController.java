@@ -83,39 +83,37 @@ public class TourManagementController {
     }
 
     private void loadData() {
-        try {
-            List<Tour> tours = tourService.getAllTours();
-
-            List<Tour> recent = tours.stream()
-                    .filter(t -> "Completed".equals(t.getStatus()) || "Active".equals(t.getStatus()))
-                    .collect(Collectors.toList());
-
-            List<Tour> upcoming = tours.stream()
-                    .filter(t -> "Upcoming".equals(t.getStatus()))
-                    .collect(Collectors.toList());
-
-            recentToursTable.getItems().setAll(recent);
-            upcomingToursTable.getItems().setAll(upcoming);
-
-            totalToursValue.setText(String.valueOf(tours.size()));
-
-            double revenue = tourService.calculateTotalRevenue(tours);
-            revenueValue.setText("€" + String.format("%,.0f", revenue));
-
-            double totalExpenses = tours.stream()
-                    .mapToDouble(t -> expenseService.calculateTotal(expenseService.getExpensesForTour(t)))
-                    .sum();
-            expensesValue.setText("€" + String.format("%,.0f", totalExpenses));
-
-            netProfitValue.setText("€" + String.format("%,.0f", revenue - totalExpenses));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalToursValue.setText("—");
-            revenueValue.setText("—");
-            expensesValue.setText("—");
-            netProfitValue.setText("—");
-        }
+        new Thread(() -> {
+            try {
+                List<Tour> tours = tourService.getAllTours();
+                List<Tour> recent = tours.stream()
+                        .filter(t -> "Completed".equals(t.getStatus()) || "Active".equals(t.getStatus()))
+                        .collect(Collectors.toList());
+                List<Tour> upcoming = tours.stream()
+                        .filter(t -> "Upcoming".equals(t.getStatus()))
+                        .collect(Collectors.toList());
+                double revenue = tourService.calculateTotalRevenue(tours);
+                double totalExpenses = tours.stream()
+                        .mapToDouble(t -> expenseService.calculateTotal(expenseService.getExpensesForTour(t)))
+                        .sum();
+                javafx.application.Platform.runLater(() -> {
+                    recentToursTable.getItems().setAll(recent);
+                    upcomingToursTable.getItems().setAll(upcoming);
+                    totalToursValue.setText(String.valueOf(tours.size()));
+                    revenueValue.setText("€" + String.format("%,.0f", revenue));
+                    expensesValue.setText("€" + String.format("%,.0f", totalExpenses));
+                    netProfitValue.setText("€" + String.format("%,.0f", revenue - totalExpenses));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalToursValue.setText("—");
+                    revenueValue.setText("—");
+                    expensesValue.setText("—");
+                    netProfitValue.setText("—");
+                });
+            }
+        }).start();
     }
 
     @FXML

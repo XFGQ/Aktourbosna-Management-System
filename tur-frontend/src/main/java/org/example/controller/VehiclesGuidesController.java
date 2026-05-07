@@ -134,21 +134,27 @@ public class VehiclesGuidesController {
     }
 
     private void loadData() {
-        try {
-            List<Vehicle> vehicles = vehicleService.getAllVehicles();
-            vehiclesTable.getItems().setAll(vehicles);
-            totalVehiclesValue.setText(String.valueOf(vehicles.size()));
-            vehiclesAvailable.setText(vehicleService.countAvailable(vehicles) + " available");
-
-            List<Guide> guides = guideService.getAllGuides();
-            guidesTable.getItems().setAll(guides);
-            totalGuidesValue.setText(String.valueOf(guides.size()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalVehiclesValue.setText("—");
-            vehiclesAvailable.setText("");
-            totalGuidesValue.setText("—");
-        }
+        new Thread(() -> {
+            try {
+                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+                List<Guide> guides = guideService.getAllGuides();
+                long available = vehicleService.countAvailable(vehicles);
+                javafx.application.Platform.runLater(() -> {
+                    vehiclesTable.getItems().setAll(vehicles);
+                    totalVehiclesValue.setText(String.valueOf(vehicles.size()));
+                    vehiclesAvailable.setText(available + " available");
+                    guidesTable.getItems().setAll(guides);
+                    totalGuidesValue.setText(String.valueOf(guides.size()));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalVehiclesValue.setText("—");
+                    vehiclesAvailable.setText("");
+                    totalGuidesValue.setText("—");
+                });
+            }
+        }).start();
     }
 
     @FXML
@@ -280,11 +286,9 @@ public class VehiclesGuidesController {
                 guidesTable.getItems().setAll(data.guides);
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }
-            AppController app = AppController.getInstance();
-            if (app != null) {
-                app.invalidateOtherViews("vehiclesGuides.fxml");
-            }
             loadingStage.close();
+            AppController app = AppController.getInstance();
+            if (app != null) app.refreshAllCached();
             new Alert(Alert.AlertType.INFORMATION, successMsg).show();
         });
 

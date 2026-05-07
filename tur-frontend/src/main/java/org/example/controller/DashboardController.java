@@ -55,29 +55,34 @@ public class DashboardController {
     }
 
     private void loadData() {
-        try {
-            List<Tour> tours = tourService.getAllTours();
-            recentToursTable.getItems().setAll(tours);
-
-            totalToursValue.setText(String.valueOf(tours.size()));
-            totalToursChange.setText("");
-
-            revenueValue.setText("€" + String.format("%,.0f", tourService.calculateTotalRevenue(tours)));
-            revenueChange.setText("");
-
-            guidesValue.setText(String.valueOf(guideService.countGuides(guideService.getAllGuides())));
-
-            var vehicles = vehicleService.getAllVehicles();
-            vehiclesValue.setText(String.valueOf(vehicles.size()));
-            vehiclesStatus.setText(vehicleService.countAvailable(vehicles) + " available");
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalToursValue.setText("—");
-            revenueValue.setText("—");
-            guidesValue.setText("—");
-            vehiclesValue.setText("—");
-            vehiclesStatus.setText("");
-        }
+        new Thread(() -> {
+            try {
+                List<Tour> tours = tourService.getAllTours();
+                double revenue = tourService.calculateTotalRevenue(tours);
+                long guides = guideService.countGuides(guideService.getAllGuides());
+                var vehicles = vehicleService.getAllVehicles();
+                long available = vehicleService.countAvailable(vehicles);
+                javafx.application.Platform.runLater(() -> {
+                    recentToursTable.getItems().setAll(tours);
+                    totalToursValue.setText(String.valueOf(tours.size()));
+                    totalToursChange.setText("");
+                    revenueValue.setText("€" + String.format("%,.0f", revenue));
+                    revenueChange.setText("");
+                    guidesValue.setText(String.valueOf(guides));
+                    vehiclesValue.setText(String.valueOf(vehicles.size()));
+                    vehiclesStatus.setText(available + " available");
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalToursValue.setText("—");
+                    revenueValue.setText("—");
+                    guidesValue.setText("—");
+                    vehiclesValue.setText("—");
+                    vehiclesStatus.setText("");
+                });
+            }
+        }).start();
     }
 
     @FXML

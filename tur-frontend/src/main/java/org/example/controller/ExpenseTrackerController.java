@@ -58,38 +58,38 @@ public class ExpenseTrackerController {
     }
 
     private void loadData() {
-        try {
-            List<Tour> tours = tourService.getAllTours();
-            List<Expense> allExpenses = new ArrayList<>();
-
-            for (Tour t : tours) {
-                List<Expense> tourExpenses = expenseService.getExpensesForTour(t);
-                if (tourExpenses != null) {
-                    for (Expense e : tourExpenses) {
-                        if (e.getExpenseId() != null) {
-                            expenseToTourName.put(e.getExpenseId(), t.getTourName());
+        new Thread(() -> {
+            try {
+                List<Tour> tours = tourService.getAllTours();
+                List<Expense> allExpenses = new ArrayList<>();
+                Map<Long, String> nameMap = new HashMap<>();
+                for (Tour t : tours) {
+                    List<Expense> tourExpenses = expenseService.getExpensesForTour(t);
+                    if (tourExpenses != null) {
+                        for (Expense e : tourExpenses) {
+                            if (e.getExpenseId() != null) nameMap.put(e.getExpenseId(), t.getTourName());
+                            allExpenses.add(e);
                         }
-                        allExpenses.add(e);
                     }
                 }
+                double total = expenseService.calculateTotal(allExpenses);
+                long toursWithExp = tours.stream()
+                        .filter(t -> t.getExpenses() != null && !t.getExpenses().isEmpty()).count();
+                javafx.application.Platform.runLater(() -> {
+                    expenseToTourName.putAll(nameMap);
+                    expensesTable.getItems().setAll(allExpenses);
+                    totalExpensesValue.setText(String.valueOf(allExpenses.size()));
+                    totalAmountValue.setText("€" + String.format("%,.0f", total));
+                    toursWithExpensesValue.setText(String.valueOf(toursWithExp));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalExpensesValue.setText("—");
+                    totalAmountValue.setText("—");
+                    toursWithExpensesValue.setText("—");
+                });
             }
-
-            expensesTable.getItems().setAll(allExpenses);
-
-            totalExpensesValue.setText(String.valueOf(allExpenses.size()));
-            double total = expenseService.calculateTotal(allExpenses);
-            totalAmountValue.setText("€" + String.format("%,.0f", total));
-
-            long toursWithExp = tours.stream()
-                    .filter(t -> t.getExpenses() != null && !t.getExpenses().isEmpty())
-                    .count();
-            toursWithExpensesValue.setText(String.valueOf(toursWithExp));
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalExpensesValue.setText("—");
-            totalAmountValue.setText("—");
-            toursWithExpensesValue.setText("—");
-        }
+        }).start();
     }
 }
