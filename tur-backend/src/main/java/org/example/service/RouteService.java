@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.application.dto.RouteDTO;
+import org.example.application.exception.ResourceNotFoundException;
 import org.example.application.mapper.RouteMapper;
 import org.example.model.Route;
 import org.example.model.Waypoint;
@@ -24,6 +25,7 @@ public class RouteService {
         this.waypointRepository = waypointRepository;
         this.routeMapper = routeMapper;
     }
+
     public List<RouteDTO> getAllRoutes() {
         return routeRepository.findAll().stream()
                 .map(routeMapper::toDto)
@@ -31,30 +33,27 @@ public class RouteService {
     }
 
     public RouteDTO getRouteById(Long id) {
-        Route route = routeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Route not found: " + id));
-        return routeMapper.toDto(route);
+        return routeMapper.toDto(routeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + id)));
     }
 
     public RouteDTO createRoute(RouteDTO routeDTO) {
-        Route route = routeMapper.toEntity(routeDTO);
-        return routeMapper.toDto(routeRepository.save(route));
+        return routeMapper.toDto(routeRepository.save(routeMapper.toEntity(routeDTO)));
     }
 
     public RouteDTO updateRoute(Long id, RouteDTO routeDTO) {
         Route route = routeRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Route not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + id));
         routeMapper.updateEntityFromDto(routeDTO, route);
         return routeMapper.toDto(routeRepository.save(route));
     }
+
     @Transactional
     public RouteDTO addWaypointToRoute(Long routeId, Long waypointId) {
         Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RuntimeException("Route not found: " + routeId));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + routeId));
         Waypoint waypoint = waypointRepository.findById(waypointId)
-                .orElseThrow(() -> new RuntimeException("Waypoint not found: " + waypointId));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Waypoint not found: " + waypointId));
         if (!route.getDefaultWaypoints().contains(waypoint)) {
             route.getDefaultWaypoints().add(waypoint);
             routeRepository.save(route);
@@ -65,14 +64,11 @@ public class RouteService {
     @Transactional
     public RouteDTO removeWaypointFromRoute(Long routeId, Long waypointId) {
         Route route = routeRepository.findById(routeId)
-                .orElseThrow(() -> new RuntimeException("Route not found: " + routeId));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + routeId));
         Waypoint waypoint = waypointRepository.findById(waypointId)
-                .orElseThrow(() -> new RuntimeException("Waypoint not found: " + waypointId));
-
+                .orElseThrow(() -> new ResourceNotFoundException("Waypoint not found: " + waypointId));
         route.getDefaultWaypoints().remove(waypoint);
         routeRepository.save(route);
-
         return routeMapper.toDto(route);
     }
 }
