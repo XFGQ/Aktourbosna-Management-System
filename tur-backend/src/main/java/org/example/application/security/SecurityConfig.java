@@ -62,6 +62,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/tours/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers(HttpMethod.DELETE, "/api/tours/**").hasRole("ADMIN")
 
+                        // Routes — GET for both roles, mutations ADMIN only
+                        .requestMatchers(HttpMethod.GET, "/api/routes/**").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers("/api/routes/**").hasRole("ADMIN")
+
+                        // Waypoints — GET for both roles, mutations ADMIN only
+                        .requestMatchers(HttpMethod.GET, "/api/waypoints/**").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers("/api/waypoints/**").hasRole("ADMIN")
+
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);

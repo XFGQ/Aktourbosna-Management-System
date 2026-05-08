@@ -1,6 +1,7 @@
 package org.example.service;
 
 import org.example.application.dto.TollDTO;
+import org.example.application.exception.ResourceNotFoundException;
 import org.example.application.mapper.TollMapper;
 import org.example.model.Toll;
 import org.example.repository.TollRepository;
@@ -27,26 +28,24 @@ public class TollService {
     }
 
     public TollDTO getTollById(Long id) {
-        Toll toll = tollRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Toll not found: " + id));
-        return tollMapper.toDto(toll);
+        return tollMapper.toDto(tollRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Toll not found: " + id)));
     }
 
     public TollDTO createToll(TollDTO tollDTO) {
-        Toll toll = tollMapper.toEntity(tollDTO);
-        return tollMapper.toDto(tollRepository.save(toll));
+        return tollMapper.toDto(tollRepository.save(tollMapper.toEntity(tollDTO)));
     }
 
     public TollDTO updateToll(Long id, TollDTO tollDTO) {
         Toll toll = tollRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Toll not found: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("Toll not found: " + id));
         tollMapper.updateEntityFromDto(tollDTO, toll);
         return tollMapper.toDto(tollRepository.save(toll));
     }
 
     public void deleteToll(Long id) {
         if (!tollRepository.existsById(id)) {
-            throw new RuntimeException("Toll not found: " + id);
+            throw new ResourceNotFoundException("Toll not found: " + id);
         }
         tollRepository.deleteById(id);
     }

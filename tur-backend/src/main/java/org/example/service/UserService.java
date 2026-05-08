@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.application.dto.UserRegistrationDTO;
 import org.example.application.dto.UserResponseDTO;
+import org.example.application.exception.ResourceNotFoundException;
 import org.example.application.mapper.UserMapper;
 import org.example.model.Guide;
 import org.example.model.User;
@@ -40,14 +41,18 @@ public class UserService {
 
     @Transactional
     public UserResponseDTO createUser(UserRegistrationDTO registrationDTO) {
+        if (userRepository.existsByUsername(registrationDTO.getUsername())) {
+            throw new IllegalArgumentException("Username already exists: " + registrationDTO.getUsername());
+        }
+        if (userRepository.existsByEmail(registrationDTO.getEmail())) {
+            throw new IllegalArgumentException("Email already exists: " + registrationDTO.getEmail());
+        }
         User user = userMapper.toEntity(registrationDTO);
         user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
         User savedUser = userRepository.save(user);
-
         if (savedUser.getRole() == UserRole.GUIDE) {
             guideRepository.save(Guide.builder().user(savedUser).build());
         }
-
         return userMapper.toResponseDto(savedUser);
     }
 }
