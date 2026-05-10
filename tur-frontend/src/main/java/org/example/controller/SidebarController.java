@@ -3,6 +3,8 @@ package org.example.controller;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.image.ImageView;
+import javafx.scene.layout.HBox;
 
 public class SidebarController {
 
@@ -10,8 +12,17 @@ public class SidebarController {
     @FXML private Button btnTourManagement;
     @FXML private Button btnExpenseTracker;
     @FXML private Button btnVehiclesGuides;
+    @FXML private HBox logoHBox;
 
     private AppController appController;
+
+    @FXML
+    public void initialize() {
+        if (logoHBox != null) {
+            ImageView logo = LogoView.create(46);
+            logoHBox.getChildren().add(0, logo);
+        }
+    }
 
     public void setAppController(AppController appController) {
         this.appController = appController;

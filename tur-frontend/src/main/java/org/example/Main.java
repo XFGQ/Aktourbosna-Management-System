@@ -12,10 +12,16 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+<<<<<<< Updated upstream
+=======
+import org.example.controller.LoginController;
+import org.example.controller.LogoView;
+>>>>>>> Stashed changes
 
 public class Main extends Application {
 
@@ -98,6 +104,35 @@ public class Main extends Application {
         t.start();
     }
 
+<<<<<<< Updated upstream
+=======
+    private void launchApp(Stage primaryStage) {
+        try {
+            String[] auth = LoginController.showLoginScreen();
+            if (auth == null) { Platform.exit(); return; }
+
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+            Parent root = loader.load();
+            org.example.controller.AppController appCtrl = loader.getController();
+            appCtrl.setRole(auth[1]);
+            appCtrl.setOnLogout(() -> {
+                org.example.service.ApiService.setToken(null);
+                primaryStage.hide();
+                launchApp(primaryStage);
+            });
+
+            primaryStage.setTitle("Aktour ViaBalkan Management System");
+            primaryStage.getIcons().add(new javafx.scene.image.Image(
+                    getClass().getResourceAsStream("/images/logo.png")));
+            primaryStage.setScene(new Scene(root, 1200, 800));
+            primaryStage.show();
+        } catch (Exception ex) {
+            ex.printStackTrace();
+            Platform.exit();
+        }
+    }
+
+>>>>>>> Stashed changes
     private Stage createSplashScreen() {
         Stage splash = new Stage();
         splash.initStyle(StageStyle.UNDECORATED);
@@ -107,6 +142,8 @@ public class Main extends Application {
         root.setPadding(new Insets(40));
         root.setStyle("-fx-background-color: linear-gradient(to bottom right, #1A237E, #3949AB);");
 
+        ImageView splashLogo = LogoView.create(72);
+
         Label logoText = new Label("Aktour ViaBalkan");
         logoText.setStyle("-fx-text-fill: white; -fx-font-size: 32px; -fx-font-weight: bold;");
 
@@ -114,7 +151,7 @@ public class Main extends Application {
         subtitle.setStyle("-fx-text-fill: #B0BEC5; -fx-font-size: 14px;");
 
         VBox spacer = new VBox();
-        spacer.setPrefHeight(30);
+        spacer.setPrefHeight(20);
 
         ProgressBar progressBar = new ProgressBar(0);
         progressBar.setId("splashProgress");
@@ -129,7 +166,7 @@ public class Main extends Application {
         Label version = new Label("v1.0");
         version.setStyle("-fx-text-fill: #757575; -fx-font-size: 10px;");
 
-        root.getChildren().addAll(logoText, subtitle, spacer, progressBar, status, version);
+        root.getChildren().addAll(splashLogo, logoText, subtitle, spacer, progressBar, status, version);
 
         Scene scene = new Scene(root, 480, 320);
         splash.setScene(scene);

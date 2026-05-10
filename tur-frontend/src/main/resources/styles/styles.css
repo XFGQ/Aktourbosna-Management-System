@@ -184,6 +184,7 @@
 }
 
 .table-view .column-header-background { -fx-background-color: transparent; }
+.table-view .column-header-background .filler { -fx-background-color: transparent; }
 
 .table-view .column-header {
     -fx-background-color: transparent;
@@ -207,15 +208,24 @@
 
 .table-view .table-row-cell:hover    { -fx-background-color: #f8f9fb; }
 .table-view .table-row-cell:selected { -fx-background-color: #eef3ff; }
+.table-view .table-row-cell:empty    { -fx-background-color: transparent; -fx-border-color: transparent; }
+.table-view .table-row-cell:empty .table-cell { -fx-border-color: transparent; }
 
 .table-view .table-cell {
     -fx-font-size: 13px;
     -fx-text-fill: #2d3748;
     -fx-padding: 10 16;
+    -fx-border-color: transparent;
+    -fx-border-width: 0;
 }
 
 .scroll-bar:vertical { -fx-background-color: transparent; -fx-pref-width: 6; }
 .scroll-bar .thumb { -fx-background-color: #cdd2da; -fx-background-radius: 3; }
+
+.badge-upcoming  { -fx-background-color: #E3F2FD; -fx-text-fill: #1565C0; -fx-background-radius: 20; -fx-padding: 3 10; -fx-font-size: 11px; -fx-font-weight: bold; }
+.badge-active    { -fx-background-color: #E8F5E9; -fx-text-fill: #2E7D32; -fx-background-radius: 20; -fx-padding: 3 10; -fx-font-size: 11px; -fx-font-weight: bold; }
+.badge-completed { -fx-background-color: #F3F4F6; -fx-text-fill: #6B7280; -fx-background-radius: 20; -fx-padding: 3 10; -fx-font-size: 11px; -fx-font-weight: bold; }
+.badge-default   { -fx-background-color: #F3F4F6; -fx-text-fill: #6B7280; -fx-background-radius: 20; -fx-padding: 3 10; -fx-font-size: 11px; -fx-font-weight: bold; }
 .scroll-bar .thumb:hover { -fx-background-color: #a0aec0; }
 .scroll-bar .track { -fx-background-color: transparent; }
 .scroll-bar .increment-button, .scroll-bar .decrement-button {

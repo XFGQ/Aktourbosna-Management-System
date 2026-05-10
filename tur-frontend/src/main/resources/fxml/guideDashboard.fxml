@@ -77,11 +77,11 @@
             <TableView fx:id="upcomingToursTable" styleClass="table-view"
                        prefHeight="220.0" fixedCellSize="42.0">
                 <columns>
-                    <TableColumn fx:id="colDate" text="Date" prefWidth="100.0" />
-                    <TableColumn fx:id="colTourName" text="Tour Name" prefWidth="170.0" />
-                    <TableColumn fx:id="colDestination" text="Destination" prefWidth="150.0" />
-                    <TableColumn fx:id="colHotel" text="Hotel" prefWidth="150.0" />
-                    <TableColumn fx:id="colGroupSize" text="Group" prefWidth="80.0" />
+                    <TableColumn fx:id="colDate" text="Date" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colTourName" text="Tour Name" prefWidth="170.0" minWidth="170.0" />
+                    <TableColumn fx:id="colDestination" text="Destination" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colHotel" text="Hotel" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colGroupSize" text="Group" prefWidth="80.0" minWidth="80.0" />
                 </columns>
             </TableView>
         </VBox>

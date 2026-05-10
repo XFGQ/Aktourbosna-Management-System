@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.model.Tour;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -13,33 +14,26 @@ public class TourService {
         return apiService.fetchTours();
     }
 
-    public List<Tour> getActiveTours(List<Tour> tours) {
-        return tours.stream()
-                .filter(t -> "Active".equals(t.getStatus()))
-                .collect(Collectors.toList());
-    }
-
     public List<Tour> getUpcomingTours(List<Tour> tours) {
+        LocalDate today = LocalDate.now();
         return tours.stream()
-                .filter(t -> "Upcoming".equals(t.getStatus()))
+                .filter(t -> t.getStartDate() != null && today.isBefore(t.getStartDate()))
                 .collect(Collectors.toList());
     }
 
-    public List<Tour> getCompletedTours(List<Tour> tours) {
+    public List<Tour> getRecentTours(List<Tour> tours) {
+        LocalDate today = LocalDate.now();
         return tours.stream()
-                .filter(t -> "Completed".equals(t.getStatus()))
+                .filter(t -> t.getStartDate() != null && !today.isBefore(t.getStartDate()))
                 .collect(Collectors.toList());
     }
 
-    public String getGuideName(Tour tour) {
-        return tour.getGuide() != null ? tour.getGuide().getFullName() : "";
-    }
-
-    public String getVehicleDisplayName(Tour tour) {
-        if (tour.getVehicle() == null) return "";
-        return tour.getVehicle().getBrand() + " "
-                + tour.getVehicle().getModel() + " · "
-                + tour.getVehicle().getPlateNumber();
+    public String deriveStatus(Tour t) {
+        if (t.getStartDate() == null || t.getEndDate() == null) return "—";
+        LocalDate today = LocalDate.now();
+        if (today.isBefore(t.getStartDate())) return "Upcoming";
+        if (today.isAfter(t.getEndDate())) return "Completed";
+        return "Active";
     }
 
     public Double calculateTotalRevenue(List<Tour> tours) {
@@ -50,5 +44,17 @@ public class TourService {
 
     public long countTours(List<Tour> tours) {
         return tours.size();
+    }
+
+    public Tour addTour(Tour tour) throws Exception {
+        return apiService.createTour(tour);
+    }
+
+    public Tour updateTour(Long id, Tour tour) throws Exception {
+        return apiService.updateTour(id, tour);
+    }
+
+    public void deleteTour(Long id) throws Exception {
+        apiService.deleteTour(id);
     }
 }
