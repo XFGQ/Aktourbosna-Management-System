@@ -20,7 +20,6 @@
                 <Label styleClass="page-title" text="Tour Management" />
                 <Label styleClass="page-subtitle" text="Your assigned tours" />
             </VBox>
-            <Button styleClass="btn-primary" text="+ Add Tour" onAction="#onAddTour" />
         </HBox>
 
         <HBox spacing="16.0">
@@ -45,14 +44,11 @@
             <TableView fx:id="recentToursTable" styleClass="table-view"
                        prefHeight="180.0" fixedCellSize="42.0">
                 <columns>
-                    <TableColumn fx:id="colRecentName"        text="Tour Name"   prefWidth="130.0" />
-                    <TableColumn fx:id="colRecentDeparture"   text="Departure"   prefWidth="120.0" />
-                    <TableColumn fx:id="colRecentDestination" text="Destination" prefWidth="110.0" />
-                    <TableColumn fx:id="colRecentDate"        text="Date"        prefWidth="95.0" />
-                    <TableColumn fx:id="colRecentHotel"       text="Hotel"       prefWidth="120.0" />
-                    <TableColumn fx:id="colRecentVehicle"     text="Vehicle"     prefWidth="140.0" />
-                    <TableColumn fx:id="colRecentGroup"       text="Group"       prefWidth="85.0" />
-                    <TableColumn fx:id="colRecentStatus"      text="Status"      prefWidth="85.0" />
+                    <TableColumn fx:id="colRecentName"    text="Tour Name"  prefWidth="200.0" minWidth="200.0" />
+                    <TableColumn fx:id="colRecentDate"    text="Start Date" prefWidth="120.0" minWidth="120.0" />
+                    <TableColumn fx:id="colRecentHotel"   text="Hotel"      prefWidth="160.0" minWidth="160.0" />
+                    <TableColumn fx:id="colRecentVehicle" text="Vehicle"    prefWidth="160.0" minWidth="160.0" />
+                    <TableColumn fx:id="colRecentStatus"  text="Status"     prefWidth="115.0" minWidth="115.0" />
                 </columns>
             </TableView>
         </VBox>
@@ -64,14 +60,11 @@
             <TableView fx:id="upcomingToursTable" styleClass="table-view"
                        prefHeight="260.0" fixedCellSize="42.0">
                 <columns>
-                    <TableColumn fx:id="colUpcomingName"        text="Tour Name"   prefWidth="130.0" />
-                    <TableColumn fx:id="colUpcomingDeparture"   text="Departure"   prefWidth="120.0" />
-                    <TableColumn fx:id="colUpcomingDestination" text="Destination" prefWidth="110.0" />
-                    <TableColumn fx:id="colUpcomingDate"        text="Date"        prefWidth="95.0" />
-                    <TableColumn fx:id="colUpcomingHotel"       text="Hotel"       prefWidth="120.0" />
-                    <TableColumn fx:id="colUpcomingVehicle"     text="Vehicle"     prefWidth="140.0" />
-                    <TableColumn fx:id="colUpcomingGroup"       text="Group"       prefWidth="85.0" />
-                    <TableColumn fx:id="colUpcomingStatus"      text="Status"      prefWidth="85.0" />
+                    <TableColumn fx:id="colUpcomingName"    text="Tour Name"  prefWidth="200.0" minWidth="200.0" />
+                    <TableColumn fx:id="colUpcomingDate"    text="Start Date" prefWidth="120.0" minWidth="120.0" />
+                    <TableColumn fx:id="colUpcomingHotel"   text="Hotel"      prefWidth="160.0" minWidth="160.0" />
+                    <TableColumn fx:id="colUpcomingVehicle" text="Vehicle"    prefWidth="160.0" minWidth="160.0" />
+                    <TableColumn fx:id="colUpcomingStatus"  text="Status"     prefWidth="115.0" minWidth="115.0" />
                 </columns>
             </TableView>
         </VBox>

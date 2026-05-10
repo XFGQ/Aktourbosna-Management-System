@@ -15,8 +15,13 @@
             <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
         </padding>
 
-        <Label styleClass="page-title" text="Expense Tracker" />
-        <Label styleClass="page-subtitle" text="Track all tour-related expenses" />
+        <HBox alignment="CENTER_LEFT">
+            <VBox HBox.hgrow="ALWAYS">
+                <Label styleClass="page-title" text="Expense Tracker" />
+                <Label styleClass="page-subtitle" text="Track all tour-related expenses" />
+            </VBox>
+            <Button styleClass="btn-primary" text="+ Add Expense" onAction="#onAddExpense" />
+        </HBox>
 
         <HBox spacing="16.0">
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
@@ -40,11 +45,12 @@
             <TableView fx:id="expensesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
                        prefHeight="320.0" fixedCellSize="42.0">
                 <columns>
-                    <TableColumn fx:id="colExpTour" text="Tour" prefWidth="180.0" />
-                    <TableColumn fx:id="colExpCategory" text="Category" prefWidth="140.0" />
-                    <TableColumn fx:id="colExpAmount" text="Amount" prefWidth="120.0" />
-                    <TableColumn fx:id="colExpDate" text="Date" prefWidth="120.0" />
-                    <TableColumn fx:id="colExpReceipt" text="Receipt" prefWidth="160.0" />
+                    <TableColumn fx:id="colExpTour"     text="Tour"     prefWidth="180.0" minWidth="180.0" />
+                    <TableColumn fx:id="colExpCategory" text="Category" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colExpAmount"   text="Amount"   prefWidth="110.0" minWidth="110.0" />
+                    <TableColumn fx:id="colExpDate"     text="Date"     prefWidth="120.0" minWidth="120.0" />
+                    <TableColumn fx:id="colExpReceipt"  text="Receipt"  prefWidth="160.0" minWidth="160.0" />
+                    <TableColumn fx:id="colExpActions"  text="Actions"  prefWidth="120.0" minWidth="120.0" />
                 </columns>
             </TableView>
         </VBox>

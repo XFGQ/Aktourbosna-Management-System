@@ -2,6 +2,11 @@ package org.example.service;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+<<<<<<< Updated upstream
+=======
+import com.google.gson.JsonParser;
+import org.example.model.Expense;
+>>>>>>> Stashed changes
 import org.example.model.Guide;
 import org.example.model.Tour;
 import org.example.model.Vehicle;
@@ -16,7 +21,18 @@ public class ApiService {
 
     private static final String BASE_URL = "http://localhost:8080/api";
 
+<<<<<<< Updated upstream
     private final HttpClient client = HttpClient.newHttpClient();
+=======
+    private static String authToken = null;
+
+    public static void setToken(String token) { authToken = token; }
+    public static String getToken() { return authToken; }
+
+    private final HttpClient client = HttpClient.newBuilder()
+            .connectTimeout(java.time.Duration.ofSeconds(5))
+            .build();
+>>>>>>> Stashed changes
 
     private final Gson gson = new GsonBuilder()
             .registerTypeAdapter(LocalDate.class, (JsonDeserializer<LocalDate>)
@@ -44,6 +60,11 @@ public class ApiService {
                 new TypeToken<List<Guide>>() {}.getType());
     }
 
+    public List<Expense> fetchExpensesByTour(Long tourId) throws Exception {
+        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/expenses"),
+                new TypeToken<List<Expense>>() {}.getType());
+    }
+
     public Vehicle createVehicle(Vehicle vehicle) throws Exception {
         String json = gson.toJson(vehicle);
         String response = post(BASE_URL + "/vehicles", json);
@@ -66,6 +87,77 @@ public class ApiService {
         return gson.fromJson(response, Guide.class);
     }
 
+<<<<<<< Updated upstream
+=======
+    public Guide updateGuide(Long id, Guide guide) throws Exception {
+        String json = gson.toJson(guide);
+        String response = put(BASE_URL + "/guides/" + id, json);
+        return gson.fromJson(response, Guide.class);
+    }
+
+    public void deleteGuide(Long id) throws Exception {
+        delete(BASE_URL + "/guides/" + id);
+    }
+
+    public Tour createTour(Tour tour) throws Exception {
+        String json = gson.toJson(tour);
+        String response = post(BASE_URL + "/tours", json);
+        return gson.fromJson(response, Tour.class);
+    }
+
+    public Tour updateTour(Long id, Tour tour) throws Exception {
+        String json = gson.toJson(tour);
+        String response = put(BASE_URL + "/tours/" + id, json);
+        return gson.fromJson(response, Tour.class);
+    }
+
+    public void deleteTour(Long id) throws Exception {
+        delete(BASE_URL + "/tours/" + id);
+    }
+
+    public Expense createExpense(Long tourId, Expense expense) throws Exception {
+        String json = gson.toJson(expense);
+        String response = post(BASE_URL + "/tours/" + tourId + "/expenses", json);
+        return gson.fromJson(response, Expense.class);
+    }
+
+    public void deleteExpense(Long tourId, Long expenseId) throws Exception {
+        delete(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId);
+    }
+
+    public String[] login(String username, String password) throws Exception {
+        String body = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
+        HttpRequest request = HttpRequest.newBuilder()
+                .uri(URI.create(BASE_URL + "/auth/login"))
+                .timeout(java.time.Duration.ofSeconds(6))
+                .header("Content-Type", "application/json")
+                .POST(HttpRequest.BodyPublishers.ofString(body))
+                .build();
+        HttpResponse<String> response;
+        try {
+            response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        } catch (java.net.ConnectException | java.net.http.HttpTimeoutException e) {
+            throw new RuntimeException("Cannot connect to server. Make sure the backend is running.");
+        }
+        if (response.statusCode() >= 400) {
+            throw new RuntimeException("Invalid username or password.");
+        }
+        JsonObject json = JsonParser.parseString(response.body()).getAsJsonObject();
+        String token = json.get("token").getAsString();
+        String role  = json.get("role").getAsString();
+        ApiService.setToken(token);
+        return new String[]{token, role};
+    }
+
+    private HttpRequest.Builder authorizedBuilder(String url) {
+        HttpRequest.Builder builder = HttpRequest.newBuilder()
+                .uri(URI.create(url))
+                .timeout(java.time.Duration.ofSeconds(15));
+        if (authToken != null) builder.header("Authorization", "Bearer " + authToken);
+        return builder;
+    }
+
+>>>>>>> Stashed changes
     private String get(String url) throws Exception {
         long start = System.currentTimeMillis();
         HttpRequest request = HttpRequest.newBuilder()

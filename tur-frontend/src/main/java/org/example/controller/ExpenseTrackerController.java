@@ -1,17 +1,24 @@
 package org.example.controller;
 
+import javafx.beans.property.ReadOnlyObjectWrapper;
 import javafx.beans.property.SimpleObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
 import org.example.model.Expense;
 import org.example.model.Tour;
 import org.example.service.ExpenseService;
 import org.example.service.TourService;
 
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -24,40 +31,57 @@ public class ExpenseTrackerController {
     @FXML private Label toursWithExpensesValue;
 
     @FXML private TableView<Expense> expensesTable;
-    @FXML private TableColumn<Expense, String> colExpTour;
-    @FXML private TableColumn<Expense, String> colExpCategory;
-    @FXML private TableColumn<Expense, Number> colExpAmount;
-    @FXML private TableColumn<Expense, String> colExpDate;
-    @FXML private TableColumn<Expense, String> colExpReceipt;
+    @FXML private TableColumn<Expense, String>  colExpTour;
+    @FXML private TableColumn<Expense, String>  colExpCategory;
+    @FXML private TableColumn<Expense, Number>  colExpAmount;
+    @FXML private TableColumn<Expense, String>  colExpDate;
+    @FXML private TableColumn<Expense, String>  colExpReceipt;
+    @FXML private TableColumn<Expense, Expense> colExpActions;
 
-    private final TourService tourService = new TourService();
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
+
+    private final TourService    tourService    = new TourService();
     private final ExpenseService expenseService = new ExpenseService();
 
     private final Map<Long, String> expenseToTourName = new HashMap<>();
+    private final Map<Long, Long>   expenseToTourId   = new HashMap<>();
+    private List<Tour> cachedTours = new ArrayList<>();
 
     @FXML
     public void initialize() {
-        colExpTour.setCellValueFactory(cd -> {
-            String name = expenseToTourName.getOrDefault(cd.getValue().getExpenseId(), "—");
-            return new SimpleStringProperty(name);
-        });
-        colExpCategory.setCellValueFactory(new PropertyValueFactory<>("category"));
+        colExpTour.setCellValueFactory(cd -> new SimpleStringProperty(
+                expenseToTourName.getOrDefault(cd.getValue().getExpenseId(), "—")));
+        colExpCategory.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getCategory() != null ? cd.getValue().getCategory() : "—"));
         colExpAmount.setCellValueFactory(cd -> new SimpleObjectProperty<>(cd.getValue().getAmount()));
-        colExpDate.setCellValueFactory(cd -> {
-            var d = cd.getValue().getDate();
-            return new SimpleStringProperty(d != null ? d.toString() : "—");
+        colExpDate.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getDate() != null ? cd.getValue().getDate().format(DATE_FMT) : "—"));
+        colExpReceipt.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getReceiptPath() != null ? cd.getValue().getReceiptPath() : "—"));
+
+        colExpActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+        colExpActions.setCellFactory(col -> new TableCell<>() {
+            private final Button deleteBtn = new Button("Delete");
+            private final HBox box = new HBox(deleteBtn);
+            {
+                box.setAlignment(Pos.CENTER);
+                deleteBtn.getStyleClass().add("btn-danger");
+                deleteBtn.setOnAction(e -> onDeleteExpense(getTableView().getItems().get(getIndex())));
+            }
+            @Override protected void updateItem(Expense item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty || item == null ? null : box);
+            }
         });
-        colExpReceipt.setCellValueFactory(new PropertyValueFactory<>("receiptPath"));
 
         loadData();
     }
 
     @FXML
-    public void refresh() {
-        loadData();
-    }
+    public void refresh() { loadData(); }
 
     private void loadData() {
+<<<<<<< Updated upstream
         try {
             List<Tour> tours = tourService.getAllTours();
             List<Expense> allExpenses = new ArrayList<>();
@@ -72,6 +96,54 @@ public class ExpenseTrackerController {
                         allExpenses.add(e);
                     }
                 }
+=======
+        new Thread(() -> {
+            try {
+                List<Tour> tours = tourService.getAllTours();
+                List<Expense> allExpenses = new ArrayList<>();
+                Map<Long, String> nameMap = new HashMap<>();
+                Map<Long, Long>   idMap   = new HashMap<>();
+                int toursWithExp = 0;
+
+                for (Tour t : tours) {
+                    if (t.getTourId() == null) continue;
+                    try {
+                        List<Expense> tourExpenses = expenseService.getExpensesByTourId(t.getTourId());
+                        if (tourExpenses != null && !tourExpenses.isEmpty()) {
+                            toursWithExp++;
+                            for (Expense e : tourExpenses) {
+                                if (e.getExpenseId() != null) {
+                                    nameMap.put(e.getExpenseId(), t.getTourName() != null ? t.getTourName() : "—");
+                                    idMap.put(e.getExpenseId(), t.getTourId());
+                                }
+                                allExpenses.add(e);
+                            }
+                        }
+                    } catch (Exception ignored) {}
+                }
+
+                double total = expenseService.calculateTotal(allExpenses);
+                int finalToursWithExp = toursWithExp;
+
+                javafx.application.Platform.runLater(() -> {
+                    cachedTours = tours;
+                    expenseToTourName.clear();
+                    expenseToTourName.putAll(nameMap);
+                    expenseToTourId.clear();
+                    expenseToTourId.putAll(idMap);
+                    expensesTable.getItems().setAll(allExpenses);
+                    totalExpensesValue.setText(String.valueOf(allExpenses.size()));
+                    totalAmountValue.setText("€" + String.format("%,.0f", total));
+                    toursWithExpensesValue.setText(String.valueOf(finalToursWithExp));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalExpensesValue.setText("—");
+                    totalAmountValue.setText("—");
+                    toursWithExpensesValue.setText("—");
+                });
+>>>>>>> Stashed changes
             }
 
             expensesTable.getItems().setAll(allExpenses);
@@ -92,4 +164,60 @@ public class ExpenseTrackerController {
             toursWithExpensesValue.setText("—");
         }
     }
+
+    @FXML
+    private void onAddExpense() {
+        Object[] result = AddExpenseDialog.show(cachedTours);
+        if (result == null) return;
+        Long tourId = (Long) result[0];
+        Expense expense = (Expense) result[1];
+        runInBackground(
+                () -> expenseService.addExpense(tourId, expense),
+                "Adding expense...", "Expense added successfully.", "Failed to add expense");
+    }
+
+    private void onDeleteExpense(Expense expense) {
+        if (!ConfirmDialog.show("Confirm deletion",
+                "Delete this expense (" + expense.getCategory() + " — €" + expense.getAmount() + ")?")) return;
+        Long tourId = expenseToTourId.get(expense.getExpenseId());
+        if (tourId == null) { Toast.error("Cannot delete: tour not found for this expense."); return; }
+        runInBackground(
+                () -> expenseService.deleteExpense(tourId, expense.getExpenseId()),
+                "Deleting expense...", "Expense deleted.", "Failed to delete expense");
+    }
+
+    private void runInBackground(BackgroundOp op, String loadingMsg, String successMsg, String errorTitle) {
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.initStyle(StageStyle.UNDECORATED);
+        loadingStage.setResizable(false);
+
+        ProgressIndicator spinner = new ProgressIndicator();
+        spinner.setPrefSize(40, 40);
+        Label msg = new Label(loadingMsg);
+        msg.setStyle("-fx-font-size: 14px;");
+        VBox box = new VBox(12, spinner, msg);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(24));
+        box.setStyle("-fx-background-color: white; -fx-border-color: #BDBDBD; -fx-border-width: 1px;");
+        loadingStage.setScene(new javafx.scene.Scene(box));
+        loadingStage.show();
+
+        Task<Void> task = new Task<>() {
+            @Override protected Void call() throws Exception { op.run(); return null; }
+        };
+        task.setOnSucceeded(e -> {
+            loadingStage.close();
+            loadData();
+            Toast.success(successMsg);
+        });
+        task.setOnFailed(e -> {
+            loadingStage.close();
+            Toast.error(errorTitle + ": " + task.getException().getMessage());
+        });
+        new Thread(task).start();
+    }
+
+    @FunctionalInterface
+    private interface BackgroundOp { void run() throws Exception; }
 }
