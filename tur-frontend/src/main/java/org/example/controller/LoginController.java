@@ -14,6 +14,7 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.util.Duration;
+import javafx.scene.image.ImageView;
 import org.example.service.ApiService;
 
 public class LoginController {
@@ -39,20 +40,23 @@ public class LoginController {
         stage.setResizable(false);
 
         StackPane root = new StackPane();
-        root.setPrefSize(960, 540);
+        root.setPrefSize(980, 540);
 
         HBox mainContent = new HBox();
-        mainContent.setPrefSize(960, 540);
+        mainContent.setPrefSize(980, 540);
 
         // ── LEFT PANEL ────────────────────────────────────────────────
         VBox leftPanel = new VBox();
-        leftPanel.setPrefWidth(288);
+        leftPanel.setPrefWidth(310);
         leftPanel.setAlignment(Pos.CENTER);
         leftPanel.setPadding(new Insets(50, 30, 50, 30));
         leftPanel.setStyle("-fx-background-color: white;");
 
+        ImageView loginLogo = LogoView.create(52);
+
         Label title = new Label("Aktour ViaBalkan");
-        title.setStyle("-fx-text-fill: #1A237E; -fx-font-size: 26px; -fx-font-weight: bold;");
+        title.setStyle("-fx-text-fill: #1A237E; -fx-font-size: 22px; -fx-font-weight: bold;");
+        title.setWrapText(false);
 
         Label subtitle = new Label("Management System");
         subtitle.setStyle("-fx-text-fill: #78909C; -fx-font-size: 12px;");
@@ -65,7 +69,7 @@ public class LoginController {
 
         TextField usernameField = new TextField();
         usernameField.setPromptText("Enter username");
-        usernameField.setPrefWidth(220);
+        usernameField.setPrefWidth(250);
         usernameField.setStyle("-fx-background-radius: 6; -fx-padding: 9; -fx-font-size: 13px;");
 
         Region gap1 = new Region();
@@ -76,7 +80,7 @@ public class LoginController {
 
         PasswordField passwordField = new PasswordField();
         passwordField.setPromptText("Enter password");
-        passwordField.setPrefWidth(220);
+        passwordField.setPrefWidth(250);
         passwordField.setStyle("-fx-background-radius: 6; -fx-padding: 9; -fx-font-size: 13px;");
 
         Region gap2 = new Region();
@@ -84,24 +88,31 @@ public class LoginController {
 
         Label errorLabel = new Label("");
         errorLabel.setStyle("-fx-text-fill: #E53935; -fx-font-size: 11px;");
-        errorLabel.setMaxWidth(300);
+        errorLabel.setMaxWidth(250);
         errorLabel.setWrapText(true);
 
         Button loginBtn = new Button("Login");
-        loginBtn.setPrefWidth(220);
+        loginBtn.setPrefWidth(250);
         loginBtn.setStyle("-fx-background-color: #4FC3F7; -fx-text-fill: #1A237E; -fx-font-weight: bold; " +
                 "-fx-background-radius: 6; -fx-padding: 10; -fx-font-size: 13px;");
+
+        Label contactLabel = new Label("info@aktourbosna.com");
+        contactLabel.setStyle("-fx-text-fill: #90A4AE; -fx-font-size: 11px;");
+
+        Region gap3 = new Region();
+        gap3.setPrefHeight(8);
 
         VBox formBox = new VBox(0,
                 userLabel, usernameField,
                 gap1,
                 passLabel, passwordField,
                 gap2,
-                errorLabel, loginBtn);
-        formBox.setMaxWidth(220);
+                errorLabel, loginBtn,
+                gap3, contactLabel);
+        formBox.setMaxWidth(250);
         formBox.setAlignment(Pos.CENTER_LEFT);
 
-        leftPanel.getChildren().addAll(title, subtitle, spacerTop, formBox);
+        leftPanel.getChildren().addAll(loginLogo, title, subtitle, spacerTop, formBox);
 
         // ── RIGHT PANEL (Slideshow) ───────────────────────────────────
         // slides sit in a StackPane that grows, dots are pinned below it
@@ -131,7 +142,7 @@ public class LoginController {
         }
 
         VBox rightPanel = new VBox();
-        rightPanel.setPrefSize(672, 540);
+        rightPanel.setPrefSize(670, 540);
         rightPanel.getChildren().addAll(slidesPane, dots);
 
         int[] current = {0};
@@ -178,6 +189,7 @@ public class LoginController {
 
         HBox winControls = new HBox(2, minBtn, closeBtn);
         winControls.setAlignment(Pos.TOP_RIGHT);
+        winControls.setPickOnBounds(false);
         StackPane.setAlignment(winControls, Pos.TOP_RIGHT);
         StackPane.setMargin(winControls, new Insets(6, 6, 0, 0));
 
@@ -197,6 +209,14 @@ public class LoginController {
         // ── LOGIN LOGIC ───────────────────────────────────────────────
         String[][] result = {null};
 
+        Timeline[] watchdog = {null};
+
+        Runnable resetBtn = () -> {
+            if (watchdog[0] != null) { watchdog[0].stop(); watchdog[0] = null; }
+            loginBtn.setDisable(false);
+            loginBtn.setText("Login");
+        };
+
         Runnable doLogin = () -> {
             String username = usernameField.getText().trim();
             String password = passwordField.getText();
@@ -204,25 +224,37 @@ public class LoginController {
                 errorLabel.setText("Username and password cannot be empty.");
                 return;
             }
+            errorLabel.setText("");
             loginBtn.setDisable(true);
             loginBtn.setText("Signing in...");
-            new Thread(() -> {
+
+            // UI-level safety net: if nothing responds in 8 s, reset button
+            watchdog[0] = new Timeline(new KeyFrame(Duration.seconds(8), ev -> {
+                errorLabel.setText("Server did not respond. Please try again.");
+                resetBtn.run();
+            }));
+            watchdog[0].play();
+
+            Thread t = new Thread(() -> {
                 try {
                     String[] auth = apiService.login(username, password);
                     ApiService.setToken(auth[0]);
                     result[0] = auth;
                     javafx.application.Platform.runLater(() -> {
+                        if (watchdog[0] != null) { watchdog[0].stop(); watchdog[0] = null; }
                         slideshow.stop();
                         stage.close();
                     });
                 } catch (Exception ex) {
                     javafx.application.Platform.runLater(() -> {
-                        errorLabel.setText(ex.getMessage());
-                        loginBtn.setDisable(false);
-                        loginBtn.setText("Login");
+                        String msg = ex.getMessage();
+                        errorLabel.setText(msg != null ? msg : "Connection error. Please try again.");
+                        resetBtn.run();
                     });
                 }
-            }).start();
+            });
+            t.setDaemon(true);
+            t.start();
         };
 
         loginBtn.setOnAction(e -> doLogin.run());
@@ -233,7 +265,7 @@ public class LoginController {
         stage.setScene(scene);
 
         Rectangle2D screen = Screen.getPrimary().getVisualBounds();
-        stage.setX((screen.getWidth() - 960) / 2);
+        stage.setX((screen.getWidth() - 980) / 2);
         stage.setY((screen.getHeight() - 540) / 2);
 
         stage.showAndWait();

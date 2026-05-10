@@ -12,11 +12,13 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Label;
 import javafx.scene.control.ProgressBar;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.example.controller.LoginController;
+import org.example.controller.LogoView;
 
 public class Main extends Application {
 
@@ -110,6 +112,8 @@ public class Main extends Application {
             });
 
             primaryStage.setTitle("Aktour ViaBalkan Management System");
+            primaryStage.getIcons().add(new javafx.scene.image.Image(
+                    getClass().getResourceAsStream("/images/logo.png")));
             primaryStage.setScene(new Scene(root, 1200, 800));
             primaryStage.show();
         } catch (Exception ex) {
@@ -127,6 +131,8 @@ public class Main extends Application {
         root.setPadding(new Insets(40));
         root.setStyle("-fx-background-color: white;");
 
+        ImageView splashLogo = LogoView.create(72);
+
         Label logoText = new Label("Aktour ViaBalkan");
         logoText.setStyle("-fx-text-fill: #1A237E; -fx-font-size: 32px; -fx-font-weight: bold;");
 
@@ -134,7 +140,7 @@ public class Main extends Application {
         subtitle.setStyle("-fx-text-fill: #78909C; -fx-font-size: 14px;");
 
         VBox spacer = new VBox();
-        spacer.setPrefHeight(30);
+        spacer.setPrefHeight(20);
 
         ProgressBar progressBar = new ProgressBar(0);
         progressBar.setId("splashProgress");
@@ -149,7 +155,7 @@ public class Main extends Application {
         Label version = new Label("v1.0");
         version.setStyle("-fx-text-fill: #757575; -fx-font-size: 10px;");
 
-        root.getChildren().addAll(logoText, subtitle, spacer, progressBar, status, version);
+        root.getChildren().addAll(splashLogo, logoText, subtitle, spacer, progressBar, status, version);
 
         Scene scene = new Scene(root, 480, 320);
         splash.setScene(scene);

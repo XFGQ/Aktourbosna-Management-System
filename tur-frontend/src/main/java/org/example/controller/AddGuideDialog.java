@@ -13,6 +13,10 @@ public class AddGuideDialog {
 
     public static Guide show(Guide existing) {
         Dialog<Guide> dialog = new Dialog<>();
+        javafx.stage.Window owner = javafx.stage.Window.getWindows().stream()
+                .filter(javafx.stage.Window::isShowing).findFirst().orElse(null);
+        dialog.initOwner(owner);
+        dialog.initModality(javafx.stage.Modality.WINDOW_MODAL);
         boolean editMode = existing != null;
         dialog.setTitle(editMode ? "Edit Guide" : "Add New Guide");
         dialog.setHeaderText(editMode ? "Update guide details" : "Enter guide details");
@@ -73,9 +77,7 @@ public class AddGuideDialog {
                     g.setDailyFee(dailyFee.getText().isEmpty() ? 0.0 : Double.parseDouble(dailyFee.getText().trim()));
                     return g;
                 } catch (NumberFormatException e) {
-                    Alert err = new Alert(Alert.AlertType.ERROR,
-                            "Experience and Daily Fee must be numbers.");
-                    err.showAndWait();
+                    Toast.error("Experience and Daily Fee must be numbers.");
                     return null;
                 }
             }

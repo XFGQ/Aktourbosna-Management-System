@@ -19,7 +19,6 @@ import org.example.service.GuideService;
 import org.example.service.VehicleService;
 
 import java.util.List;
-import java.util.Optional;
 
 public class VehiclesGuidesController {
 
@@ -181,13 +180,9 @@ public class VehiclesGuidesController {
     }
 
     private void onDeleteVehicle(Vehicle vehicle) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+        if (!ConfirmDialog.show("Confirm deletion",
                 "Delete vehicle \"" + vehicle.getBrand() + " " + vehicle.getModel()
-                        + " (" + vehicle.getPlateNumber() + ")\"?",
-                ButtonType.OK, ButtonType.CANCEL);
-        confirm.setHeaderText("Confirm deletion");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+                        + " (" + vehicle.getPlateNumber() + ")\"?")) return;
 
         runInBackground(
                 () -> vehicleService.deleteVehicle(vehicle.getId()),
@@ -221,12 +216,8 @@ public class VehiclesGuidesController {
     }
 
     private void onDeleteGuide(Guide guide) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
-                "Delete guide \"" + guide.getFullName() + "\"?",
-                ButtonType.OK, ButtonType.CANCEL);
-        confirm.setHeaderText("Confirm deletion");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+        if (!ConfirmDialog.show("Confirm deletion",
+                "Delete guide \"" + guide.getFullName() + "\"?")) return;
 
         runInBackground(
                 () -> guideService.deleteGuide(guide.getId()),
@@ -289,14 +280,14 @@ public class VehiclesGuidesController {
             loadingStage.close();
             AppController app = AppController.getInstance();
             if (app != null) app.refreshAllCached();
-            new Alert(Alert.AlertType.INFORMATION, successMsg).show();
+            Toast.success(successMsg);
         });
 
         task.setOnFailed(e -> {
             loadingStage.close();
             Throwable ex = task.getException();
             ex.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, errorTitle + ": " + ex.getMessage()).show();
+            Toast.error(errorTitle + ": " + ex.getMessage());
         });
 
         Thread t = new Thread(task);

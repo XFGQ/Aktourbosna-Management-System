@@ -3,17 +3,19 @@ package org.example.controller;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.fxml.FXML;
 import javafx.scene.Node;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableView;
-import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.*;
+
+import java.time.format.DateTimeFormatter;
+import org.example.model.Guide;
 import org.example.model.Tour;
+import org.example.model.Vehicle;
 import org.example.service.GuideService;
 import org.example.service.TourService;
 import org.example.service.VehicleService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class DashboardController {
 
@@ -36,17 +38,54 @@ public class DashboardController {
     private final GuideService guideService = new GuideService();
     private final VehicleService vehicleService = new VehicleService();
 
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
+
+    private final Map<Long, String> guideNames = new HashMap<>();
+
     @FXML
     public void initialize() {
-        colTourName.setCellValueFactory(new PropertyValueFactory<>("tourName"));
-        colDestination.setCellValueFactory(new PropertyValueFactory<>("destination"));
-        colDate.setCellValueFactory(new PropertyValueFactory<>("startDate"));
-        colStatus.setCellValueFactory(new PropertyValueFactory<>("status"));
+        colTourName.setCellValueFactory(cd -> new SimpleStringProperty(cd.getValue().getTourName()));
+        colTourName.setCellFactory(col -> tooltipCell());
 
-        colGuide.setCellValueFactory(cd ->
-                new SimpleStringProperty(tourService.getGuideName(cd.getValue())));
+        colDestination.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getHotelName() != null ? cd.getValue().getHotelName() : "—"));
+        colDestination.setCellFactory(col -> tooltipCell());
+
+        colDate.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getStartDate() != null ? cd.getValue().getStartDate().format(DATE_FMT) : "—"));
+        colDate.setCellFactory(col -> tooltipCell());
+
+        colGuide.setCellValueFactory(cd -> new SimpleStringProperty(
+                guideNames.getOrDefault(cd.getValue().getGuideId(), "—")));
+        colGuide.setCellFactory(col -> tooltipCell());
+
+        colStatus.setCellValueFactory(cd -> new SimpleStringProperty(tourService.deriveStatus(cd.getValue())));
+        colStatus.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(String s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) { setGraphic(null); return; }
+                Label badge = new Label(s);
+                badge.getStyleClass().add(switch (s) {
+                    case "Active"    -> "badge-active";
+                    case "Upcoming"  -> "badge-upcoming";
+                    case "Completed" -> "badge-completed";
+                    default          -> "badge-default";
+                });
+                setGraphic(badge); setText(null);
+            }
+        });
 
         loadData();
+    }
+
+    private static TableCell<Tour, String> tooltipCell() {
+        return new TableCell<>() {
+            @Override protected void updateItem(String s, boolean empty) {
+                super.updateItem(s, empty);
+                if (empty || s == null) { setText(null); setTooltip(null); }
+                else { setText(s); setTooltip(new Tooltip(s)); }
+            }
+        };
     }
 
     @FXML
@@ -58,17 +97,28 @@ public class DashboardController {
         new Thread(() -> {
             try {
                 List<Tour> tours = tourService.getAllTours();
+                List<Guide> guides = guideService.getAllGuides();
+                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+
+                Map<Long, String> nameMap = new HashMap<>();
+                for (Guide g : guides) {
+                    if (g.getId() != null && g.getFullName() != null) {
+                        nameMap.put(g.getId(), g.getFullName());
+                    }
+                }
+
                 double revenue = tourService.calculateTotalRevenue(tours);
-                long guides = guideService.countGuides(guideService.getAllGuides());
-                var vehicles = vehicleService.getAllVehicles();
                 long available = vehicleService.countAvailable(vehicles);
+
                 javafx.application.Platform.runLater(() -> {
+                    guideNames.clear();
+                    guideNames.putAll(nameMap);
                     recentToursTable.getItems().setAll(tours);
                     totalToursValue.setText(String.valueOf(tours.size()));
                     totalToursChange.setText("");
                     revenueValue.setText("€" + String.format("%,.0f", revenue));
                     revenueChange.setText("");
-                    guidesValue.setText(String.valueOf(guides));
+                    guidesValue.setText(String.valueOf(guides.size()));
                     vehiclesValue.setText(String.valueOf(vehicles.size()));
                     vehiclesStatus.setText(available + " available");
                 });

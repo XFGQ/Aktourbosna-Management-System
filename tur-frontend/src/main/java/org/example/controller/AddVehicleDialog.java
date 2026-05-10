@@ -13,6 +13,10 @@ public class AddVehicleDialog {
 
     public static Vehicle show(Vehicle existing) {
         Dialog<Vehicle> dialog = new Dialog<>();
+        javafx.stage.Window owner = javafx.stage.Window.getWindows().stream()
+                .filter(javafx.stage.Window::isShowing).findFirst().orElse(null);
+        dialog.initOwner(owner);
+        dialog.initModality(javafx.stage.Modality.WINDOW_MODAL);
         boolean editMode = existing != null;
         dialog.setTitle(editMode ? "Edit Vehicle" : "Add New Vehicle");
         dialog.setHeaderText(editMode ? "Update vehicle details" : "Enter vehicle details");
@@ -80,9 +84,7 @@ public class AddVehicleDialog {
                 if (brand.getText().trim().isEmpty() || model.getText().trim().isEmpty()
                         || year.getText().trim().isEmpty() || plate.getText().trim().isEmpty()
                         || seats.getText().trim().isEmpty()) {
-                    Alert err = new Alert(Alert.AlertType.ERROR,
-                            "Brand, Model, Year, Plate Number and Seats are required.");
-                    err.showAndWait();
+                    Toast.error("Brand, Model, Year, Plate Number and Seats are required.");
                     return null;
                 }
                 try {
@@ -99,9 +101,7 @@ public class AddVehicleDialog {
                     v.setIsAvailable(available.isSelected());
                     return v;
                 } catch (NumberFormatException e) {
-                    Alert err = new Alert(Alert.AlertType.ERROR,
-                            "Year, seats, mileage and fuel consumption must be numbers.");
-                    err.showAndWait();
+                    Toast.error("Year, seats, mileage and fuel consumption must be numbers.");
                     return null;
                 }
             }

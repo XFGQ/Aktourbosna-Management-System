@@ -5,7 +5,8 @@ import org.example.model.Tour;
 import org.example.model.Waypoint;
 import org.mapstruct.*;
 
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        unmappedSourcePolicy = ReportingPolicy.IGNORE)
 public interface TourMapper {
 
     @Mapping(source = "guide.id", target = "guideId")
@@ -16,7 +17,7 @@ public interface TourMapper {
 
     @Mapping(source = "guideId", target = "guide.id")
     @Mapping(source = "vehicleId", target = "vehicle.id")
-    @Mapping(source = "routeId", target = "baseRoute.routeId")
+    @Mapping(target = "baseRoute", ignore = true)
     @Mapping(target = "extraWaypoints", ignore = true)
     @Mapping(target = "customers", ignore = true)
     @Mapping(target = "expenses", ignore = true)
