@@ -231,3 +231,39 @@
 .scroll-bar .increment-button, .scroll-bar .decrement-button {
     -fx-background-color: transparent; -fx-pref-width: 0; -fx-pref-height: 0;
 }
+
+.btn-secondary {
+    -fx-background-color: #f0f2f5;
+    -fx-text-fill: #1a2535;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 14;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-border-color: #d0d5dd;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+.btn-secondary:hover {
+    -fx-background-color: #e2e6ea;
+    -fx-border-color: #b0b8c1;
+}
+
+.btn-danger {
+    -fx-background-color: #fff0f0;
+    -fx-text-fill: #c0392b;
+    -fx-font-size: 12px;
+    -fx-font-weight: bold;
+    -fx-padding: 5 14;
+    -fx-background-radius: 5;
+    -fx-cursor: hand;
+    -fx-border-color: #f5c6c6;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+}
+
+.btn-danger:hover {
+    -fx-background-color: #ffe0e0;
+    -fx-border-color: #e57373;
+}
