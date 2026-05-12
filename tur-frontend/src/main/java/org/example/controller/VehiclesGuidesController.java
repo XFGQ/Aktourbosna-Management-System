@@ -28,6 +28,7 @@ public class VehiclesGuidesController {
     @FXML private Label totalGuidesValue;
 
     @FXML private TableView<Vehicle> vehiclesTable;
+    @FXML private TableColumn<Vehicle, Long> colVehId;
     @FXML private TableColumn<Vehicle, String> colVehBrand;
     @FXML private TableColumn<Vehicle, String> colVehModel;
     @FXML private TableColumn<Vehicle, Integer> colVehYear;
@@ -35,6 +36,7 @@ public class VehiclesGuidesController {
     @FXML private TableColumn<Vehicle, String> colVehPlate;
     @FXML private TableColumn<Vehicle, Integer> colVehSeats;
     @FXML private TableColumn<Vehicle, String> colVehFuel;
+    @FXML private TableColumn<Vehicle, String> colVehPrice;
     @FXML private TableColumn<Vehicle, String> colVehStatus;
     @FXML private TableColumn<Vehicle, Vehicle> colVehActions;
 
@@ -46,12 +48,14 @@ public class VehiclesGuidesController {
     @FXML private TableColumn<Guide, String> colGuideLicense;
     @FXML private TableColumn<Guide, Integer> colGuideExp;
     @FXML private TableColumn<Guide, String> colGuideFee;
+    @FXML private TableColumn<Guide, Guide>  colGuideActions;
 
     private final VehicleService vehicleService = new VehicleService();
     private final GuideService guideService = new GuideService();
 
     @FXML
     public void initialize() {
+        colVehId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colVehBrand.setCellValueFactory(new PropertyValueFactory<>("brand"));
         colVehModel.setCellValueFactory(new PropertyValueFactory<>("model"));
         colVehYear.setCellValueFactory(new PropertyValueFactory<>("year"));
@@ -59,8 +63,15 @@ public class VehiclesGuidesController {
         colVehPlate.setCellValueFactory(new PropertyValueFactory<>("plateNumber"));
         colVehSeats.setCellValueFactory(new PropertyValueFactory<>("seatCapacity"));
         colVehFuel.setCellValueFactory(new PropertyValueFactory<>("fuelType"));
+
+        colVehPrice.setCellValueFactory(cd -> {
+            Double price = cd.getValue().getDailyRentalFee();
+            // "%,.0f" kısmı binlik ayraç (virgül) ekler ve ondalık kısımları siler.
+            return new SimpleStringProperty(price != null ? "€" + String.format("%,.0f", price) : "—");
+        });
+
         colVehStatus.setCellValueFactory(cd ->
-                new SimpleStringProperty(Boolean.TRUE.equals(cd.getValue().getIsAvailable()) ? "Available" : "Not Available"));
+                new SimpleStringProperty(Boolean.TRUE.equals(cd.getValue().getAvailable()) ? "Available" : "Not Available"));
 
         colVehActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colVehActions.setCellFactory(col -> new TableCell<>() {
@@ -97,6 +108,25 @@ public class VehiclesGuidesController {
         colGuideFee.setCellValueFactory(cd -> {
             Double fee = cd.getValue().getDailyFee();
             return new SimpleStringProperty(fee != null ? "€" + String.format("%,.0f", fee) : "—");
+        });
+
+        colGuideActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+        colGuideActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("Edit");
+            private final Button deleteBtn = new Button("Delete");
+            private final HBox box = new HBox(6, editBtn, deleteBtn);
+            {
+                box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
+                deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e -> onEditGuide(getTableView().getItems().get(getIndex())));
+                deleteBtn.setOnAction(e -> onDeleteGuide(getTableView().getItems().get(getIndex())));
+            }
+            @Override
+            protected void updateItem(Guide item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty || item == null ? null : box);
+            }
         });
 
         loadData();
@@ -173,8 +203,6 @@ public class VehiclesGuidesController {
         );
     }
 
-<<<<<<< Updated upstream
-=======
     private void onEditGuide(Guide guide) {
         Guide updated = AddGuideDialog.show(guide);
         if (updated == null) return;
@@ -198,13 +226,6 @@ public class VehiclesGuidesController {
         );
     }
 
->>>>>>> Stashed changes
-    /**
-     * 1) Loading penceresi göster
-     * 2) Arka planda HTTP işlemi + yeni veri çekme
-     * 3) Loading kapanınca UI güncelle, başarı mesajı göster
-     * 4) Diğer ekranları "kirli" işaretle - kullanıcı geçince yenilenecekler
-     */
     private void runInBackground(BackgroundOp op, String loadingMsg, String successMsg, String errorTitle) {
         Stage loadingStage = new Stage();
         loadingStage.initModality(Modality.APPLICATION_MODAL);
@@ -250,16 +271,9 @@ public class VehiclesGuidesController {
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }
             AppController app = AppController.getInstance();
-<<<<<<< Updated upstream
-            if (app != null) {
-                app.invalidateOtherViews("vehiclesGuides.fxml");
-            }
-            loadingStage.close();
-            new Alert(Alert.AlertType.INFORMATION, successMsg).show();
-=======
             if (app != null) app.refreshAllCached();
+            loadingStage.close();
             Toast.success(successMsg);
->>>>>>> Stashed changes
         });
 
         task.setOnFailed(e -> {

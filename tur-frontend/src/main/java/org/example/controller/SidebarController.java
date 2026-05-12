@@ -26,14 +26,6 @@ public class SidebarController {
         }
     }
 
-    @FXML
-    public void initialize() {
-        if (logoHBox != null) {
-            ImageView logo = LogoView.create(46);
-            logoHBox.getChildren().add(0, logo);
-        }
-    }
-
     public void setAppController(AppController appController) {
         this.appController = appController;
         setActive(btnDashboard);

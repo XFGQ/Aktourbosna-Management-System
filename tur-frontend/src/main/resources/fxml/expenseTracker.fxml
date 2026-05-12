@@ -34,17 +34,19 @@
         </HBox>
 
         <VBox styleClass="panel" spacing="0">
-            <HBox alignment="CENTER_LEFT" styleClass="panel-header">
-                <Label styleClass="panel-title" text="All Expenses" />
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10">
+                <Label styleClass="panel-title" text="All Expenses" HBox.hgrow="ALWAYS" />
+                <Button text="+ Add Expense" styleClass="btn-primary" onAction="#onAddExpense" />
             </HBox>
             <TableView fx:id="expensesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
                        prefHeight="320.0" fixedCellSize="42.0">
                 <columns>
-                    <TableColumn fx:id="colExpTour" text="Tour" prefWidth="180.0" />
+                    <TableColumn fx:id="colExpTour"     text="Tour"     prefWidth="170.0" />
                     <TableColumn fx:id="colExpCategory" text="Category" prefWidth="140.0" />
-                    <TableColumn fx:id="colExpAmount" text="Amount" prefWidth="120.0" />
-                    <TableColumn fx:id="colExpDate" text="Date" prefWidth="120.0" />
-                    <TableColumn fx:id="colExpReceipt" text="Receipt" prefWidth="160.0" />
+                    <TableColumn fx:id="colExpAmount"   text="Amount"   prefWidth="110.0" />
+                    <TableColumn fx:id="colExpDate"     text="Date"     prefWidth="120.0" />
+                    <TableColumn fx:id="colExpReceipt"  text="Receipt"  prefWidth="140.0" />
+                    <TableColumn fx:id="colExpActions"  text="Actions"  prefWidth="120.0" />
                 </columns>
             </TableView>
         </VBox>

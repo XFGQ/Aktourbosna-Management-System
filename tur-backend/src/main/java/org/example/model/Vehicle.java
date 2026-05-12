@@ -52,6 +52,8 @@ public class Vehicle {
 
     @Column(name = "is_available")
     private Boolean available = true;
+    @Column(name = "daily_rental_fee")
+    private Double dailyRentalFee;
 
     @ElementCollection
     @CollectionTable(name = "vehicle_service_history", joinColumns = @JoinColumn(name = "vehicle_id"))

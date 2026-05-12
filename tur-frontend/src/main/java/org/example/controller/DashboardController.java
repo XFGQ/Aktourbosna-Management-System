@@ -94,31 +94,6 @@ public class DashboardController {
     }
 
     private void loadData() {
-<<<<<<< Updated upstream
-        try {
-            List<Tour> tours = tourService.getAllTours();
-            recentToursTable.getItems().setAll(tours);
-
-            totalToursValue.setText(String.valueOf(tours.size()));
-            totalToursChange.setText("");
-
-            revenueValue.setText("€" + String.format("%,.0f", tourService.calculateTotalRevenue(tours)));
-            revenueChange.setText("");
-
-            guidesValue.setText(String.valueOf(guideService.countGuides(guideService.getAllGuides())));
-
-            var vehicles = vehicleService.getAllVehicles();
-            vehiclesValue.setText(String.valueOf(vehicles.size()));
-            vehiclesStatus.setText(vehicleService.countAvailable(vehicles) + " available");
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalToursValue.setText("—");
-            revenueValue.setText("—");
-            guidesValue.setText("—");
-            vehiclesValue.setText("—");
-            vehiclesStatus.setText("");
-        }
-=======
         new Thread(() -> {
             try {
                 List<Tour> tours = tourService.getAllTours();
@@ -158,7 +133,6 @@ public class DashboardController {
                 });
             }
         }).start();
->>>>>>> Stashed changes
     }
 
     @FXML
