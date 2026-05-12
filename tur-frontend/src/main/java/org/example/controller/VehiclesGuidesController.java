@@ -28,6 +28,7 @@ public class VehiclesGuidesController {
     @FXML private Label totalGuidesValue;
 
     @FXML private TableView<Vehicle> vehiclesTable;
+    @FXML private TableColumn<Vehicle, Long> colVehId;
     @FXML private TableColumn<Vehicle, String> colVehBrand;
     @FXML private TableColumn<Vehicle, String> colVehModel;
     @FXML private TableColumn<Vehicle, Integer> colVehYear;
@@ -35,6 +36,7 @@ public class VehiclesGuidesController {
     @FXML private TableColumn<Vehicle, String> colVehPlate;
     @FXML private TableColumn<Vehicle, Integer> colVehSeats;
     @FXML private TableColumn<Vehicle, String> colVehFuel;
+    @FXML private TableColumn<Vehicle, String> colVehPrice;
     @FXML private TableColumn<Vehicle, String> colVehStatus;
     @FXML private TableColumn<Vehicle, Vehicle> colVehActions;
 
@@ -53,6 +55,7 @@ public class VehiclesGuidesController {
 
     @FXML
     public void initialize() {
+        colVehId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colVehBrand.setCellValueFactory(new PropertyValueFactory<>("brand"));
         colVehModel.setCellValueFactory(new PropertyValueFactory<>("model"));
         colVehYear.setCellValueFactory(new PropertyValueFactory<>("year"));
@@ -60,8 +63,15 @@ public class VehiclesGuidesController {
         colVehPlate.setCellValueFactory(new PropertyValueFactory<>("plateNumber"));
         colVehSeats.setCellValueFactory(new PropertyValueFactory<>("seatCapacity"));
         colVehFuel.setCellValueFactory(new PropertyValueFactory<>("fuelType"));
+
+        colVehPrice.setCellValueFactory(cd -> {
+            Double price = cd.getValue().getDailyRentalFee();
+            // "%,.0f" kısmı binlik ayraç (virgül) ekler ve ondalık kısımları siler.
+            return new SimpleStringProperty(price != null ? "€" + String.format("%,.0f", price) : "—");
+        });
+
         colVehStatus.setCellValueFactory(cd ->
-                new SimpleStringProperty(Boolean.TRUE.equals(cd.getValue().getIsAvailable()) ? "Available" : "Not Available"));
+                new SimpleStringProperty(Boolean.TRUE.equals(cd.getValue().getAvailable()) ? "Available" : "Not Available"));
 
         colVehActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colVehActions.setCellFactory(col -> new TableCell<>() {
@@ -216,12 +226,6 @@ public class VehiclesGuidesController {
         );
     }
 
-    /**
-     * 1) Loading penceresi göster
-     * 2) Arka planda HTTP işlemi + yeni veri çekme
-     * 3) Loading kapanınca UI güncelle, başarı mesajı göster
-     * 4) Diğer ekranları "kirli" işaretle - kullanıcı geçince yenilenecekler
-     */
     private void runInBackground(BackgroundOp op, String loadingMsg, String successMsg, String errorTitle) {
         Stage loadingStage = new Stage();
         loadingStage.initModality(Modality.APPLICATION_MODAL);

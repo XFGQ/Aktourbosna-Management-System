@@ -39,14 +39,16 @@
             <TableView fx:id="vehiclesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
                        prefHeight="280.0" fixedCellSize="44.0">
                 <columns>
-                    <TableColumn fx:id="colVehBrand" text="Brand" prefWidth="110.0" minWidth="110.0" />
-                    <TableColumn fx:id="colVehModel" text="Model" prefWidth="110.0" minWidth="110.0" />
-                    <TableColumn fx:id="colVehYear" text="Year" prefWidth="70.0" minWidth="70.0" />
-                    <TableColumn fx:id="colVehColor" text="Color" prefWidth="80.0" minWidth="80.0" />
-                    <TableColumn fx:id="colVehPlate" text="Plate" prefWidth="110.0" minWidth="110.0" />
-                    <TableColumn fx:id="colVehSeats" text="Seats" prefWidth="60.0" minWidth="60.0" />
-                    <TableColumn fx:id="colVehFuel" text="Fuel" prefWidth="80.0" minWidth="80.0" />
-                    <TableColumn fx:id="colVehStatus" text="Status" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colVehId" text="ID" prefWidth="50.0" minWidth="50.0" />
+                    <TableColumn fx:id="colVehBrand" text="Brand" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colVehModel" text="Model" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colVehYear" text="Year" prefWidth="60.0" minWidth="60.0" />
+                    <TableColumn fx:id="colVehColor" text="Color" prefWidth="70.0" minWidth="70.0" />
+                    <TableColumn fx:id="colVehPlate" text="Plate" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colVehSeats" text="Seats" prefWidth="50.0" minWidth="50.0" />
+                    <TableColumn fx:id="colVehFuel" text="Fuel" prefWidth="70.0" minWidth="70.0" />
+                    <TableColumn fx:id="colVehPrice" text="Price/Day" prefWidth="80.0" minWidth="80.0" />
+                    <TableColumn fx:id="colVehStatus" text="Status" prefWidth="90.0" minWidth="90.0" />
                     <TableColumn fx:id="colVehActions" text="Actions" prefWidth="160.0" minWidth="160.0" sortable="false" />
                 </columns>
             </TableView>
