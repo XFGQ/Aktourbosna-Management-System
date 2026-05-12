@@ -40,6 +40,9 @@
             </HBox>
             <TableView fx:id="expensesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
                        prefHeight="320.0" fixedCellSize="42.0">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
                 <columns>
                     <TableColumn fx:id="colExpTour"     text="Tour"     prefWidth="170.0" />
                     <TableColumn fx:id="colExpCategory" text="Category" prefWidth="140.0" />
