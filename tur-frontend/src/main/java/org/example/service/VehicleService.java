@@ -27,7 +27,7 @@ public class VehicleService {
 
     public List<Vehicle> getAvailableVehicles(List<Vehicle> vehicles) {
         return vehicles.stream()
-                .filter(v -> Boolean.TRUE.equals(v.getIsAvailable()))
+                .filter(v -> Boolean.TRUE.equals(v.getAvailable()))
                 .collect(Collectors.toList());
     }
 
@@ -39,7 +39,7 @@ public class VehicleService {
 
     public long countAvailable(List<Vehicle> vehicles) {
         return vehicles.stream()
-                .filter(v -> Boolean.TRUE.equals(v.getIsAvailable()))
+                .filter(v -> Boolean.TRUE.equals(v.getAvailable()))
                 .count();
     }
 }

@@ -62,7 +62,7 @@ public class AddVehicleDialog {
             if (existing.getFuelType() != null) fuel.setValue(existing.getFuelType());
             mileage.setText(existing.getCurrentMileage() != null ? existing.getCurrentMileage().toString() : "");
             fuelConsumption.setText(existing.getAvgFuelConsumption() != null ? existing.getAvgFuelConsumption().toString() : "");
-            available.setSelected(Boolean.TRUE.equals(existing.getIsAvailable()));
+            available.setSelected(Boolean.TRUE.equals(existing.getAvailable()));
         }
 
         grid.add(new Label("Brand:"), 0, 0);          grid.add(brand, 1, 0);
@@ -98,7 +98,7 @@ public class AddVehicleDialog {
                     v.setFuelType(fuel.getValue());
                     v.setCurrentMileage(mileage.getText().isEmpty() ? 0f : Float.parseFloat(mileage.getText().trim()));
                     v.setAvgFuelConsumption(fuelConsumption.getText().isEmpty() ? 0f : Float.parseFloat(fuelConsumption.getText().trim()));
-                    v.setIsAvailable(available.isSelected());
+                    v.setAvailable(available.isSelected());
                     return v;
                 } catch (NumberFormatException e) {
                     Toast.error("Year, seats, mileage and fuel consumption must be numbers.");
