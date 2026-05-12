@@ -46,6 +46,7 @@ public class VehiclesGuidesController {
     @FXML private TableColumn<Guide, String> colGuideLicense;
     @FXML private TableColumn<Guide, Integer> colGuideExp;
     @FXML private TableColumn<Guide, String> colGuideFee;
+    @FXML private TableColumn<Guide, Guide>  colGuideActions;
 
     private final VehicleService vehicleService = new VehicleService();
     private final GuideService guideService = new GuideService();
@@ -97,6 +98,25 @@ public class VehiclesGuidesController {
         colGuideFee.setCellValueFactory(cd -> {
             Double fee = cd.getValue().getDailyFee();
             return new SimpleStringProperty(fee != null ? "€" + String.format("%,.0f", fee) : "—");
+        });
+
+        colGuideActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+        colGuideActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn = new Button("Edit");
+            private final Button deleteBtn = new Button("Delete");
+            private final HBox box = new HBox(6, editBtn, deleteBtn);
+            {
+                box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
+                deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e -> onEditGuide(getTableView().getItems().get(getIndex())));
+                deleteBtn.setOnAction(e -> onDeleteGuide(getTableView().getItems().get(getIndex())));
+            }
+            @Override
+            protected void updateItem(Guide item, boolean empty) {
+                super.updateItem(item, empty);
+                setGraphic(empty || item == null ? null : box);
+            }
         });
 
         loadData();
@@ -173,8 +193,6 @@ public class VehiclesGuidesController {
         );
     }
 
-<<<<<<< Updated upstream
-=======
     private void onEditGuide(Guide guide) {
         Guide updated = AddGuideDialog.show(guide);
         if (updated == null) return;
@@ -198,7 +216,6 @@ public class VehiclesGuidesController {
         );
     }
 
->>>>>>> Stashed changes
     /**
      * 1) Loading penceresi göster
      * 2) Arka planda HTTP işlemi + yeni veri çekme
@@ -250,16 +267,9 @@ public class VehiclesGuidesController {
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }
             AppController app = AppController.getInstance();
-<<<<<<< Updated upstream
-            if (app != null) {
-                app.invalidateOtherViews("vehiclesGuides.fxml");
-            }
-            loadingStage.close();
-            new Alert(Alert.AlertType.INFORMATION, successMsg).show();
-=======
             if (app != null) app.refreshAllCached();
+            loadingStage.close();
             Toast.success(successMsg);
->>>>>>> Stashed changes
         });
 
         task.setOnFailed(e -> {
