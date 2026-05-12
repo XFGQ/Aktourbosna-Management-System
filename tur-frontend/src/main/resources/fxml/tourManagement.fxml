@@ -48,6 +48,9 @@
             </HBox>
             <TableView fx:id="recentToursTable" styleClass="table-view"
                        prefHeight="180.0" fixedCellSize="42.0">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
                 <columns>
                     <TableColumn fx:id="colRecentName"        text="Tour Name"    prefWidth="140.0" />
                     <TableColumn fx:id="colRecentDeparture"   text="Departure"    prefWidth="130.0" />

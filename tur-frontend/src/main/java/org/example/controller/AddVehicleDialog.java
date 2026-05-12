@@ -48,10 +48,11 @@ public class AddVehicleDialog {
         mileage.setPromptText("e.g. 50000");
         TextField fuelConsumption = new TextField();
         fuelConsumption.setPromptText("e.g. 7.5");
+        TextField dailyFee = new TextField();
+        dailyFee.setPromptText("e.g. 100.0");
         CheckBox available = new CheckBox("Available");
         available.setSelected(true);
 
-        // Edit modunda mevcut değerleri doldur
         if (editMode) {
             brand.setText(existing.getBrand() != null ? existing.getBrand() : "");
             model.setText(existing.getModel() != null ? existing.getModel() : "");
@@ -62,6 +63,7 @@ public class AddVehicleDialog {
             if (existing.getFuelType() != null) fuel.setValue(existing.getFuelType());
             mileage.setText(existing.getCurrentMileage() != null ? existing.getCurrentMileage().toString() : "");
             fuelConsumption.setText(existing.getAvgFuelConsumption() != null ? existing.getAvgFuelConsumption().toString() : "");
+            dailyFee.setText(existing.getDailyRentalFee() != null ? existing.getDailyRentalFee().toString() : "");
             available.setSelected(Boolean.TRUE.equals(existing.getAvailable()));
         }
 
@@ -74,7 +76,8 @@ public class AddVehicleDialog {
         grid.add(new Label("Fuel Type:"), 0, 6);      grid.add(fuel, 1, 6);
         grid.add(new Label("Mileage (km):"), 0, 7);   grid.add(mileage, 1, 7);
         grid.add(new Label("Fuel cons. (L/100km):"), 0, 8); grid.add(fuelConsumption, 1, 8);
-        grid.add(available, 1, 9);
+        grid.add(new Label("Daily Fee (€):"), 0, 9);  grid.add(dailyFee, 1, 9);
+        grid.add(available, 1, 10);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -98,10 +101,11 @@ public class AddVehicleDialog {
                     v.setFuelType(fuel.getValue());
                     v.setCurrentMileage(mileage.getText().isEmpty() ? 0f : Float.parseFloat(mileage.getText().trim()));
                     v.setAvgFuelConsumption(fuelConsumption.getText().isEmpty() ? 0f : Float.parseFloat(fuelConsumption.getText().trim()));
+                    v.setDailyRentalFee(dailyFee.getText().isEmpty() ? 0.0 : Double.parseDouble(dailyFee.getText().trim()));
                     v.setAvailable(available.isSelected());
                     return v;
                 } catch (NumberFormatException e) {
-                    Toast.error("Year, seats, mileage and fuel consumption must be numbers.");
+                    Toast.error("Year, seats, mileage, fuel consumption and daily fee must be numbers.");
                     return null;
                 }
             }

@@ -76,6 +76,9 @@
             </HBox>
             <TableView fx:id="upcomingToursTable" styleClass="table-view"
                        prefHeight="220.0" fixedCellSize="42.0">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
                 <columns>
                     <TableColumn fx:id="colDate" text="Date" prefWidth="100.0" minWidth="100.0" />
                     <TableColumn fx:id="colTourName" text="Tour Name" prefWidth="170.0" minWidth="170.0" />
