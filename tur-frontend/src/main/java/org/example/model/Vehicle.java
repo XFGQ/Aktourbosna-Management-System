@@ -21,5 +21,6 @@ public class Vehicle {
     private Float currentMileage;
     private LocalDate lastMinorService;
     @SerializedName("available")
-    private Boolean isAvailable;
+    private Boolean available;
+    private Double dailyRentalFee;
 }
