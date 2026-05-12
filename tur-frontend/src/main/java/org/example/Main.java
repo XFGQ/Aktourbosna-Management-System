@@ -18,6 +18,7 @@ import javafx.stage.StageStyle;
 import org.example.controller.LoginController;
 import org.example.controller.LogoView;
 
+
 public class Main extends Application {
 
     public static void main(String[] args) {
@@ -99,8 +100,8 @@ public class Main extends Application {
             String[] auth = LoginController.showLoginScreen();
             if (auth == null) { Platform.exit(); return; }
 
-            javafx.fxml.FXMLLoader loader = new javafx.fxml.FXMLLoader(getClass().getResource("/fxml/main.fxml"));
-            javafx.scene.Parent root = loader.load();
+            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
+            Parent root = loader.load();
             org.example.controller.AppController appCtrl = loader.getController();
             appCtrl.setRole(auth[1]);
             appCtrl.setOnLogout(() -> {
@@ -119,7 +120,6 @@ public class Main extends Application {
             Platform.exit();
         }
     }
-
     private Stage createSplashScreen() {
         Stage splash = new Stage();
         splash.initStyle(StageStyle.UNDECORATED);
@@ -165,10 +165,7 @@ public class Main extends Application {
         return splash;
     }
 
-    /**
-     * Bar'ı yumuşak şekilde target değerine doğru iten animator.
-     * 60fps, her frame'de 1-2% ilerler.
-     */
+   
     private static class ProgressAnimator extends AnimationTimer {
         private final ProgressBar bar;
         volatile double target = 0.0;

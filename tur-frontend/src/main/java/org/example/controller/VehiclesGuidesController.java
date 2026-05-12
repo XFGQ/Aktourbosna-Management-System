@@ -20,7 +20,6 @@ import org.example.service.GuideService;
 import org.example.service.VehicleService;
 
 import java.util.List;
-import java.util.Optional;
 
 public class VehiclesGuidesController {
 
@@ -150,13 +149,9 @@ public class VehiclesGuidesController {
     }
 
     private void onDeleteVehicle(Vehicle vehicle) {
-        Alert confirm = new Alert(Alert.AlertType.CONFIRMATION,
+        if (!ConfirmDialog.show("Confirm deletion",
                 "Delete vehicle \"" + vehicle.getBrand() + " " + vehicle.getModel()
-                        + " (" + vehicle.getPlateNumber() + ")\"?",
-                ButtonType.OK, ButtonType.CANCEL);
-        confirm.setHeaderText("Confirm deletion");
-        Optional<ButtonType> result = confirm.showAndWait();
-        if (result.isEmpty() || result.get() != ButtonType.OK) return;
+                        + " (" + vehicle.getPlateNumber() + ")\"?")) return;
 
         runInBackground(
                 () -> vehicleService.deleteVehicle(vehicle.getId()),
@@ -178,6 +173,32 @@ public class VehiclesGuidesController {
         );
     }
 
+<<<<<<< Updated upstream
+=======
+    private void onEditGuide(Guide guide) {
+        Guide updated = AddGuideDialog.show(guide);
+        if (updated == null) return;
+        runInBackground(
+                () -> guideService.updateGuide(guide.getId(), updated),
+                "Updating guide...",
+                "Guide updated successfully.",
+                "Failed to update guide"
+        );
+    }
+
+    private void onDeleteGuide(Guide guide) {
+        if (!ConfirmDialog.show("Confirm deletion",
+                "Delete guide \"" + guide.getFullName() + "\"?")) return;
+
+        runInBackground(
+                () -> guideService.deleteGuide(guide.getId()),
+                "Deleting guide...",
+                "Guide deleted.",
+                "Failed to delete guide"
+        );
+    }
+
+>>>>>>> Stashed changes
     /**
      * 1) Loading penceresi göster
      * 2) Arka planda HTTP işlemi + yeni veri çekme
@@ -229,18 +250,23 @@ public class VehiclesGuidesController {
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }
             AppController app = AppController.getInstance();
+<<<<<<< Updated upstream
             if (app != null) {
                 app.invalidateOtherViews("vehiclesGuides.fxml");
             }
             loadingStage.close();
             new Alert(Alert.AlertType.INFORMATION, successMsg).show();
+=======
+            if (app != null) app.refreshAllCached();
+            Toast.success(successMsg);
+>>>>>>> Stashed changes
         });
 
         task.setOnFailed(e -> {
             loadingStage.close();
             Throwable ex = task.getException();
             ex.printStackTrace();
-            new Alert(Alert.AlertType.ERROR, errorTitle + ": " + ex.getMessage()).show();
+            Toast.error(errorTitle + ": " + ex.getMessage());
         });
 
         Thread t = new Thread(task);
