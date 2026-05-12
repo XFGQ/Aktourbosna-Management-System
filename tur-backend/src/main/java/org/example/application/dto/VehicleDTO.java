@@ -19,5 +19,6 @@ public class VehicleDTO {
     private Float currentMileage;
     private LocalDate lastMinorService;
     private boolean available;
+    private Double dailyRentalFee;
 
 }
