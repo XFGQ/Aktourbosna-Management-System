@@ -189,8 +189,8 @@
 .table-view .column-header {
     -fx-background-color: transparent;
     -fx-padding: 0 16;
-    -fx-border-color: transparent transparent #eef0f4 transparent;
-    -fx-border-width: 0 0 1 0;
+    -fx-border-color: transparent #e2e8f0 #eef0f4 transparent;
+    -fx-border-width: 0 1 1 0;
 }
 
 .table-view .column-header .label {
@@ -202,7 +202,7 @@
 
 .table-view .table-row-cell {
     -fx-background-color: transparent;
-    -fx-border-color: transparent transparent #f0f2f5 transparent;
+    -fx-border-color: transparent transparent #e2e8f0 transparent;
     -fx-border-width: 0 0 1 0;
 }
 
@@ -215,8 +215,8 @@
     -fx-font-size: 13px;
     -fx-text-fill: #2d3748;
     -fx-padding: 10 16;
-    -fx-border-color: transparent;
-    -fx-border-width: 0;
+    -fx-border-color: transparent #e2e8f0 transparent transparent;
+    -fx-border-width: 0 1 0 0;
 }
 
 .scroll-bar:vertical { -fx-background-color: transparent; -fx-pref-width: 6; }
