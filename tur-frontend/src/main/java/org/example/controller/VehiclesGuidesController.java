@@ -138,21 +138,26 @@ public class VehiclesGuidesController {
     }
 
     private void loadData() {
-        try {
-            List<Vehicle> vehicles = vehicleService.getAllVehicles();
-            vehiclesTable.getItems().setAll(vehicles);
-            totalVehiclesValue.setText(String.valueOf(vehicles.size()));
-            vehiclesAvailable.setText(vehicleService.countAvailable(vehicles) + " available");
-
-            List<Guide> guides = guideService.getAllGuides();
-            guidesTable.getItems().setAll(guides);
-            totalGuidesValue.setText(String.valueOf(guides.size()));
-        } catch (Exception e) {
-            e.printStackTrace();
-            totalVehiclesValue.setText("—");
-            vehiclesAvailable.setText("");
-            totalGuidesValue.setText("—");
-        }
+        new Thread(() -> {
+            try {
+                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+                List<Guide> guides = guideService.getAllGuides();
+                Platform.runLater(() -> {
+                    vehiclesTable.getItems().setAll(vehicles);
+                    totalVehiclesValue.setText(String.valueOf(vehicles.size()));
+                    vehiclesAvailable.setText(vehicleService.countAvailable(vehicles) + " available");
+                    guidesTable.getItems().setAll(guides);
+                    totalGuidesValue.setText(String.valueOf(guides.size()));
+                });
+            } catch (Exception e) {
+                e.printStackTrace();
+                Platform.runLater(() -> {
+                    totalVehiclesValue.setText("—");
+                    vehiclesAvailable.setText("");
+                    totalGuidesValue.setText("—");
+                });
+            }
+        }, "vehicles-guides-load").start();
     }
 
     @FXML
@@ -270,8 +275,6 @@ public class VehiclesGuidesController {
                 guidesTable.getItems().setAll(data.guides);
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }
-            AppController app = AppController.getInstance();
-            if (app != null) app.refreshAllCached();
             loadingStage.close();
             Toast.success(successMsg);
         });

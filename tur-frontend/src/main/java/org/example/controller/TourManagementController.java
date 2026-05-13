@@ -245,7 +245,7 @@ public class TourManagementController {
             loadingStage.close();
             loadData();
             AppController app = AppController.getInstance();
-            if (app != null) app.refreshAllCached();
+            if (app != null) app.invalidateOtherViews("tourManagement.fxml");
             Toast.success(successMsg);
         });
         task.setOnFailed(e -> {
