@@ -1,6 +1,8 @@
 package org.example.application.mapper;
 
-import org.example.application.dto.ExpenseDTO;
+import org.example.application.dto.expense.ExpenseCreateDTO;
+import org.example.application.dto.expense.ExpenseResponseDTO;
+import org.example.application.dto.expense.ExpenseUpdateDTO;
 import org.example.model.Expense;
 import org.mapstruct.*;
 
@@ -8,12 +10,13 @@ import org.mapstruct.*;
 public interface ExpenseMapper {
 
     @Mapping(source = "tour.tourId", target = "tourId")
-    ExpenseDTO toDto(Expense expense);
-
-    @Mapping(source = "tourId", target = "tour.tourId")
-    Expense toEntity(ExpenseDTO dto);
+    ExpenseResponseDTO toResponse(Expense expense);
 
     @Mapping(target = "tour", ignore = true)
     @Mapping(target = "expenseId", ignore = true)
-    void updateEntityFromDto(ExpenseDTO dto, @MappingTarget Expense entity);
+    Expense toEntity(ExpenseCreateDTO dto);
+
+    @Mapping(target = "tour", ignore = true)
+    @Mapping(target = "expenseId", ignore = true)
+    void updateEntityFromDto(ExpenseUpdateDTO dto, @MappingTarget Expense entity);
 }
