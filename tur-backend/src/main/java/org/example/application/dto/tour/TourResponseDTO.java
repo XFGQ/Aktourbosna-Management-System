@@ -1,17 +1,14 @@
-package org.example.application.dto;
+package org.example.application.dto.tour;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.time.LocalDate;
 import java.util.List;
 
 @Data
-public class TourDTO {
+public class TourResponseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long tourId;
-
     private String tourName;
     private LocalDate startDate;
     private LocalDate endDate;
@@ -20,8 +17,16 @@ public class TourDTO {
     private Double finalPrice;
 
     private Long guideId;
+    private String guidePartnerCode;
+
     private Long vehicleId;
+    private String vehiclePlate;
+
     private Long routeId;
+    private String routeName;
 
     private List<Long> extraWaypointIds;
+
+    private int customerCount;
+    private Double totalExpense;
 }
