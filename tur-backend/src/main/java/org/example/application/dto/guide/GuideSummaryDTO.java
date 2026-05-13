@@ -1,4 +1,4 @@
-package org.example.application.dto;
+package org.example.application.dto.guide;
 
 import lombok.Data;
 
@@ -6,6 +6,7 @@ import java.util.List;
 
 @Data
 public class GuideSummaryDTO {
+
     private Long id;
     private String fullName;
     private String baseCity;

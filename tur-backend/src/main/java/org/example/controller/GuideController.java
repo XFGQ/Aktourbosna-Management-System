@@ -1,6 +1,9 @@
 package org.example.controller;
 
-import org.example.application.dto.GuideDTO;
+import jakarta.validation.Valid;
+import org.example.application.dto.guide.GuideCreateDTO;
+import org.example.application.dto.guide.GuideResponseDTO;
+import org.example.application.dto.guide.GuideUpdateDTO;
 import org.example.service.GuideService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -29,18 +32,19 @@ public class GuideController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<GuideDTO> getGuideById(@PathVariable Long id) {
+    public ResponseEntity<GuideResponseDTO> getGuideById(@PathVariable Long id) {
         return ResponseEntity.ok(guideService.getGuideById(id));
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<GuideDTO> updateGuide(@PathVariable Long id, @RequestBody GuideDTO guideDTO) {
-        return ResponseEntity.ok(guideService.updateGuide(id, guideDTO));
+    @PostMapping
+    public ResponseEntity<GuideResponseDTO> createGuide(@Valid @RequestBody GuideCreateDTO dto) {
+        return ResponseEntity.ok(guideService.createGuide(dto));
     }
 
-    @PostMapping
-    public ResponseEntity<GuideDTO> createGuide(@RequestBody GuideDTO guideDTO) {
-        return ResponseEntity.ok(guideService.createGuide(guideDTO));
+    @PutMapping("/{id}")
+    public ResponseEntity<GuideResponseDTO> updateGuide(@PathVariable Long id,
+                                                        @RequestBody GuideUpdateDTO dto) {
+        return ResponseEntity.ok(guideService.updateGuide(id, dto));
     }
 
     @DeleteMapping("/{id}")
