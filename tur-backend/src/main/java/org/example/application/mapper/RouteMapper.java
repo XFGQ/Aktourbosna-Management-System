@@ -14,6 +14,7 @@ public interface RouteMapper {
 
     RouteSummaryDTO toSummary(Route route);
 
+    @Mapping(target = "routeId", ignore = true)
     @Mapping(target = "defaultWaypoints", ignore = true)
     @Mapping(target = "tolls", ignore = true)
     Route toEntity(RouteCreateDTO dto);

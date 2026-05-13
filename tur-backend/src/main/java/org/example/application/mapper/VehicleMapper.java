@@ -15,6 +15,9 @@ public interface VehicleMapper {
 
     VehicleSummaryDTO toSummary(Vehicle vehicle);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "tours", ignore = true)
+    @Mapping(target = "serviceHistory", ignore = true)
     Vehicle toEntity(VehicleCreateDTO dto);
 
     @Mapping(target = "id", ignore = true)

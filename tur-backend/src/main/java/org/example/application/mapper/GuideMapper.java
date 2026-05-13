@@ -20,6 +20,7 @@ public interface GuideMapper {
     GuideSummaryDTO toSummary(Guide guide);
 
     @Mapping(source = "userId", target = "user.id")
+    @Mapping(target = "id", ignore = true)
     @Mapping(target = "user.username", ignore = true)
     @Mapping(target = "user.email", ignore = true)
     @Mapping(target = "tours", ignore = true)

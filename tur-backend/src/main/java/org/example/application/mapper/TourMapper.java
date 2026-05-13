@@ -24,13 +24,13 @@ public interface TourMapper {
 
     @Mapping(source = "guide.id", target = "guideId")
     @Mapping(source = "guide.partnerCode", target = "guidePartnerCode")
-    @Mapping(source = "extraWaypoints", target = "extraWaypointIds")
     @Mapping(expression = "java(tour.getCustomers().size())", target = "customerCount")
     TourSummaryDTO toSummary(Tour tour);
 
     @Mapping(source = "guideId", target = "guide.id")
     @Mapping(source = "vehicleId", target = "vehicle.id")
     @Mapping(source = "routeId", target = "baseRoute.routeId")
+    @Mapping(target = "tourId", ignore = true)
     @Mapping(target = "extraWaypoints", ignore = true)
     @Mapping(target = "customers", ignore = true)
     @Mapping(target = "expenses", ignore = true)
