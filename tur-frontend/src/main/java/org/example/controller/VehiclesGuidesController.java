@@ -20,6 +20,8 @@ import org.example.service.GuideService;
 import org.example.service.VehicleService;
 
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class VehiclesGuidesController {
 
@@ -138,10 +140,27 @@ public class VehiclesGuidesController {
     }
 
     private void loadData() {
-        new Thread(() -> {
+        CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
+            try { return vehicleService.getAllVehicles(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Guide>> guidesFut = CompletableFuture.supplyAsync(() -> {
+            try { return guideService.getAllGuides(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture.allOf(vehiclesFut, guidesFut).whenComplete((ignored, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
+                Platform.runLater(() -> {
+                    totalVehiclesValue.setText("—");
+                    vehiclesAvailable.setText("");
+                    totalGuidesValue.setText("—");
+                });
+                return;
+            }
             try {
-                List<Vehicle> vehicles = vehicleService.getAllVehicles();
-                List<Guide> guides = guideService.getAllGuides();
+                List<Vehicle> vehicles = vehiclesFut.join();
+                List<Guide>   guides   = guidesFut.join();
                 Platform.runLater(() -> {
                     vehiclesTable.getItems().setAll(vehicles);
                     totalVehiclesValue.setText(String.valueOf(vehicles.size()));
@@ -157,7 +176,7 @@ public class VehiclesGuidesController {
                     totalGuidesValue.setText("—");
                 });
             }
-        }, "vehicles-guides-load").start();
+        });
     }
 
     @FXML
@@ -253,13 +272,18 @@ public class VehiclesGuidesController {
             @Override
             protected RefreshedData call() throws Exception {
                 op.run();
+                CompletableFuture<List<Vehicle>> vFut = CompletableFuture.supplyAsync(() -> {
+                    try { return vehicleService.getAllVehicles(); }
+                    catch (Exception e) { return null; }
+                });
+                CompletableFuture<List<Guide>> gFut = CompletableFuture.supplyAsync(() -> {
+                    try { return guideService.getAllGuides(); }
+                    catch (Exception e) { return null; }
+                });
+                CompletableFuture.allOf(vFut, gFut).join();
                 RefreshedData data = new RefreshedData();
-                try {
-                    data.vehicles = vehicleService.getAllVehicles();
-                } catch (Exception ignored) {}
-                try {
-                    data.guides = guideService.getAllGuides();
-                } catch (Exception ignored) {}
+                data.vehicles = vFut.join();
+                data.guides   = gFut.join();
                 return data;
             }
         };

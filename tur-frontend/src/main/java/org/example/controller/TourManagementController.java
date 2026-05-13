@@ -27,6 +27,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 
 public class TourManagementController {
 
@@ -146,11 +149,47 @@ public class TourManagementController {
     }
 
     private void loadData() {
-        new Thread(() -> {
+        CompletableFuture<List<Tour>>    toursFut    = CompletableFuture.supplyAsync(() -> {
+            try { return tourService.getAllTours(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Guide>>   guidesFut   = CompletableFuture.supplyAsync(() -> {
+            try { return guideService.getAllGuides(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
+            try { return vehicleService.getAllVehicles(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+
+        CompletableFuture.allOf(toursFut, guidesFut, vehiclesFut).whenComplete((ignored, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalToursValue.setText("—"); revenueValue.setText("—");
+                    expensesValue.setText("—");   netProfitValue.setText("—");
+                });
+                return;
+            }
             try {
-                List<Tour>    tours    = tourService.getAllTours();
-                List<Guide>   guides   = guideService.getAllGuides();
-                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+                List<Tour>    tours    = toursFut.join();
+                List<Guide>   guides   = guidesFut.join();
+                List<Vehicle> vehicles = vehiclesFut.join();
+
+                List<CompletableFuture<List<Expense>>> expFuts = tours.stream()
+                        .filter(t -> t.getTourId() != null)
+                        .map(t -> CompletableFuture.supplyAsync(() -> {
+                            try { return expenseService.getExpensesByTourId(t.getTourId()); }
+                            catch (Exception e) { return List.<Expense>of(); }
+                        }))
+                        .collect(Collectors.toList());
+
+                List<Expense> allExpenses = CompletableFuture
+                        .allOf(expFuts.toArray(new CompletableFuture[0]))
+                        .thenApply(_void -> expFuts.stream()
+                                .flatMap(f -> f.join().stream())
+                                .collect(Collectors.toList()))
+                        .join();
 
                 Map<Long, String> gNames = new HashMap<>();
                 for (Guide g : guides)
@@ -161,14 +200,6 @@ public class TourManagementController {
 
                 List<Tour> recent   = tourService.getRecentTours(tours);
                 List<Tour> upcoming = tourService.getUpcomingTours(tours);
-
-                List<Expense> allExpenses = new ArrayList<>();
-                for (Tour t : tours) {
-                    if (t.getTourId() == null) continue;
-                    try { allExpenses.addAll(expenseService.getExpensesByTourId(t.getTourId())); }
-                    catch (Exception ignored) {}
-                }
-
                 double revenue      = tourService.calculateTotalRevenue(tours);
                 double totalExpense = expenseService.calculateTotal(allExpenses);
 
@@ -187,13 +218,11 @@ public class TourManagementController {
             } catch (Exception e) {
                 e.printStackTrace();
                 javafx.application.Platform.runLater(() -> {
-                    totalToursValue.setText("—");
-                    revenueValue.setText("—");
-                    expensesValue.setText("—");
-                    netProfitValue.setText("—");
+                    totalToursValue.setText("—"); revenueValue.setText("—");
+                    expensesValue.setText("—");   netProfitValue.setText("—");
                 });
             }
-        }).start();
+        });
     }
 
     @FXML

@@ -12,6 +12,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class GuideTourManagementController {
 
@@ -87,10 +89,28 @@ public class GuideTourManagementController {
     }
 
     private void loadData() {
-        new Thread(() -> {
+        CompletableFuture<List<Tour>>    toursFut    = CompletableFuture.supplyAsync(() -> {
+            try { return tourService.getAllTours(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
+            try { return vehicleService.getAllVehicles(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+
+        CompletableFuture.allOf(toursFut, vehiclesFut).whenComplete((ignored, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalEarningsValue.setText("—");
+                    monthlyEarningsValue.setText("—");
+                    completedToursValue.setText("—");
+                });
+                return;
+            }
             try {
-                List<Tour>    tours    = tourService.getAllTours();
-                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+                List<Tour>    tours    = toursFut.join();
+                List<Vehicle> vehicles = vehiclesFut.join();
 
                 Map<Long, String> vNames = new HashMap<>();
                 for (Vehicle v : vehicles)
@@ -117,7 +137,7 @@ public class GuideTourManagementController {
                     completedToursValue.setText("—");
                 });
             }
-        }).start();
+        });
     }
 
     private static TableCell<Tour, String> tooltipCell() {
