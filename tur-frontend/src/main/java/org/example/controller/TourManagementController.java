@@ -69,6 +69,7 @@ public class TourManagementController {
     private final Map<Long, String> vehicleNames = new HashMap<>();
     private List<Guide>   cachedGuides   = new ArrayList<>();
     private List<Vehicle> cachedVehicles = new ArrayList<>();
+    private List<Tour>    cachedTours    = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -208,6 +209,7 @@ public class TourManagementController {
                     vehicleNames.clear(); vehicleNames.putAll(vNames);
                     cachedGuides   = guides;
                     cachedVehicles = vehicles;
+                    cachedTours    = tours;
                     recentToursTable.getItems().setAll(recent);
                     upcomingToursTable.getItems().setAll(upcoming);
                     totalToursValue.setText(String.valueOf(tours.size()));
@@ -227,7 +229,7 @@ public class TourManagementController {
 
     @FXML
     private void onAddTour() {
-        Tour newTour = AddTourDialog.show(cachedGuides, cachedVehicles);
+        Tour newTour = AddTourDialog.show(cachedGuides, cachedVehicles, cachedTours);
         if (newTour == null) return;
         runInBackground(
                 () -> tourService.addTour(newTour),
@@ -235,7 +237,7 @@ public class TourManagementController {
     }
 
     private void onEditTour(Tour tour) {
-        Tour updated = AddTourDialog.show(tour, cachedGuides, cachedVehicles);
+        Tour updated = AddTourDialog.show(tour, cachedGuides, cachedVehicles, cachedTours);
         if (updated == null) return;
         runInBackground(
                 () -> tourService.updateTour(tour.getTourId(), updated),

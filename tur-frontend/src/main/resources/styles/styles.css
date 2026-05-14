@@ -176,6 +176,26 @@
 
 .btn-primary:hover { -fx-background-color: #255c96; }
 
+.btn-secondary {
+    -fx-background-color: #e2e8f0;
+    -fx-text-fill: #374151;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.btn-secondary:hover { -fx-background-color: #cbd5e1; }
+
+.btn-danger {
+    -fx-background-color: #e05252;
+    -fx-text-fill: #ffffff;
+    -fx-font-size: 13px;
+    -fx-padding: 8 16;
+    -fx-background-radius: 6;
+    -fx-cursor: hand;
+}
+.btn-danger:hover { -fx-background-color: #c93a3a; }
+
 .tm-header { -fx-background-color: #ffffff; }
 
 .table-view {

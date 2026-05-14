@@ -12,14 +12,15 @@ import org.example.model.Vehicle;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class AddTourDialog {
 
-    public static Tour show(List<Guide> guides, List<Vehicle> vehicles) {
-        return show(null, guides, vehicles);
+    public static Tour show(List<Guide> guides, List<Vehicle> vehicles, List<Tour> allTours) {
+        return show(null, guides, vehicles, allTours);
     }
 
-    public static Tour show(Tour existing, List<Guide> guides, List<Vehicle> vehicles) {
+    public static Tour show(Tour existing, List<Guide> guides, List<Vehicle> vehicles, List<Tour> allTours) {
         boolean isEdit = existing != null;
         Dialog<Tour> dialog = new Dialog<>();
         dialog.setTitle(isEdit ? "Edit Tour" : "Add Tour");
@@ -92,6 +93,38 @@ public class AddTourDialog {
             vehicles.stream().filter(v -> existing.getVehicleId().equals(v.getId())).findFirst()
                     .ifPresent(vehicleBox::setValue);
         }
+
+        Runnable updateAvailability = () -> {
+            LocalDate start = startPicker.getValue();
+            LocalDate end   = endPicker.getValue();
+            Long currentTourId = isEdit ? existing.getTourId() : null;
+
+            List<Vehicle> availableVehicles = vehicles.stream()
+                    .filter(v -> Boolean.TRUE.equals(v.getAvailable())
+                            || (isEdit && v.getId() != null && v.getId().equals(existing.getVehicleId())))
+                    .collect(Collectors.toList());
+
+            List<Guide> availableGuides = guides.stream()
+                    .filter(g -> g.getId() == null || allTours == null || allTours.stream().noneMatch(t ->
+                            t.getTourId() != null
+                            && !t.getTourId().equals(currentTourId)
+                            && g.getId().equals(t.getGuideId())
+                            && start != null && end != null
+                            && t.getStartDate() != null && t.getEndDate() != null
+                            && !start.isAfter(t.getEndDate()) && !t.getStartDate().isAfter(end)))
+                    .collect(Collectors.toList());
+
+            Vehicle selectedVehicle = vehicleBox.getValue();
+            Guide   selectedGuide   = guideBox.getValue();
+            vehicleBox.getItems().setAll(availableVehicles);
+            guideBox.getItems().setAll(availableGuides);
+            if (selectedVehicle != null && availableVehicles.contains(selectedVehicle)) vehicleBox.setValue(selectedVehicle);
+            if (selectedGuide   != null && availableGuides.contains(selectedGuide))     guideBox.setValue(selectedGuide);
+        };
+
+        startPicker.valueProperty().addListener((obs, o, n) -> updateAvailability.run());
+        endPicker.valueProperty().addListener((obs, o, n)   -> updateAvailability.run());
+        updateAvailability.run();
 
         grid.addRow(0, new Label("Tour Name *"), nameField);
         grid.addRow(1, new Label("Start Date *"), startPicker);

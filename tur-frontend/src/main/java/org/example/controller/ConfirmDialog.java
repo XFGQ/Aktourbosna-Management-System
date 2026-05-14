@@ -46,7 +46,9 @@ public class ConfirmDialog {
         root.setStyle("-fx-background-color: white; -fx-border-color: #BDBDBD; -fx-border-width: 1px;");
         root.setPrefWidth(360);
 
-        stage.setScene(new Scene(root));
+        Scene scene = new Scene(root);
+        scene.getStylesheets().add(ConfirmDialog.class.getResource("/styles/styles.css").toExternalForm());
+        stage.setScene(scene);
         stage.showAndWait();
         return result[0];
     }

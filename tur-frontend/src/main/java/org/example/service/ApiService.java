@@ -3,6 +3,7 @@ package org.example.service;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.JsonParser;
+import org.example.model.Customer;
 import org.example.model.Expense;
 import org.example.model.Guide;
 import org.example.model.Tour;
@@ -114,6 +115,21 @@ public class ApiService {
 
     public void deleteExpense(Long tourId, Long expenseId) throws Exception {
         delete(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId);
+    }
+
+    public List<Customer> fetchCustomersByTour(Long tourId) throws Exception {
+        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/customers"),
+                new TypeToken<List<Customer>>() {}.getType());
+    }
+
+    public Customer createCustomer(Long tourId, Customer customer) throws Exception {
+        String json = gson.toJson(customer);
+        String response = post(BASE_URL + "/tours/" + tourId + "/customers", json);
+        return gson.fromJson(response, Customer.class);
+    }
+
+    public void deleteCustomer(Long tourId, Long customerId) throws Exception {
+        delete(BASE_URL + "/tours/" + tourId + "/customers/" + customerId);
     }
 
     public String[] login(String username, String password) throws Exception {

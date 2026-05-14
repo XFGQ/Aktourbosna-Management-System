@@ -63,10 +63,15 @@ public class AddExpenseDialog {
         DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setPrefWidth(260);
 
+        TextField receiptField = new TextField();
+        receiptField.setPromptText("https://...");
+        receiptField.setPrefWidth(260);
+
         grid.addRow(0, new Label("Tour *"),        tourBox);
         grid.addRow(1, new Label("Category *"),    categoryBox);
         grid.addRow(2, new Label("Amount (€) *"),  amountField);
         grid.addRow(3, new Label("Date"),          datePicker);
+        grid.addRow(4, new Label("Receipt URL"),   receiptField);
 
         dialog.getDialogPane().setContent(new VBox(grid));
         dialog.getDialogPane().setPrefWidth(440);
@@ -96,6 +101,7 @@ public class AddExpenseDialog {
             expense.setCategory(categoryBox.getValue().trim());
             expense.setAmount(amount);
             expense.setDate(datePicker.getValue());
+            expense.setReceiptPath(receiptField.getText().trim().isEmpty() ? null : receiptField.getText().trim());
             return new Object[]{tourBox.getValue().getTourId(), expense};
         });
 
