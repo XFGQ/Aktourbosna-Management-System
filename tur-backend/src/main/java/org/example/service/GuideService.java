@@ -1,7 +1,9 @@
 package org.example.service;
 
-import org.example.application.dto.GuideDTO;
-import org.example.application.dto.GuideSummaryDTO;
+import org.example.application.dto.guide.GuideCreateDTO;
+import org.example.application.dto.guide.GuideResponseDTO;
+import org.example.application.dto.guide.GuideSummaryDTO;
+import org.example.application.dto.guide.GuideUpdateDTO;
 import org.example.application.exception.ResourceNotFoundException;
 import org.example.application.mapper.GuideMapper;
 import org.example.model.Guide;
@@ -29,38 +31,38 @@ public class GuideService {
         this.userRepository = userRepository;
     }
 
-    public List<GuideDTO> getAllGuides() {
+    public List<GuideResponseDTO> getAllGuides() {
         return guideRepository.findAll().stream()
-                .map(guideMapper::toDto)
+                .map(guideMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
     public List<GuideSummaryDTO> getAllGuidesSummary() {
         return guideRepository.findAll().stream()
-                .map(guideMapper::toSummaryDto)
+                .map(guideMapper::toSummary)
                 .collect(Collectors.toList());
     }
 
-    public GuideDTO createGuide(GuideDTO guideDTO) {
-        Guide guide = guideMapper.toEntity(guideDTO);
-        User user = userRepository.findById(guideDTO.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + guideDTO.getUserId()));
-        guide.setUser(user);
-        return guideMapper.toDto(guideRepository.save(guide));
-    }
-
-    public GuideDTO getGuideById(Long id) {
+    public GuideResponseDTO getGuideById(Long id) {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Guide not found: " + id));
-        return guideMapper.toDto(guide);
+        return guideMapper.toResponse(guide);
     }
 
-    public GuideDTO updateGuide(Long id, GuideDTO guideDTO) {
-        Guide existingGuide = guideRepository.findById(id)
+    public GuideResponseDTO createGuide(GuideCreateDTO dto) {
+        Guide guide = guideMapper.toEntity(dto);
+        User user = userRepository.findById(dto.getUserId())
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getUserId()));
+        guide.setUser(user);
+        return guideMapper.toResponse(guideRepository.save(guide));
+    }
+
+    public GuideResponseDTO updateGuide(Long id, GuideUpdateDTO dto) {
+        Guide existing = guideRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Guide not found: " + id));
-        checkOwnership(existingGuide);
-        guideMapper.updateEntityFromDto(guideDTO, existingGuide);
-        return guideMapper.toDto(guideRepository.save(existingGuide));
+        checkOwnership(existing);
+        guideMapper.updateEntityFromDto(dto, existing);
+        return guideMapper.toResponse(guideRepository.save(existing));
     }
 
     public void deleteGuide(Long id) {

@@ -1,17 +1,14 @@
-package org.example.application.dto;
+package org.example.application.dto.route;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import lombok.AllArgsConstructor;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+import org.example.application.dto.TollDTO;
+import org.example.application.dto.WaypointDTO;
+
 import java.util.List;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class RouteDTO {
+public class RouteResponseDTO {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Long routeId;
     private String routeName;
     private String startCity;
@@ -19,7 +16,6 @@ public class RouteDTO {
     private String country;
     private Float distance;
     private Double basePrice;
-
     private List<WaypointDTO> defaultWaypoints;
     private List<TollDTO> tolls;
 }

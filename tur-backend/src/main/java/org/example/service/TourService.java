@@ -1,6 +1,9 @@
 package org.example.service;
 
-import org.example.application.dto.TourDTO;
+import org.example.application.dto.tour.TourCreateDTO;
+import org.example.application.dto.tour.TourResponseDTO;
+import org.example.application.dto.tour.TourSummaryDTO;
+import org.example.application.dto.tour.TourUpdateDTO;
 import org.example.application.mapper.TourMapper;
 import org.example.model.Tour;
 import org.example.model.Waypoint;
@@ -31,30 +34,30 @@ public class TourService {
         this.waypointRepository = waypointRepository;
     }
 
-    public List<TourDTO> getAllTours() {
+    public List<TourSummaryDTO> getAllTours() {
         return tourRepository.findAll().stream()
-                .map(tourMapper::toDto)
+                .map(tourMapper::toSummary)
                 .collect(Collectors.toList());
     }
 
-    public TourDTO getTourById(Long id) {
+    public TourResponseDTO getTourById(Long id) {
         Tour tour = tourRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Tur bulunamadı. ID: " + id));
-        return tourMapper.toDto(tour);
+        return tourMapper.toResponse(tour);
     }
 
-    public TourDTO createTour(TourDTO dto) {
+    public TourResponseDTO createTour(TourCreateDTO dto) {
         Tour tour = tourMapper.toEntity(dto);
-        resolveRelations(tour, dto);
-        return tourMapper.toDto(tourRepository.save(tour));
+        resolveRelations(tour, dto.getGuideId(), dto.getVehicleId(), dto.getRouteId(), dto.getExtraWaypointIds());
+        return tourMapper.toResponse(tourRepository.save(tour));
     }
 
-    public TourDTO updateTour(Long id, TourDTO dto) {
+    public TourResponseDTO updateTour(Long id, TourUpdateDTO dto) {
         Tour existing = tourRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Güncellenecek tur bulunamadı. ID: " + id));
         tourMapper.updateEntityFromDto(dto, existing);
-        resolveRelations(existing, dto);
-        return tourMapper.toDto(tourRepository.save(existing));
+        resolveRelations(existing, dto.getGuideId(), dto.getVehicleId(), dto.getRouteId(), dto.getExtraWaypointIds());
+        return tourMapper.toResponse(tourRepository.save(existing));
     }
 
     public void deleteTour(Long id) {
@@ -64,7 +67,7 @@ public class TourService {
         tourRepository.deleteById(id);
     }
 
-    public TourDTO addWaypoint(Long tourId, Long waypointId) {
+    public TourResponseDTO addWaypoint(Long tourId, Long waypointId) {
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new RuntimeException("Tur bulunamadı. ID: " + tourId));
         Waypoint waypoint = waypointRepository.findById(waypointId)
@@ -72,31 +75,31 @@ public class TourService {
         if (!tour.getExtraWaypoints().contains(waypoint)) {
             tour.getExtraWaypoints().add(waypoint);
         }
-        return tourMapper.toDto(tourRepository.save(tour));
+        return tourMapper.toResponse(tourRepository.save(tour));
     }
 
-    public TourDTO removeWaypoint(Long tourId, Long waypointId) {
+    public TourResponseDTO removeWaypoint(Long tourId, Long waypointId) {
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new RuntimeException("Tur bulunamadı. ID: " + tourId));
         tour.getExtraWaypoints().removeIf(w -> w.getId().equals(waypointId));
-        return tourMapper.toDto(tourRepository.save(tour));
+        return tourMapper.toResponse(tourRepository.save(tour));
     }
 
-    private void resolveRelations(Tour tour, TourDTO dto) {
-        if (dto.getGuideId() != null) {
-            tour.setGuide(guideRepository.findById(dto.getGuideId())
-                    .orElseThrow(() -> new RuntimeException("Rehber bulunamadı. ID: " + dto.getGuideId())));
+    private void resolveRelations(Tour tour, Long guideId, Long vehicleId, Long routeId, List<Long> waypointIds) {
+        if (guideId != null) {
+            tour.setGuide(guideRepository.findById(guideId)
+                    .orElseThrow(() -> new RuntimeException("Rehber bulunamadı. ID: " + guideId)));
         }
-        if (dto.getVehicleId() != null) {
-            tour.setVehicle(vehicleRepository.findById(dto.getVehicleId())
-                    .orElseThrow(() -> new RuntimeException("Araç bulunamadı. ID: " + dto.getVehicleId())));
+        if (vehicleId != null) {
+            tour.setVehicle(vehicleRepository.findById(vehicleId)
+                    .orElseThrow(() -> new RuntimeException("Araç bulunamadı. ID: " + vehicleId)));
         }
-        if (dto.getRouteId() != null) {
-            tour.setBaseRoute(routeRepository.findById(dto.getRouteId())
-                    .orElseThrow(() -> new RuntimeException("Rota bulunamadı. ID: " + dto.getRouteId())));
+        if (routeId != null) {
+            tour.setBaseRoute(routeRepository.findById(routeId)
+                    .orElseThrow(() -> new RuntimeException("Rota bulunamadı. ID: " + routeId)));
         }
-        if (dto.getExtraWaypointIds() != null) {
-            List<Waypoint> waypoints = dto.getExtraWaypointIds().stream()
+        if (waypointIds != null) {
+            List<Waypoint> waypoints = waypointIds.stream()
                     .map(wId -> waypointRepository.findById(wId)
                             .orElseThrow(() -> new RuntimeException("Durak bulunamadı. ID: " + wId)))
                     .collect(Collectors.toList());

@@ -1,6 +1,10 @@
 package org.example.controller;
 
-import org.example.application.dto.TourDTO;
+import jakarta.validation.Valid;
+import org.example.application.dto.tour.TourCreateDTO;
+import org.example.application.dto.tour.TourResponseDTO;
+import org.example.application.dto.tour.TourSummaryDTO;
+import org.example.application.dto.tour.TourUpdateDTO;
 import org.example.service.TourService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,23 +22,24 @@ public class TourController {
     }
 
     @GetMapping
-    public ResponseEntity<List<TourDTO>> getAllTours() {
+    public ResponseEntity<List<TourSummaryDTO>> getAllTours() {
         return ResponseEntity.ok(tourService.getAllTours());
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<TourDTO> getTourById(@PathVariable Long id) {
+    public ResponseEntity<TourResponseDTO> getTourById(@PathVariable Long id) {
         return ResponseEntity.ok(tourService.getTourById(id));
     }
 
     @PostMapping
-    public ResponseEntity<TourDTO> createTour(@RequestBody TourDTO tourDTO) {
-        return ResponseEntity.ok(tourService.createTour(tourDTO));
+    public ResponseEntity<TourResponseDTO> createTour(@Valid @RequestBody TourCreateDTO dto) {
+        return ResponseEntity.ok(tourService.createTour(dto));
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<TourDTO> updateTour(@PathVariable Long id, @RequestBody TourDTO tourDTO) {
-        return ResponseEntity.ok(tourService.updateTour(id, tourDTO));
+    public ResponseEntity<TourResponseDTO> updateTour(@PathVariable Long id,
+                                                      @RequestBody TourUpdateDTO dto) {
+        return ResponseEntity.ok(tourService.updateTour(id, dto));
     }
 
     @DeleteMapping("/{id}")
@@ -44,12 +49,14 @@ public class TourController {
     }
 
     @PostMapping("/{tourId}/waypoints/{waypointId}")
-    public ResponseEntity<TourDTO> addWaypoint(@PathVariable Long tourId, @PathVariable Long waypointId) {
+    public ResponseEntity<TourResponseDTO> addWaypoint(@PathVariable Long tourId,
+                                                       @PathVariable Long waypointId) {
         return ResponseEntity.ok(tourService.addWaypoint(tourId, waypointId));
     }
 
     @DeleteMapping("/{tourId}/waypoints/{waypointId}")
-    public ResponseEntity<TourDTO> removeWaypoint(@PathVariable Long tourId, @PathVariable Long waypointId) {
+    public ResponseEntity<TourResponseDTO> removeWaypoint(@PathVariable Long tourId,
+                                                          @PathVariable Long waypointId) {
         return ResponseEntity.ok(tourService.removeWaypoint(tourId, waypointId));
     }
 }

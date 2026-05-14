@@ -1,6 +1,8 @@
 package org.example.service;
 
-import org.example.application.dto.ExpenseDTO;
+import org.example.application.dto.expense.ExpenseCreateDTO;
+import org.example.application.dto.expense.ExpenseResponseDTO;
+import org.example.application.dto.expense.ExpenseUpdateDTO;
 import org.example.application.mapper.ExpenseMapper;
 import org.example.model.Expense;
 import org.example.model.Tour;
@@ -25,31 +27,31 @@ public class ExpenseService {
         this.tourRepository = tourRepository;
     }
 
-    public List<ExpenseDTO> getExpensesByTour(Long tourId) {
+    public List<ExpenseResponseDTO> getExpensesByTour(Long tourId) {
         return expenseRepository.findByTour_TourId(tourId).stream()
-                .map(expenseMapper::toDto)
+                .map(expenseMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    public ExpenseDTO getExpenseById(Long id) {
+    public ExpenseResponseDTO getExpenseById(Long id) {
         Expense expense = expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Masraf bulunamadı. ID: " + id));
-        return expenseMapper.toDto(expense);
+        return expenseMapper.toResponse(expense);
     }
 
-    public ExpenseDTO createExpense(Long tourId, ExpenseDTO dto) {
+    public ExpenseResponseDTO createExpense(Long tourId, ExpenseCreateDTO dto) {
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new RuntimeException("Tur bulunamadı. ID: " + tourId));
         Expense expense = expenseMapper.toEntity(dto);
         expense.setTour(tour);
-        return expenseMapper.toDto(expenseRepository.save(expense));
+        return expenseMapper.toResponse(expenseRepository.save(expense));
     }
 
-    public ExpenseDTO updateExpense(Long id, ExpenseDTO dto) {
+    public ExpenseResponseDTO updateExpense(Long id, ExpenseUpdateDTO dto) {
         Expense existing = expenseRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Güncellenecek masraf bulunamadı. ID: " + id));
         expenseMapper.updateEntityFromDto(dto, existing);
-        return expenseMapper.toDto(expenseRepository.save(existing));
+        return expenseMapper.toResponse(expenseRepository.save(existing));
     }
 
     public void deleteExpense(Long id) {
