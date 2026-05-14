@@ -11,4 +11,5 @@ public class Customer {
     private String passportNumber;
     private String phone;
     private String nationality;
+    private Long tourId;
 }

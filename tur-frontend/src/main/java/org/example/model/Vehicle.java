@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -23,4 +24,6 @@ public class Vehicle {
     @SerializedName("available")
     private Boolean available;
     private Double dailyRentalFee;
+    private List<String> serviceHistory;
+    private int tourCount;
 }
