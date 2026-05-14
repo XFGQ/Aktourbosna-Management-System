@@ -23,7 +23,7 @@ public class ApiService {
     public static void setToken(String token) { authToken = token; }
     public static String getToken() { return authToken; }
 
-    private final HttpClient client = HttpClient.newBuilder()
+    private static final HttpClient client = HttpClient.newBuilder()
             .connectTimeout(java.time.Duration.ofSeconds(5))
             .build();
 

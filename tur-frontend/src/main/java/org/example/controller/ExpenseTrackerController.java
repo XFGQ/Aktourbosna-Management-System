@@ -23,6 +23,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 
 public class ExpenseTrackerController {
 
@@ -85,52 +88,67 @@ public class ExpenseTrackerController {
     public void refresh() { loadData(); }
 
     private void loadData() {
-        new Thread(() -> {
-            try {
-                List<Tour> tours = tourService.getAllTours();
-                List<Expense> allExpenses = new ArrayList<>();
-                Map<Long, String> nameMap = new HashMap<>();
-                Map<Long, Long>   idMap   = new HashMap<>();
-                int toursWithExp = 0;
-
-                for (Tour t : tours) {
-                    if (t.getTourId() == null) continue;
-                    try {
-                        List<Expense> tourExpenses = expenseService.getExpensesByTourId(t.getTourId());
-                        if (tourExpenses != null && !tourExpenses.isEmpty()) {
-                            toursWithExp++;
-                            for (Expense e : tourExpenses) {
-                                if (e.getExpenseId() != null) {
-                                    nameMap.put(e.getExpenseId(), t.getTourName() != null ? t.getTourName() : "—");
-                                    idMap.put(e.getExpenseId(), t.getTourId());
-                                }
-                                allExpenses.add(e);
-                            }
-                        }
-                    } catch (Exception ignored) {}
-                }
-
-                double total = expenseService.calculateTotal(allExpenses);
-                int finalToursWithExp = toursWithExp;
-
-                javafx.application.Platform.runLater(() -> {
-                    cachedTours = tours;
-                    expenseToTourName.clear(); expenseToTourName.putAll(nameMap);
-                    expenseToTourId.clear();   expenseToTourId.putAll(idMap);
-                    expensesTable.getItems().setAll(allExpenses);
-                    totalExpensesValue.setText(String.valueOf(allExpenses.size()));
-                    totalAmountValue.setText("€" + String.format("%,.0f", total));
-                    toursWithExpensesValue.setText(String.valueOf(finalToursWithExp));
-                });
-            } catch (Exception e) {
-                e.printStackTrace();
+        CompletableFuture.supplyAsync(() -> {
+            try { return tourService.getAllTours(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        }).whenComplete((tours, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
                 javafx.application.Platform.runLater(() -> {
                     totalExpensesValue.setText("—");
                     totalAmountValue.setText("—");
                     toursWithExpensesValue.setText("—");
                 });
+                return;
             }
-        }).start();
+            List<CompletableFuture<TourExpenses>> expFuts = tours.stream()
+                    .filter(t -> t.getTourId() != null)
+                    .map(t -> CompletableFuture.supplyAsync(() -> {
+                        try {
+                            List<Expense> exps = expenseService.getExpensesByTourId(t.getTourId());
+                            return new TourExpenses(t, exps != null ? exps : List.of());
+                        } catch (Exception e) {
+                            return new TourExpenses(t, List.of());
+                        }
+                    }))
+                    .collect(Collectors.toList());
+
+            CompletableFuture.allOf(expFuts.toArray(new CompletableFuture[0]))
+                    .whenComplete((ignored, ex2) -> {
+                        List<Expense>     allExpenses = new ArrayList<>();
+                        Map<Long, String> nameMap     = new HashMap<>();
+                        Map<Long, Long>   idMap       = new HashMap<>();
+                        int[] toursWithExp = {0};
+
+                        expFuts.stream().map(CompletableFuture::join).forEach(te -> {
+                            if (!te.expenses.isEmpty()) toursWithExp[0]++;
+                            for (Expense e : te.expenses) {
+                                if (e.getExpenseId() != null) {
+                                    nameMap.put(e.getExpenseId(), te.tour.getTourName() != null ? te.tour.getTourName() : "—");
+                                    idMap.put(e.getExpenseId(), te.tour.getTourId());
+                                }
+                                allExpenses.add(e);
+                            }
+                        });
+
+                        double total = expenseService.calculateTotal(allExpenses);
+                        javafx.application.Platform.runLater(() -> {
+                            cachedTours = tours;
+                            expenseToTourName.clear(); expenseToTourName.putAll(nameMap);
+                            expenseToTourId.clear();   expenseToTourId.putAll(idMap);
+                            expensesTable.getItems().setAll(allExpenses);
+                            totalExpensesValue.setText(String.valueOf(allExpenses.size()));
+                            totalAmountValue.setText("€" + String.format("%,.0f", total));
+                            toursWithExpensesValue.setText(String.valueOf(toursWithExp[0]));
+                        });
+                    });
+        });
+    }
+
+    private static class TourExpenses {
+        final Tour          tour;
+        final List<Expense> expenses;
+        TourExpenses(Tour tour, List<Expense> expenses) { this.tour = tour; this.expenses = expenses; }
     }
 
     @FXML

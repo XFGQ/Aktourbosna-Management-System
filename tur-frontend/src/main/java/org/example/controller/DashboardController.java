@@ -16,6 +16,8 @@ import org.example.service.VehicleService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class DashboardController {
 
@@ -94,25 +96,42 @@ public class DashboardController {
     }
 
     private void loadData() {
-        new Thread(() -> {
+        CompletableFuture<List<Tour>>    toursFut    = CompletableFuture.supplyAsync(() -> {
+            try { return tourService.getAllTours(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Guide>>   guidesFut   = CompletableFuture.supplyAsync(() -> {
+            try { return guideService.getAllGuides(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
+            try { return vehicleService.getAllVehicles(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+
+        CompletableFuture.allOf(toursFut, guidesFut, vehiclesFut).whenComplete((v, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    totalToursValue.setText("—"); revenueValue.setText("—");
+                    guidesValue.setText("—"); vehiclesValue.setText("—"); vehiclesStatus.setText("");
+                });
+                return;
+            }
             try {
-                List<Tour> tours = tourService.getAllTours();
-                List<Guide> guides = guideService.getAllGuides();
-                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+                List<Tour>    tours    = toursFut.join();
+                List<Guide>   guides   = guidesFut.join();
+                List<Vehicle> vehicles = vehiclesFut.join();
 
                 Map<Long, String> nameMap = new HashMap<>();
-                for (Guide g : guides) {
-                    if (g.getId() != null && g.getFullName() != null) {
-                        nameMap.put(g.getId(), g.getFullName());
-                    }
-                }
+                for (Guide g : guides)
+                    if (g.getId() != null && g.getFullName() != null) nameMap.put(g.getId(), g.getFullName());
 
                 double revenue = tourService.calculateTotalRevenue(tours);
                 long available = vehicleService.countAvailable(vehicles);
 
                 javafx.application.Platform.runLater(() -> {
-                    guideNames.clear();
-                    guideNames.putAll(nameMap);
+                    guideNames.clear(); guideNames.putAll(nameMap);
                     recentToursTable.getItems().setAll(tours);
                     totalToursValue.setText(String.valueOf(tours.size()));
                     totalToursChange.setText("");
@@ -125,14 +144,11 @@ public class DashboardController {
             } catch (Exception e) {
                 e.printStackTrace();
                 javafx.application.Platform.runLater(() -> {
-                    totalToursValue.setText("—");
-                    revenueValue.setText("—");
-                    guidesValue.setText("—");
-                    vehiclesValue.setText("—");
-                    vehiclesStatus.setText("");
+                    totalToursValue.setText("—"); revenueValue.setText("—");
+                    guidesValue.setText("—"); vehiclesValue.setText("—"); vehiclesStatus.setText("");
                 });
             }
-        }).start();
+        });
     }
 
     @FXML

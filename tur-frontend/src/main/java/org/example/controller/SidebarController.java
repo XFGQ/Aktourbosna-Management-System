@@ -12,6 +12,7 @@ public class SidebarController {
     @FXML private Button btnTourManagement;
     @FXML private Button btnExpenseTracker;
     @FXML private Button btnVehiclesGuides;
+    @FXML private Button btnRefresh;
     @FXML private HBox logoHBox;
 
     private AppController appController;
@@ -67,6 +68,11 @@ public class SidebarController {
     private void onVehiclesGuides() {
         appController.navigateTo("vehiclesGuides.fxml");
         setActive(btnVehiclesGuides);
+    }
+
+    @FXML
+    private void onRefresh() {
+        if (appController != null) appController.refreshAllCached();
     }
 
     @FXML

@@ -13,6 +13,8 @@ import org.example.service.VehicleService;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.CompletionException;
 
 public class GuideDashboardController {
 
@@ -59,18 +61,34 @@ public class GuideDashboardController {
     }
 
     private void loadData() {
-        new Thread(() -> {
+        CompletableFuture<List<Tour>>    toursFut    = CompletableFuture.supplyAsync(() -> {
+            try { return tourService.getAllTours(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+        CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
+            try { return vehicleService.getAllVehicles(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+
+        CompletableFuture.allOf(toursFut, vehiclesFut).whenComplete((ignored, ex) -> {
+            if (ex != null) {
+                ex.printStackTrace();
+                javafx.application.Platform.runLater(() -> {
+                    toursThisWeekValue.setText("—"); customersValue.setText("—");
+                    completedToursValue.setText("—"); nextTourValue.setText("—");
+                });
+                return;
+            }
             try {
-                List<Tour> tours = tourService.getAllTours();
-                List<Vehicle> vehicles = vehicleService.getAllVehicles();
+                List<Tour>    tours    = toursFut.join();
+                List<Vehicle> vehicles = vehiclesFut.join();
 
                 Map<Long, String> vNames = new HashMap<>();
-                for (Vehicle v : vehicles) {
+                for (Vehicle v : vehicles)
                     if (v.getId() != null) vNames.put(v.getId(), v.getBrand() + " " + v.getModel());
-                }
 
                 List<Tour> upcoming = tourService.getUpcomingTours(tours);
-                List<Tour> recent = tourService.getRecentTours(tours);
+                List<Tour> recent   = tourService.getRecentTours(tours);
 
                 javafx.application.Platform.runLater(() -> {
                     vehicleNames.clear(); vehicleNames.putAll(vNames);
@@ -93,12 +111,10 @@ public class GuideDashboardController {
             } catch (Exception e) {
                 e.printStackTrace();
                 javafx.application.Platform.runLater(() -> {
-                    toursThisWeekValue.setText("—");
-                    customersValue.setText("—");
-                    completedToursValue.setText("—");
-                    nextTourValue.setText("—");
+                    toursThisWeekValue.setText("—"); customersValue.setText("—");
+                    completedToursValue.setText("—"); nextTourValue.setText("—");
                 });
             }
-        }).start();
+        });
     }
 }

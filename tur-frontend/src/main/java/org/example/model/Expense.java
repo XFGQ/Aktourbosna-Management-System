@@ -13,4 +13,5 @@ public class Expense {
     private Float amount;
     private LocalDate date;
     private String receiptPath;
+    private Long tourId;
 }

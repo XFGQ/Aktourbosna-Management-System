@@ -21,6 +21,7 @@ public class AppController {
     private final Map<String, Node> viewCache = new HashMap<>();
     private final Map<String, Object> controllerCache = new HashMap<>();
     private final Set<String> dirtyViews = new HashSet<>();
+    private String currentView;
 
     public static AppController getInstance() { return instance; }
 
@@ -74,6 +75,7 @@ public class AppController {
                 viewCache.put(fxmlFile, view);
                 controllerCache.put(fxmlFile, loader.getController());
             }
+            currentView = fxmlFile;
             contentArea.getChildren().setAll(view);
             if (dirtyViews.remove(fxmlFile)) {
                 callRefresh(controllerCache.get(fxmlFile));
@@ -94,7 +96,14 @@ public class AppController {
     }
 
     public void refreshAllCached() {
-        controllerCache.values().forEach(this::callRefresh);
+        // Refresh only the currently visible view immediately; mark others dirty.
+        for (String fxml : controllerCache.keySet()) {
+            if (fxml.equals(currentView)) {
+                callRefresh(controllerCache.get(fxml));
+            } else {
+                dirtyViews.add(fxml);
+            }
+        }
     }
 
     public void invalidateOtherViews(String currentView) {
