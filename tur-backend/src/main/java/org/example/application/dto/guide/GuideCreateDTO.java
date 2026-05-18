@@ -1,6 +1,7 @@
 package org.example.application.dto.guide;
 
-import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 
 import java.util.List;
@@ -8,12 +9,17 @@ import java.util.List;
 @Data
 public class GuideCreateDTO {
 
-    @NotNull
-    private Long userId;
+    @NotBlank
+    private String username;
+
+    @NotBlank
+    private String password;
+
+    @NotBlank
+    @Email
+    private String email;
 
     private String phone;
-    private String jobTitle;
-    private String partnerCode;
     private String baseCity;
     private String licenseNo;
     private Double dailyFee;

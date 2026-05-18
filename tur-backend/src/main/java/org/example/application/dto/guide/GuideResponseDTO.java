@@ -9,11 +9,9 @@ public class GuideResponseDTO {
 
     private Long id;
     private Long userId;
-    private String fullName;
+    private String username;
     private String email;
     private String phone;
-    private String jobTitle;
-    private String partnerCode;
     private String baseCity;
     private String licenseNo;
     private Double dailyFee;

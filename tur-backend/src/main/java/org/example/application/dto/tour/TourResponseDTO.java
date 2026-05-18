@@ -17,7 +17,7 @@ public class TourResponseDTO {
     private Double finalPrice;
 
     private Long guideId;
-    private String guidePartnerCode;
+    private String guideUsername;
 
     private Long vehicleId;
     private String vehiclePlate;

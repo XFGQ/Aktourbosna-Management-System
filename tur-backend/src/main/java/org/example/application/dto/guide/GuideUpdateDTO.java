@@ -8,8 +8,6 @@ import java.util.List;
 public class GuideUpdateDTO {
 
     private String phone;
-    private String jobTitle;
-    private String partnerCode;
     private String baseCity;
     private String licenseNo;
     private Double dailyFee;

@@ -8,9 +8,8 @@ import java.util.List;
 public class GuideSummaryDTO {
 
     private Long id;
-    private String fullName;
+    private String username;
     private String baseCity;
-    private String jobTitle;
     private Integer experience;
     private Double rating;
     private String currency;

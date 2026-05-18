@@ -12,7 +12,7 @@ import org.mapstruct.*;
 public interface TourMapper {
 
     @Mapping(source = "guide.id", target = "guideId")
-    @Mapping(source = "guide.partnerCode", target = "guidePartnerCode")
+    @Mapping(source = "guide.user.username", target = "guideUsername")
     @Mapping(source = "vehicle.id", target = "vehicleId")
     @Mapping(source = "vehicle.plateNumber", target = "vehiclePlate")
     @Mapping(source = "baseRoute.routeId", target = "routeId")
@@ -23,7 +23,7 @@ public interface TourMapper {
     TourResponseDTO toResponse(Tour tour);
 
     @Mapping(source = "guide.id", target = "guideId")
-    @Mapping(source = "guide.partnerCode", target = "guidePartnerCode")
+    @Mapping(source = "guide.user.username", target = "guideUsername")
     @Mapping(expression = "java(tour.getCustomers().size())", target = "customerCount")
     TourSummaryDTO toSummary(Tour tour);
 
