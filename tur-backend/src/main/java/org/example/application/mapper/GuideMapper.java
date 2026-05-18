@@ -11,18 +11,16 @@ import org.mapstruct.*;
 public interface GuideMapper {
 
     @Mapping(source = "user.id", target = "userId")
-    @Mapping(source = "user.username", target = "fullName")
+    @Mapping(source = "user.username", target = "username")
     @Mapping(source = "user.email", target = "email")
     @Mapping(expression = "java(guide.getTours().size())", target = "tourCount")
     GuideResponseDTO toResponse(Guide guide);
 
-    @Mapping(source = "user.username", target = "fullName")
+    @Mapping(source = "user.username", target = "username")
     GuideSummaryDTO toSummary(Guide guide);
 
-    @Mapping(source = "userId", target = "user.id")
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "user.username", ignore = true)
-    @Mapping(target = "user.email", ignore = true)
+    @Mapping(target = "user", ignore = true)
     @Mapping(target = "tours", ignore = true)
     Guide toEntity(GuideCreateDTO dto);
 

@@ -1,6 +1,9 @@
 package org.example.controller;
 
-import org.example.application.dto.CustomerDTO;
+import jakarta.validation.Valid;
+import org.example.application.dto.customer.CustomerCreateDTO;
+import org.example.application.dto.customer.CustomerResponseDTO;
+import org.example.application.dto.customer.CustomerUpdateDTO;
 import org.example.service.CustomerService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -18,26 +21,26 @@ public class CustomerController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CustomerDTO>> getCustomersByTour(@PathVariable Long tourId) {
+    public ResponseEntity<List<CustomerResponseDTO>> getCustomersByTour(@PathVariable Long tourId) {
         return ResponseEntity.ok(customerService.getCustomersByTour(tourId));
     }
 
     @GetMapping("/{customerId}")
-    public ResponseEntity<CustomerDTO> getCustomerById(@PathVariable Long tourId,
-                                                       @PathVariable Long customerId) {
+    public ResponseEntity<CustomerResponseDTO> getCustomerById(@PathVariable Long tourId,
+                                                               @PathVariable Long customerId) {
         return ResponseEntity.ok(customerService.getCustomerById(customerId));
     }
 
     @PostMapping
-    public ResponseEntity<CustomerDTO> createCustomer(@PathVariable Long tourId,
-                                                      @RequestBody CustomerDTO dto) {
+    public ResponseEntity<CustomerResponseDTO> createCustomer(@PathVariable Long tourId,
+                                                              @Valid @RequestBody CustomerCreateDTO dto) {
         return ResponseEntity.ok(customerService.createCustomer(tourId, dto));
     }
 
     @PutMapping("/{customerId}")
-    public ResponseEntity<CustomerDTO> updateCustomer(@PathVariable Long tourId,
-                                                      @PathVariable Long customerId,
-                                                      @RequestBody CustomerDTO dto) {
+    public ResponseEntity<CustomerResponseDTO> updateCustomer(@PathVariable Long tourId,
+                                                              @PathVariable Long customerId,
+                                                              @RequestBody CustomerUpdateDTO dto) {
         return ResponseEntity.ok(customerService.updateCustomer(customerId, dto));
     }
 

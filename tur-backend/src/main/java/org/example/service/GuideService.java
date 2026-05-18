@@ -13,7 +13,9 @@ import org.example.repository.GuideRepository;
 import org.example.repository.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.stream.Collectors;
@@ -24,11 +26,14 @@ public class GuideService {
     private final GuideRepository guideRepository;
     private final GuideMapper guideMapper;
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    public GuideService(GuideRepository guideRepository, GuideMapper guideMapper, UserRepository userRepository) {
+    public GuideService(GuideRepository guideRepository, GuideMapper guideMapper,
+                        UserRepository userRepository, PasswordEncoder passwordEncoder) {
         this.guideRepository = guideRepository;
         this.guideMapper = guideMapper;
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
     public List<GuideResponseDTO> getAllGuides() {
@@ -43,16 +48,33 @@ public class GuideService {
                 .collect(Collectors.toList());
     }
 
+    public GuideResponseDTO getMyProfile() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Guide guide = guideRepository.findByUser_Username(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Guide profile not found for user: " + username));
+        return guideMapper.toResponse(guide);
+    }
+
     public GuideResponseDTO getGuideById(Long id) {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Guide not found: " + id));
         return guideMapper.toResponse(guide);
     }
 
+    @Transactional
     public GuideResponseDTO createGuide(GuideCreateDTO dto) {
+        if (userRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalArgumentException("Username already exists: " + dto.getUsername());
+        }
+        User user = User.builder()
+                .username(dto.getUsername())
+                .email(dto.getEmail())
+                .password(passwordEncoder.encode(dto.getPassword()))
+                .role(UserRole.GUIDE)
+                .build();
+        user = userRepository.save(user);
+
         Guide guide = guideMapper.toEntity(dto);
-        User user = userRepository.findById(dto.getUserId())
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + dto.getUserId()));
         guide.setUser(user);
         return guideMapper.toResponse(guideRepository.save(guide));
     }

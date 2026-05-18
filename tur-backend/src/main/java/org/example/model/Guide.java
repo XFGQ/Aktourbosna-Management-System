@@ -21,11 +21,6 @@ public class Guide {
     private User user;
 
     private String phone;
-    private String jobTitle;
-
-    @Column(unique = true)
-    private String partnerCode;
-
     private String baseCity;
     private String licenseNo;
     private Double dailyFee;

@@ -12,6 +12,6 @@ public class TourSummaryDTO {
     private LocalDate startDate;
     private LocalDate endDate;
     private Long guideId;
-    private String guidePartnerCode;
+    private String guideUsername;
     private int customerCount;
 }

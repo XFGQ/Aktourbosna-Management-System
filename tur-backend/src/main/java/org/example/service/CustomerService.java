@@ -1,6 +1,8 @@
 package org.example.service;
 
-import org.example.application.dto.CustomerDTO;
+import org.example.application.dto.customer.CustomerCreateDTO;
+import org.example.application.dto.customer.CustomerResponseDTO;
+import org.example.application.dto.customer.CustomerUpdateDTO;
 import org.example.application.mapper.CustomerMapper;
 import org.example.model.Customer;
 import org.example.model.Tour;
@@ -25,31 +27,31 @@ public class CustomerService {
         this.tourRepository = tourRepository;
     }
 
-    public List<CustomerDTO> getCustomersByTour(Long tourId) {
+    public List<CustomerResponseDTO> getCustomersByTour(Long tourId) {
         return customerRepository.findByTour_TourId(tourId).stream()
-                .map(customerMapper::toDto)
+                .map(customerMapper::toResponse)
                 .collect(Collectors.toList());
     }
 
-    public CustomerDTO getCustomerById(Long id) {
+    public CustomerResponseDTO getCustomerById(Long id) {
         Customer customer = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Müşteri bulunamadı. ID: " + id));
-        return customerMapper.toDto(customer);
+        return customerMapper.toResponse(customer);
     }
 
-    public CustomerDTO createCustomer(Long tourId, CustomerDTO dto) {
+    public CustomerResponseDTO createCustomer(Long tourId, CustomerCreateDTO dto) {
         Tour tour = tourRepository.findById(tourId)
                 .orElseThrow(() -> new RuntimeException("Tur bulunamadı. ID: " + tourId));
         Customer customer = customerMapper.toEntity(dto);
         customer.setTour(tour);
-        return customerMapper.toDto(customerRepository.save(customer));
+        return customerMapper.toResponse(customerRepository.save(customer));
     }
 
-    public CustomerDTO updateCustomer(Long id, CustomerDTO dto) {
+    public CustomerResponseDTO updateCustomer(Long id, CustomerUpdateDTO dto) {
         Customer existing = customerRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Güncellenecek müşteri bulunamadı. ID: " + id));
         customerMapper.updateEntityFromDto(dto, existing);
-        return customerMapper.toDto(customerRepository.save(existing));
+        return customerMapper.toResponse(customerRepository.save(existing));
     }
 
     public void deleteCustomer(Long id) {

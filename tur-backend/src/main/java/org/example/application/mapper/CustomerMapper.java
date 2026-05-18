@@ -1,6 +1,8 @@
 package org.example.application.mapper;
 
-import org.example.application.dto.CustomerDTO;
+import org.example.application.dto.customer.CustomerCreateDTO;
+import org.example.application.dto.customer.CustomerResponseDTO;
+import org.example.application.dto.customer.CustomerUpdateDTO;
 import org.example.model.Customer;
 import org.mapstruct.*;
 
@@ -8,12 +10,13 @@ import org.mapstruct.*;
 public interface CustomerMapper {
 
     @Mapping(source = "tour.tourId", target = "tourId")
-    CustomerDTO toDto(Customer customer);
+    CustomerResponseDTO toResponse(Customer customer);
 
-    @Mapping(source = "tourId", target = "tour.tourId")
-    Customer toEntity(CustomerDTO dto);
-
-    @Mapping(target = "tour", ignore = true)
     @Mapping(target = "id", ignore = true)
-    void updateEntityFromDto(CustomerDTO dto, @MappingTarget Customer entity);
+    @Mapping(target = "tour", ignore = true)
+    Customer toEntity(CustomerCreateDTO dto);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "tour", ignore = true)
+    void updateEntityFromDto(CustomerUpdateDTO dto, @MappingTarget Customer entity);
 }
