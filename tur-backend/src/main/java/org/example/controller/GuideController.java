@@ -31,6 +31,11 @@ public class GuideController {
         return ResponseEntity.ok(guideService.getAllGuidesSummary());
     }
 
+    @GetMapping("/me")
+    public ResponseEntity<GuideResponseDTO> getMyProfile() {
+        return ResponseEntity.ok(guideService.getMyProfile());
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<GuideResponseDTO> getGuideById(@PathVariable Long id) {
         return ResponseEntity.ok(guideService.getGuideById(id));

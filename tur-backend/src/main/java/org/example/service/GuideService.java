@@ -48,6 +48,13 @@ public class GuideService {
                 .collect(Collectors.toList());
     }
 
+    public GuideResponseDTO getMyProfile() {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Guide guide = guideRepository.findByUser_Username(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Guide profile not found for user: " + username));
+        return guideMapper.toResponse(guide);
+    }
+
     public GuideResponseDTO getGuideById(Long id) {
         Guide guide = guideRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Guide not found: " + id));

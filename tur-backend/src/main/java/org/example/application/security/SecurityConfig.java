@@ -47,7 +47,9 @@ public class SecurityConfig {
                         // User management — ADMIN only
                         .requestMatchers("/api/users/**").hasRole("ADMIN")
 
-                        // Guides — GET + PUT for both roles, POST + DELETE ADMIN only
+                        // Guides — /me for GUIDE, rest GET+PUT for both, POST+DELETE ADMIN only
+                        .requestMatchers(HttpMethod.GET, "/api/guides/me").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers(HttpMethod.PUT, "/api/guides/me").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers(HttpMethod.GET, "/api/guides/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers(HttpMethod.PUT, "/api/guides/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers("/api/guides/**").hasRole("ADMIN")
