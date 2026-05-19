@@ -44,26 +44,21 @@ public class Main extends Application {
                 fill.setStyle("-fx-background-color: #4FC3F7; -fx-background-radius: 5px; -fx-background-insets: 0; -fx-padding: 0;");
         });
 
-        // Bar'ı sürekli yumuşak şekilde dolduran animator
         ProgressAnimator animator = new ProgressAnimator(bar);
         animator.start();
 
-        // Sadece animasyon - FXML yükleme FX thread'de yapılacak
         Task<Void> loadTask = new Task<>() {
             @Override
             protected Void call() throws Exception {
                 Platform.runLater(() -> status.setText("Loading components..."));
                 animator.target = 0.30;
                 Thread.sleep(200);
-
                 Platform.runLater(() -> status.setText("Building UI..."));
                 animator.target = 0.60;
                 Thread.sleep(200);
-
                 Platform.runLater(() -> status.setText("Almost ready..."));
                 animator.target = 0.90;
                 Thread.sleep(150);
-
                 return null;
             }
         };
@@ -79,9 +74,9 @@ public class Main extends Application {
                 }
             };
             finishTask.setOnSucceeded(ev -> {
-                    animator.stop();
-                    splash.close();
-                    launchApp(primaryStage);
+                animator.stop();
+                splash.close();
+                launchApp(primaryStage);
             });
             new Thread(finishTask).start();
         });
@@ -122,6 +117,7 @@ public class Main extends Application {
             Platform.exit();
         }
     }
+
     private Stage createSplashScreen() {
         Stage splash = new Stage();
         splash.initStyle(StageStyle.UNDECORATED);
@@ -148,14 +144,14 @@ public class Main extends Application {
         progressBar.setPrefHeight(10);
         progressBar.setStyle("-fx-accent: #4FC3F7;");
 
-        Label status = new Label("Initializing...");
-        status.setId("splashStatus");
-        status.setStyle("-fx-text-fill: #90A4AE; -fx-font-size: 11px;");
+        Label statusLabel = new Label("Initializing...");
+        statusLabel.setId("splashStatus");
+        statusLabel.setStyle("-fx-text-fill: #90A4AE; -fx-font-size: 11px;");
 
         Label version = new Label("v1.0");
         version.setStyle("-fx-text-fill: #757575; -fx-font-size: 10px;");
 
-        root.getChildren().addAll(splashLogo, logoText, subtitle, spacer, progressBar, status, version);
+        root.getChildren().addAll(splashLogo, logoText, subtitle, spacer, progressBar, statusLabel, version);
 
         Scene scene = new Scene(root, 480, 320);
         splash.setScene(scene);
@@ -167,14 +163,11 @@ public class Main extends Application {
         return splash;
     }
 
-   
     private static class ProgressAnimator extends AnimationTimer {
         private final ProgressBar bar;
         volatile double target = 0.0;
 
-        ProgressAnimator(ProgressBar bar) {
-            this.bar = bar;
-        }
+        ProgressAnimator(ProgressBar bar) { this.bar = bar; }
 
         @Override
         public void handle(long now) {
