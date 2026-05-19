@@ -20,7 +20,6 @@ import javafx.stage.StageStyle;
 import org.example.controller.LoginController;
 import org.example.controller.LogoView;
 
-
 public class Main extends Application {
 
     public static void main(String[] args) {
@@ -41,7 +40,8 @@ public class Main extends Application {
                 track.setStyle("-fx-background-color: rgba(255,255,255,0.15); -fx-background-radius: 5px;");
             javafx.scene.layout.Region fill = (javafx.scene.layout.Region) bar.lookup(".bar");
             if (fill != null)
-                fill.setStyle("-fx-background-color: #4FC3F7; -fx-background-radius: 5px; -fx-background-insets: 0; -fx-padding: 0;");
+                fill.setStyle(
+                        "-fx-background-color: #4FC3F7; -fx-background-radius: 5px; -fx-background-insets: 0; -fx-padding: 0;");
         });
 
         ProgressAnimator animator = new ProgressAnimator(bar);
@@ -95,7 +95,10 @@ public class Main extends Application {
     private void launchApp(Stage primaryStage) {
         try {
             String[] auth = LoginController.showLoginScreen();
-            if (auth == null) { Platform.exit(); return; }
+            if (auth == null) {
+                Platform.exit();
+                return;
+            }
 
             FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/main.fxml"));
             Parent root = loader.load();
@@ -174,7 +177,8 @@ public class Main extends Application {
             double current = bar.getProgress();
             if (current < target) {
                 double next = current + (target - current) * 0.05;
-                if (next > target) next = target;
+                if (next > target)
+                    next = target;
                 bar.setProgress(next);
             }
         }
