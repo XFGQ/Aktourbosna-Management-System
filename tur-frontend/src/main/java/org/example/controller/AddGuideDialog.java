@@ -32,56 +32,41 @@ public class AddGuideDialog {
         grid.setPadding(new Insets(20, 20, 10, 20));
 
         TextField fullName   = new TextField();
-        fullName.setPromptText("e.g. Hasan Yilmaz");
+        fullName.setPromptText("e.g. hasan_yilmaz");
+        PasswordField password = new PasswordField();
+        password.setPromptText("Min. 6 characters");
         TextField email      = new TextField();
         email.setPromptText("e.g. hasan@example.com");
-        TextField phone      = new TextField();
-        phone.setPromptText("e.g. +387601234567");
-        TextField baseCity   = new TextField();
-        baseCity.setPromptText("e.g. Sarajevo");
-        TextField licenseNo  = new TextField();
-        licenseNo.setPromptText("e.g. LIC-2024-001");
-        TextField experience = new TextField();
-        experience.setPromptText("Years, e.g. 5");
-        TextField dailyFee   = new TextField();
-        dailyFee.setPromptText("e.g. 150");
+
+        int row = 0;
+        grid.add(new Label("Username *:"),   0, row); grid.add(fullName, 1, row++);
+        if (!editMode) {
+            grid.add(new Label("Password *:"), 0, row); grid.add(password, 1, row++);
+        }
+        grid.add(new Label("Email *:"),      0, row); grid.add(email,    1, row);
 
         if (editMode) {
-            fullName.setText(existing.getFullName() != null ? existing.getFullName() : "");
+            fullName.setText(existing.getUsername() != null ? existing.getUsername() : "");
             email.setText(existing.getEmail() != null ? existing.getEmail() : "");
-            phone.setText(existing.getPhone() != null ? existing.getPhone() : "");
-            baseCity.setText(existing.getBaseCity() != null ? existing.getBaseCity() : "");
-            licenseNo.setText(existing.getLicenseNo() != null ? existing.getLicenseNo() : "");
-            experience.setText(existing.getExperience() != null ? String.valueOf(existing.getExperience()) : "");
-            dailyFee.setText(existing.getDailyFee() != null ? String.valueOf(existing.getDailyFee().intValue()) : "");
         }
-
-        grid.add(new Label("Full Name:"),        0, 0); grid.add(fullName,   1, 0);
-        grid.add(new Label("Email:"),            0, 1); grid.add(email,      1, 1);
-        grid.add(new Label("Phone:"),            0, 2); grid.add(phone,      1, 2);
-        grid.add(new Label("Base City:"),        0, 3); grid.add(baseCity,   1, 3);
-        grid.add(new Label("License No:"),       0, 4); grid.add(licenseNo,  1, 4);
-        grid.add(new Label("Experience (yrs):"), 0, 5); grid.add(experience, 1, 5);
-        grid.add(new Label("Daily Fee (€):"),    0, 6); grid.add(dailyFee,   1, 6);
 
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(btn -> {
             if (btn == saveButton) {
-                try {
-                    Guide g = new Guide();
-                    g.setFullName(fullName.getText().trim());
-                    g.setEmail(email.getText().trim());
-                    g.setPhone(phone.getText().trim());
-                    g.setBaseCity(baseCity.getText().trim());
-                    g.setLicenseNo(licenseNo.getText().trim());
-                    g.setExperience(experience.getText().isEmpty() ? 0 : Integer.parseInt(experience.getText().trim()));
-                    g.setDailyFee(dailyFee.getText().isEmpty() ? 0.0 : Double.parseDouble(dailyFee.getText().trim()));
-                    return g;
-                } catch (NumberFormatException e) {
-                    Toast.error("Experience and Daily Fee must be numbers.");
+                if (fullName.getText().trim().isEmpty() || email.getText().trim().isEmpty()) {
+                    Toast.error("Username and Email are required.");
                     return null;
                 }
+                if (!editMode && password.getText().trim().length() < 6) {
+                    Toast.error("Password must be at least 6 characters.");
+                    return null;
+                }
+                Guide g = new Guide();
+                g.setUsername(fullName.getText().trim());
+                g.setPassword(password.getText().trim());
+                g.setEmail(email.getText().trim());
+                return g;
             }
             return null;
         });
