@@ -13,8 +13,9 @@ import org.example.service.GuideService;
 
 public class GuideProfileSetupDialog {
 
-    public static void show(Guide existing) {
-        Dialog<Void> dialog = new Dialog<>();
+    /** Returns true if the profile was saved, false if the dialog was dismissed without saving. */
+    public static boolean show(Guide existing) {
+        Dialog<Boolean> dialog = new Dialog<>();
         javafx.stage.Window owner = javafx.stage.Window.getWindows().stream()
                 .filter(javafx.stage.Window::isShowing).findFirst().orElse(null);
         dialog.initOwner(owner);
@@ -117,8 +118,8 @@ public class GuideProfileSetupDialog {
             }
         });
 
-        dialog.setResultConverter(btn -> null);
-        dialog.showAndWait();
+        dialog.setResultConverter(btn -> btn != null && btn.getButtonData() == ButtonBar.ButtonData.OK_DONE);
+        return dialog.showAndWait().orElse(false);
     }
 
     private static String nvl(String s) {

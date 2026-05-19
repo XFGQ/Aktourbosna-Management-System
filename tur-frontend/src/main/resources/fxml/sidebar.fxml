@@ -30,7 +30,6 @@
         <Button fx:id="btnExpenseTracker" maxWidth="Infinity" styleClass="nav-button" text="  Expense Tracker"       onAction="#onExpenseTracker" />
         <Button fx:id="btnVehiclesGuides" maxWidth="Infinity" styleClass="nav-button" text="  Vehicles &amp; Guides"  onAction="#onVehiclesGuides" />
         <Button fx:id="btnRoutes"         maxWidth="Infinity" styleClass="nav-button" text="  Routes"                onAction="#onRoutes" />
-        <Button fx:id="btnRefresh"        maxWidth="Infinity" styleClass="nav-button" text="  Refresh All"           onAction="#onRefresh" />
     </VBox>
 
     <VBox>

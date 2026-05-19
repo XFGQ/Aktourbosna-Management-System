@@ -30,6 +30,9 @@ public class VehiclesGuidesController {
     @FXML private VBox guidesPanel;
     @FXML private Button addVehicleBtn;
 
+    @FXML private Label pageTitle;
+    @FXML private Label pageSubtitle;
+
     @FXML private Label totalVehiclesValue;
     @FXML private Label vehiclesAvailable;
     @FXML private Label totalGuidesValue;
@@ -65,6 +68,9 @@ public class VehiclesGuidesController {
         boolean isGuide = SessionManager.getInstance().isGuide();
 
         if (isGuide) {
+            if (pageTitle != null) pageTitle.setText("Vehicles");
+            if (pageSubtitle != null) pageSubtitle.setText("Overview of all vehicles");
+
             if (addVehicleBtn != null) {
                 addVehicleBtn.setVisible(false);
                 addVehicleBtn.setManaged(false);

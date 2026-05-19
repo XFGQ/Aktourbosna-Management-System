@@ -38,7 +38,7 @@ public class TourCustomersDialog {
         table.setPrefWidth(580);
         table.setPrefHeight(300);
         table.setFixedCellSize(40);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
 
         TableColumn<Customer, String> colName = new TableColumn<>("Full Name");
         colName.setCellValueFactory(new PropertyValueFactory<>("fullName"));

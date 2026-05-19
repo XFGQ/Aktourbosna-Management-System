@@ -16,8 +16,8 @@
         </padding>
 
         <VBox spacing="4.0">
-            <Label styleClass="page-title" text="My Schedule" />
-            <Label styleClass="page-subtitle" text="Welcome back, Guide" />
+            <Label fx:id="pageTitle" styleClass="page-title" text="Welcome back" />
+            <Label styleClass="page-subtitle" text="Dashboard" />
         </VBox>
 
         <HBox spacing="16.0">
@@ -43,31 +43,20 @@
             <HBox styleClass="panel-header" alignment="CENTER_LEFT">
                 <Label styleClass="panel-title" text="Today's Tour" />
             </HBox>
-            <VBox styleClass="today-body" spacing="14.0">
-                <Label fx:id="todayTourName" styleClass="today-title" text="No tour scheduled for today" />
-                <HBox spacing="36.0">
-                    <VBox spacing="4.0">
-                        <Label styleClass="field-label" text="Time" />
-                        <Label fx:id="todayTourTime" styleClass="field-value" text="—" />
-                    </VBox>
-                    <VBox spacing="4.0">
-                        <Label styleClass="field-label" text="Hotel" />
-                        <Label fx:id="todayHotel" styleClass="field-value" text="—" />
-                    </VBox>
-                    <VBox spacing="4.0">
-                        <Label styleClass="field-label" text="Destination" />
-                        <Label fx:id="todayDestination" styleClass="field-value" text="—" />
-                    </VBox>
-                    <VBox spacing="4.0">
-                        <Label styleClass="field-label" text="Group" />
-                        <Label fx:id="todayGroupSize" styleClass="field-value" text="—" />
-                    </VBox>
-                    <VBox spacing="4.0">
-                        <Label styleClass="field-label" text="Vehicle" />
-                        <Label fx:id="todayVehicle" styleClass="field-value" text="—" />
-                    </VBox>
-                </HBox>
-            </VBox>
+            <TableView fx:id="todayTourTable" styleClass="table-view"
+                       prefHeight="80.0" fixedCellSize="42.0">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+                <columns>
+                    <TableColumn fx:id="colTodayDate" text="Date" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colTodayTourName" text="Tour Name" prefWidth="170.0" minWidth="170.0" />
+                    <TableColumn fx:id="colTodayDestination" text="Destination" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colTodayHotel" text="Hotel" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colTodayGroupSize" text="Group" prefWidth="80.0" minWidth="80.0" />
+                    <TableColumn fx:id="colTodayVehicle" text="Vehicle" prefWidth="120.0" minWidth="120.0" />
+                </columns>
+            </TableView>
         </VBox>
 
         <VBox styleClass="panel" spacing="0">

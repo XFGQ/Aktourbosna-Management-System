@@ -15,11 +15,15 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import org.example.model.Route;
+import org.example.model.Toll;
+import org.example.model.Waypoint;
 import org.example.service.RouteService;
 import org.example.service.SessionManager;
 
+import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 
 public class RoutesController {
 
@@ -31,6 +35,8 @@ public class RoutesController {
     @FXML private TableColumn<Route, String> colRouteName;
     @FXML private TableColumn<Route, String> colRouteStart;
     @FXML private TableColumn<Route, String> colRouteEnd;
+    @FXML private TableColumn<Route, String> colRouteWaypoints;
+    @FXML private TableColumn<Route, String> colRouteTolls;
     @FXML private TableColumn<Route, Float> colRouteDistance;
     @FXML private TableColumn<Route, Route> colRouteActions;
 
@@ -54,6 +60,29 @@ public class RoutesController {
         colRouteName.setCellValueFactory(new PropertyValueFactory<>("routeName"));
         colRouteStart.setCellValueFactory(new PropertyValueFactory<>("startCity"));
         colRouteEnd.setCellValueFactory(new PropertyValueFactory<>("endCity"));
+        colRouteWaypoints.setCellValueFactory(cd -> {
+            List<Waypoint> waypoints = cd.getValue().getDefaultWaypoints();
+            if (waypoints == null || waypoints.isEmpty()) {
+                return new ReadOnlyObjectWrapper<>("-");
+            }
+            String wpsString = waypoints.stream()
+                    .map(Waypoint::getCity)
+                    .collect(Collectors.joining(", "));
+            return new ReadOnlyObjectWrapper<>(wpsString);
+        });
+
+        colRouteTolls.setCellValueFactory(cd -> {
+            List<Toll> tolls = cd.getValue().getTolls();
+            if (tolls == null || tolls.isEmpty()) {
+                return new ReadOnlyObjectWrapper<>("-");
+            }
+            String tollsString = tolls.stream()
+                    .map(t -> (t.getName() != null ? t.getName() : "") + 
+                              (t.getLocation() != null && !t.getLocation().isEmpty() ? ", " + t.getLocation() : ""))
+                    .collect(Collectors.joining(" | "));
+            return new ReadOnlyObjectWrapper<>(tollsString);
+        });
+
         colRouteDistance.setCellValueFactory(new PropertyValueFactory<>("distance"));
 
         if (!isGuide) {

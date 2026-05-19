@@ -15,8 +15,8 @@
             <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
         </padding>
 
-        <Label styleClass="page-title" text="Vehicles &amp; Guides" />
-        <Label styleClass="page-subtitle" text="Overview of all vehicles and guides" />
+        <Label fx:id="pageTitle" styleClass="page-title" text="Vehicles &amp; Guides" />
+        <Label fx:id="pageSubtitle" styleClass="page-subtitle" text="Overview of all vehicles and guides" />
 
         <HBox spacing="16.0">
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
