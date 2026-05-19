@@ -22,7 +22,6 @@ import java.util.stream.Collectors;
 public class ApiService {
 
     private static final String BASE_URL = "http://localhost:8080/api";
-
     private static String authToken = null;
 
     public static void setToken(String token) { authToken = token; }
@@ -89,13 +88,15 @@ public class ApiService {
     }
 
     public List<Guide> fetchGuides() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/guides"),
-                new TypeToken<List<Guide>>() {}.getType());
+        return gson.fromJson(get(BASE_URL + "/guides"), new TypeToken<List<Guide>>() {}.getType());
     }
 
     public List<Expense> fetchExpensesByTour(Long tourId) throws Exception {
-        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/expenses"),
-                new TypeToken<List<Expense>>() {}.getType());
+        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/expenses"), new TypeToken<List<Expense>>() {}.getType());
+    }
+
+    public List<Route> fetchRoutes() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/routes"), new TypeToken<List<Route>>() {}.getType());
     }
 
     public Vehicle createVehicle(Vehicle vehicle) throws Exception {
@@ -112,6 +113,16 @@ public class ApiService {
 
     public void deleteVehicle(Long id) throws Exception {
         delete(BASE_URL + "/vehicles/" + id);
+    }
+
+    public Guide getGuideMe() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/guides/me"), Guide.class);
+    }
+
+    public Guide updateGuideMe(Guide guide) throws Exception {
+        String json = gson.toJson(guide);
+        String response = put(BASE_URL + "/guides/me", json);
+        return gson.fromJson(response, Guide.class);
     }
 
     public Guide createGuide(Guide guide) throws Exception {
@@ -246,48 +257,38 @@ public class ApiService {
     }
 
     private String get(String url) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[GET " + url + "] took " + (System.currentTimeMillis() - start) + " ms");
+        System.out.println("[GET " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
+        if (response.statusCode() >= 400) {
+            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
+        }
         return response.body();
     }
 
     private String post(String url, String jsonBody) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[POST " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
-        }
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
         return response.body();
     }
 
     private String put(String url, String jsonBody) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url)
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[PUT " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
-        }
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
         return response.body();
     }
 
     private void delete(String url) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url).DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[DELETE " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
-        }
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
     }
 }

@@ -18,12 +18,17 @@ import org.example.model.Guide;
 import org.example.model.Vehicle;
 import org.example.service.GuideService;
 import org.example.service.VehicleService;
+import org.example.service.SessionManager;
 
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
 
 public class VehiclesGuidesController {
+
+    @FXML private VBox guidesStatCard;
+    @FXML private VBox guidesPanel;
+    @FXML private Button addVehicleBtn;
 
     @FXML private Label totalVehiclesValue;
     @FXML private Label vehiclesAvailable;
@@ -57,6 +62,25 @@ public class VehiclesGuidesController {
 
     @FXML
     public void initialize() {
+        boolean isGuide = SessionManager.getInstance().isGuide();
+
+        if (isGuide) {
+            if (addVehicleBtn != null) {
+                addVehicleBtn.setVisible(false);
+                addVehicleBtn.setManaged(false);
+            }
+            colVehActions.setVisible(false);
+
+            if (guidesPanel != null) {
+                guidesPanel.setVisible(false);
+                guidesPanel.setManaged(false);
+            }
+            if (guidesStatCard != null) {
+                guidesStatCard.setVisible(false);
+                guidesStatCard.setManaged(false);
+            }
+        }
+
         colVehId.setCellValueFactory(new PropertyValueFactory<>("id"));
         colVehBrand.setCellValueFactory(new PropertyValueFactory<>("brand"));
         colVehModel.setCellValueFactory(new PropertyValueFactory<>("model"));
@@ -68,68 +92,69 @@ public class VehiclesGuidesController {
 
         colVehPrice.setCellValueFactory(cd -> {
             Double price = cd.getValue().getDailyRentalFee();
-            // "%,.0f" kısmı binlik ayraç (virgül) ekler ve ondalık kısımları siler.
             return new SimpleStringProperty(price != null ? "€" + String.format("%,.0f", price) : "—");
         });
 
         colVehStatus.setCellValueFactory(cd ->
                 new SimpleStringProperty(Boolean.TRUE.equals(cd.getValue().getAvailable()) ? "Available" : "Not Available"));
 
-        colVehActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
-        colVehActions.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn = new Button("Edit");
-            private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(6, editBtn, deleteBtn);
-            {
-                box.setAlignment(Pos.CENTER);
-                editBtn.getStyleClass().add("btn-secondary");
-                deleteBtn.getStyleClass().add("btn-danger");
-                editBtn.setOnAction(e -> {
-                    Vehicle v = getTableView().getItems().get(getIndex());
-                    onEditVehicle(v);
-                });
-                deleteBtn.setOnAction(e -> {
-                    Vehicle v = getTableView().getItems().get(getIndex());
-                    onDeleteVehicle(v);
-                });
-            }
-            @Override
-            protected void updateItem(Vehicle item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty || item == null ? null : box);
-            }
-        });
+        if (!isGuide) {
+            colVehActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+            colVehActions.setCellFactory(col -> new TableCell<>() {
+                private final Button editBtn = new Button("Edit");
+                private final Button deleteBtn = new Button("Delete");
+                private final HBox box = new HBox(6, editBtn, deleteBtn);
+                {
+                    box.setAlignment(Pos.CENTER);
+                    editBtn.getStyleClass().add("btn-secondary");
+                    deleteBtn.getStyleClass().add("btn-danger");
+                    editBtn.setOnAction(e -> {
+                        Vehicle v = getTableView().getItems().get(getIndex());
+                        onEditVehicle(v);
+                    });
+                    deleteBtn.setOnAction(e -> {
+                        Vehicle v = getTableView().getItems().get(getIndex());
+                        onDeleteVehicle(v);
+                    });
+                }
+                @Override
+                protected void updateItem(Vehicle item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setGraphic(empty || item == null ? null : box);
+                }
+            });
 
-        colGuideName.setCellValueFactory(cd ->
-                new SimpleStringProperty(guideService.getDisplayName(cd.getValue())));
-        colGuideEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
-        colGuidePhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        colGuideCity.setCellValueFactory(new PropertyValueFactory<>("baseCity"));
-        colGuideLicense.setCellValueFactory(new PropertyValueFactory<>("licenseNo"));
-        colGuideExp.setCellValueFactory(new PropertyValueFactory<>("experience"));
-        colGuideFee.setCellValueFactory(cd -> {
-            Double fee = cd.getValue().getDailyFee();
-            return new SimpleStringProperty(fee != null ? "€" + String.format("%,.0f", fee) : "—");
-        });
+            colGuideName.setCellValueFactory(cd ->
+                    new SimpleStringProperty(guideService.getDisplayName(cd.getValue())));
+            colGuideEmail.setCellValueFactory(new PropertyValueFactory<>("email"));
+            colGuidePhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
+            colGuideCity.setCellValueFactory(new PropertyValueFactory<>("baseCity"));
+            colGuideLicense.setCellValueFactory(new PropertyValueFactory<>("licenseNo"));
+            colGuideExp.setCellValueFactory(new PropertyValueFactory<>("experience"));
+            colGuideFee.setCellValueFactory(cd -> {
+                Double fee = cd.getValue().getDailyFee();
+                return new SimpleStringProperty(fee != null ? "€" + String.format("%,.0f", fee) : "—");
+            });
 
-        colGuideActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
-        colGuideActions.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn = new Button("Edit");
-            private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(6, editBtn, deleteBtn);
-            {
-                box.setAlignment(Pos.CENTER);
-                editBtn.getStyleClass().add("btn-secondary");
-                deleteBtn.getStyleClass().add("btn-danger");
-                editBtn.setOnAction(e -> onEditGuide(getTableView().getItems().get(getIndex())));
-                deleteBtn.setOnAction(e -> onDeleteGuide(getTableView().getItems().get(getIndex())));
-            }
-            @Override
-            protected void updateItem(Guide item, boolean empty) {
-                super.updateItem(item, empty);
-                setGraphic(empty || item == null ? null : box);
-            }
-        });
+            colGuideActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
+            colGuideActions.setCellFactory(col -> new TableCell<>() {
+                private final Button editBtn = new Button("Edit");
+                private final Button deleteBtn = new Button("Delete");
+                private final HBox box = new HBox(6, editBtn, deleteBtn);
+                {
+                    box.setAlignment(Pos.CENTER);
+                    editBtn.getStyleClass().add("btn-secondary");
+                    deleteBtn.getStyleClass().add("btn-danger");
+                    editBtn.setOnAction(e -> onEditGuide(getTableView().getItems().get(getIndex())));
+                    deleteBtn.setOnAction(e -> onDeleteGuide(getTableView().getItems().get(getIndex())));
+                }
+                @Override
+                protected void updateItem(Guide item, boolean empty) {
+                    super.updateItem(item, empty);
+                    setGraphic(empty || item == null ? null : box);
+                }
+            });
+        }
 
         loadData();
     }
@@ -140,21 +165,27 @@ public class VehiclesGuidesController {
     }
 
     private void loadData() {
+        boolean isGuide = SessionManager.getInstance().isGuide();
+
         CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
             try { return vehicleService.getAllVehicles(); }
             catch (Exception e) { throw new CompletionException(e); }
         });
-        CompletableFuture<List<Guide>> guidesFut = CompletableFuture.supplyAsync(() -> {
-            try { return guideService.getAllGuides(); }
-            catch (Exception e) { throw new CompletionException(e); }
-        });
+
+        CompletableFuture<List<Guide>> guidesFut = isGuide ?
+                CompletableFuture.completedFuture(null) :
+                CompletableFuture.supplyAsync(() -> {
+                    try { return guideService.getAllGuides(); }
+                    catch (Exception e) { throw new CompletionException(e); }
+                });
+
         CompletableFuture.allOf(vehiclesFut, guidesFut).whenComplete((ignored, ex) -> {
             if (ex != null) {
                 ex.printStackTrace();
                 Platform.runLater(() -> {
                     totalVehiclesValue.setText("—");
                     vehiclesAvailable.setText("");
-                    totalGuidesValue.setText("—");
+                    if (!isGuide) totalGuidesValue.setText("—");
                 });
                 return;
             }
@@ -165,15 +196,17 @@ public class VehiclesGuidesController {
                     vehiclesTable.getItems().setAll(vehicles);
                     totalVehiclesValue.setText(String.valueOf(vehicles.size()));
                     vehiclesAvailable.setText(vehicleService.countAvailable(vehicles) + " available");
-                    guidesTable.getItems().setAll(guides);
-                    totalGuidesValue.setText(String.valueOf(guides.size()));
+                    if (!isGuide && guides != null) {
+                        guidesTable.getItems().setAll(guides);
+                        totalGuidesValue.setText(String.valueOf(guides.size()));
+                    }
                 });
             } catch (Exception e) {
                 e.printStackTrace();
                 Platform.runLater(() -> {
                     totalVehiclesValue.setText("—");
                     vehiclesAvailable.setText("");
-                    totalGuidesValue.setText("—");
+                    if (!isGuide) totalGuidesValue.setText("—");
                 });
             }
         });
@@ -271,15 +304,18 @@ public class VehiclesGuidesController {
         Task<RefreshedData> task = new Task<>() {
             @Override
             protected RefreshedData call() throws Exception {
+                boolean isGuide = SessionManager.getInstance().isGuide();
                 op.run();
                 CompletableFuture<List<Vehicle>> vFut = CompletableFuture.supplyAsync(() -> {
                     try { return vehicleService.getAllVehicles(); }
                     catch (Exception e) { return null; }
                 });
-                CompletableFuture<List<Guide>> gFut = CompletableFuture.supplyAsync(() -> {
-                    try { return guideService.getAllGuides(); }
-                    catch (Exception e) { return null; }
-                });
+                CompletableFuture<List<Guide>> gFut = isGuide ?
+                        CompletableFuture.completedFuture(null) :
+                        CompletableFuture.supplyAsync(() -> {
+                            try { return guideService.getAllGuides(); }
+                            catch (Exception e) { return null; }
+                        });
                 CompletableFuture.allOf(vFut, gFut).join();
                 RefreshedData data = new RefreshedData();
                 data.vehicles = vFut.join();
@@ -289,13 +325,14 @@ public class VehiclesGuidesController {
         };
 
         task.setOnSucceeded(e -> {
+            boolean isGuide = SessionManager.getInstance().isGuide();
             RefreshedData data = task.getValue();
             if (data.vehicles != null) {
                 vehiclesTable.getItems().setAll(data.vehicles);
                 totalVehiclesValue.setText(String.valueOf(data.vehicles.size()));
                 vehiclesAvailable.setText(vehicleService.countAvailable(data.vehicles) + " available");
             }
-            if (data.guides != null) {
+            if (!isGuide && data.guides != null) {
                 guidesTable.getItems().setAll(data.guides);
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }

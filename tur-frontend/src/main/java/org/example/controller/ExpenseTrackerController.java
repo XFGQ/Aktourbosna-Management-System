@@ -16,6 +16,7 @@ import javafx.stage.StageStyle;
 import org.example.model.Expense;
 import org.example.model.Tour;
 import org.example.service.ExpenseService;
+import org.example.service.SessionManager;
 import org.example.service.TourService;
 
 import java.time.format.DateTimeFormatter;
@@ -100,7 +101,16 @@ public class ExpenseTrackerController {
 
     private void loadData() {
         CompletableFuture.supplyAsync(() -> {
-            try { return tourService.getAllTours(); }
+            try {
+                List<Tour> allTours = tourService.getAllTours();
+                if (SessionManager.getInstance().isGuide() && SessionManager.getInstance().getGuideId() != null) {
+                    Long myGuideId = SessionManager.getInstance().getGuideId();
+                    return allTours.stream()
+                            .filter(t -> t.getGuideId() != null && t.getGuideId().equals(myGuideId))
+                            .collect(Collectors.toList());
+                }
+                return allTours;
+            }
             catch (Exception e) { throw new CompletionException(e); }
         }).whenComplete((tours, ex) -> {
             if (ex != null) {

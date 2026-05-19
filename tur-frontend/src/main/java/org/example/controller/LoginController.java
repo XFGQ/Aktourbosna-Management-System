@@ -16,21 +16,21 @@ import javafx.stage.StageStyle;
 import javafx.util.Duration;
 import javafx.scene.image.ImageView;
 import org.example.service.ApiService;
+import org.example.service.SessionManager;
 
 public class LoginController {
 
     private static final ApiService apiService = new ApiService();
 
-    // city, country, gradient-from, gradient-to, image-resource-path
     private static final String[][] CITIES = {
-        {"Sarajevo",   "Bosnia & Herzegovina", "#0D1B2A", "#1B3A5C", "/images/sarajevo.jpg"},
-        {"Dubrovnik",  "Croatia",              "#0D2A1B", "#1B5C3A", "/images/dubrovnik.jpg"},
-        {"Kotor",      "Montenegro",           "#1B0D2A", "#3A1B5C", "/images/kotor.jpg"},
-        {"Mostar",     "Bosnia & Herzegovina", "#2A0D0D", "#5C1B1B", "/images/mostar.jpg"},
-        {"Ljubljana",  "Slovenia",             "#0D2A2A", "#1B5C5C", "/images/ljubljana.jpg"},
-        {"Belgrade",   "Serbia",               "#2A1B0D", "#5C3A1B", "/images/belgrade.jpg"},
-        {"Ohrid",      "North Macedonia",      "#0D1B2A", "#1B3A6E", "/images/ohrid.jpg"},
-        {"Tirana",     "Albania",              "#2A0D1B", "#5C1B3A", "/images/tirana.jpg"},
+            {"Sarajevo",   "Bosnia & Herzegovina", "#0D1B2A", "#1B3A5C", "/images/sarajevo.jpg"},
+            {"Dubrovnik",  "Croatia",              "#0D2A1B", "#1B5C3A", "/images/dubrovnik.jpg"},
+            {"Kotor",      "Montenegro",           "#1B0D2A", "#3A1B5C", "/images/kotor.jpg"},
+            {"Mostar",     "Bosnia & Herzegovina", "#2A0D0D", "#5C1B1B", "/images/mostar.jpg"},
+            {"Ljubljana",  "Slovenia",             "#0D2A2A", "#1B5C5C", "/images/ljubljana.jpg"},
+            {"Belgrade",   "Serbia",               "#2A1B0D", "#5C3A1B", "/images/belgrade.jpg"},
+            {"Ohrid",      "North Macedonia",      "#0D1B2A", "#1B3A6E", "/images/ohrid.jpg"},
+            {"Tirana",     "Albania",              "#2A0D1B", "#5C1B3A", "/images/tirana.jpg"},
     };
 
     public static String[] showLoginScreen() {
@@ -45,7 +45,6 @@ public class LoginController {
         HBox mainContent = new HBox();
         mainContent.setPrefSize(980, 540);
 
-        // ── LEFT PANEL ────────────────────────────────────────────────
         VBox leftPanel = new VBox();
         leftPanel.setPrefWidth(310);
         leftPanel.setAlignment(Pos.CENTER);
@@ -114,8 +113,6 @@ public class LoginController {
 
         leftPanel.getChildren().addAll(loginLogo, title, subtitle, spacerTop, formBox);
 
-        // ── RIGHT PANEL (Slideshow) ───────────────────────────────────
-        // slides sit in a StackPane that grows, dots are pinned below it
         StackPane slidesPane = new StackPane();
         VBox.setVgrow(slidesPane, javafx.scene.layout.Priority.ALWAYS);
         slidesPane.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -170,7 +167,6 @@ public class LoginController {
 
         mainContent.getChildren().addAll(leftPanel, rightPanel);
 
-        // ── WINDOW CONTROLS (top-right) ───────────────────────────────
         Button minBtn = new Button("─");
         Button closeBtn = new Button("✕");
 
@@ -193,7 +189,6 @@ public class LoginController {
         StackPane.setAlignment(winControls, Pos.TOP_RIGHT);
         StackPane.setMargin(winControls, new Insets(6, 6, 0, 0));
 
-        // ── WINDOW DRAG ───────────────────────────────────────────────
         double[] dragOffset = {0, 0};
         mainContent.setOnMousePressed(e -> {
             dragOffset[0] = e.getScreenX() - stage.getX();
@@ -206,9 +201,7 @@ public class LoginController {
 
         root.getChildren().addAll(mainContent, winControls);
 
-        // ── LOGIN LOGIC ───────────────────────────────────────────────
         String[][] result = {null};
-
         Timeline[] watchdog = {null};
 
         Runnable resetBtn = () -> {
@@ -228,7 +221,6 @@ public class LoginController {
             loginBtn.setDisable(true);
             loginBtn.setText("Signing in...");
 
-            // UI-level safety net: if nothing responds in 8 s, reset button
             watchdog[0] = new Timeline(new KeyFrame(Duration.seconds(8), ev -> {
                 errorLabel.setText("Server did not respond. Please try again.");
                 resetBtn.run();
@@ -240,6 +232,22 @@ public class LoginController {
                     String[] auth = apiService.login(username, password);
                     ApiService.setToken(auth[0]);
                     result[0] = auth;
+
+                    String userRole = auth.length > 1 ? auth[1] : "ADMIN";
+                    SessionManager.getInstance().login(auth[0], username, userRole);
+
+                    if ("GUIDE".equals(userRole)) {
+                        try {
+                            org.example.service.GuideService gs = new org.example.service.GuideService();
+                            org.example.model.Guide myGuide = gs.getMe();
+                            if (myGuide != null && myGuide.getId() != null) {
+                                SessionManager.getInstance().setGuideId(myGuide.getId());
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+
                     javafx.application.Platform.runLater(() -> {
                         if (watchdog[0] != null) { watchdog[0].stop(); watchdog[0] = null; }
                         slideshow.stop();

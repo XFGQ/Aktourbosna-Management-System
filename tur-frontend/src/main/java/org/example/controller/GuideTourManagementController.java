@@ -5,6 +5,7 @@ import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import org.example.model.Tour;
 import org.example.model.Vehicle;
+import org.example.service.SessionManager;
 import org.example.service.TourService;
 import org.example.service.VehicleService;
 
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CompletionException;
+import java.util.stream.Collectors;
 
 public class GuideTourManagementController {
 
@@ -96,10 +98,20 @@ public class GuideTourManagementController {
     }
 
     private void loadData() {
-        CompletableFuture<List<Tour>>    toursFut    = CompletableFuture.supplyAsync(() -> {
-            try { return tourService.getAllTours(); }
+        CompletableFuture<List<Tour>> toursFut = CompletableFuture.supplyAsync(() -> {
+            try {
+                List<Tour> allTours = tourService.getAllTours();
+                if (SessionManager.getInstance().isGuide() && SessionManager.getInstance().getGuideId() != null) {
+                    Long myGuideId = SessionManager.getInstance().getGuideId();
+                    return allTours.stream()
+                            .filter(t -> t.getGuideId() != null && t.getGuideId().equals(myGuideId))
+                            .collect(Collectors.toList());
+                }
+                return allTours;
+            }
             catch (Exception e) { throw new CompletionException(e); }
         });
+
         CompletableFuture<List<Vehicle>> vehiclesFut = CompletableFuture.supplyAsync(() -> {
             try { return vehicleService.getAllVehicles(); }
             catch (Exception e) { throw new CompletionException(e); }

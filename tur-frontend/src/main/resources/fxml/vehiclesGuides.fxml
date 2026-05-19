@@ -24,7 +24,7 @@
                 <Label fx:id="totalVehiclesValue" styleClass="stat-value" text="—" />
                 <Label fx:id="vehiclesAvailable" styleClass="stat-sub" text="" />
             </VBox>
-            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+            <VBox fx:id="guidesStatCard" styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <Label styleClass="stat-label" text="Total Guides" />
                 <Label fx:id="totalGuidesValue" styleClass="stat-value" text="—" />
             </VBox>
@@ -34,7 +34,7 @@
             <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10.0">
                 <Label styleClass="panel-title" text="Vehicles" />
                 <Pane HBox.hgrow="ALWAYS" />
-                <Button styleClass="btn-primary" text="+ Add Vehicle" onAction="#onAddVehicle" />
+                <Button fx:id="addVehicleBtn" styleClass="btn-primary" text="+ Add Vehicle" onAction="#onAddVehicle" />
             </HBox>
             <TableView fx:id="vehiclesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
                        prefHeight="280.0" fixedCellSize="44.0">
@@ -57,7 +57,7 @@
             </TableView>
         </VBox>
 
-        <VBox styleClass="panel" spacing="0">
+        <VBox fx:id="guidesPanel" styleClass="panel" spacing="0">
             <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10.0">
                 <Label styleClass="panel-title" text="Guides" />
                 <Pane HBox.hgrow="ALWAYS" />

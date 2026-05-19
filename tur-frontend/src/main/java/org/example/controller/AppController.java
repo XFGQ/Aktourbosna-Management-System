@@ -9,6 +9,7 @@ import org.example.service.GuideService;
 import org.example.service.RouteService;
 import org.example.service.TourService;
 import org.example.service.VehicleService;
+import org.example.model.Guide;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -35,7 +36,6 @@ public class AppController {
         sidebarController.setRole(role);
         boolean isGuide = "GUIDE".equals(role);
         navigateTo(isGuide ? "guideDashboard.fxml" : "dashboard.fxml");
-        // Preload other views immediately; their data loads are async so no UI blocking
         if (isGuide) {
             preload("guideTourManagement.fxml");
         } else {

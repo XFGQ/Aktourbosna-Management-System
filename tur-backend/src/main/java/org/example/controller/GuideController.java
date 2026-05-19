@@ -36,6 +36,11 @@ public class GuideController {
         return ResponseEntity.ok(guideService.getMyProfile());
     }
 
+    @PutMapping("/me")
+    public ResponseEntity<GuideResponseDTO> updateMyProfile(@RequestBody GuideUpdateDTO dto) {
+        return ResponseEntity.ok(guideService.updateMyProfile(dto));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<GuideResponseDTO> getGuideById(@PathVariable Long id) {
         return ResponseEntity.ok(guideService.getGuideById(id));
