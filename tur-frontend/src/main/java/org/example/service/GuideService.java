@@ -12,6 +12,14 @@ public class GuideService {
         return apiService.fetchGuides();
     }
 
+    public Guide getMyProfile() throws Exception {
+        return apiService.getGuideMe();
+    }
+
+    public Guide updateMyProfile(Guide guide) throws Exception {
+        return apiService.updateGuideMe(guide);
+    }
+
     public Guide addGuide(Guide guide) throws Exception {
         return apiService.createGuide(guide);
     }
@@ -26,7 +34,7 @@ public class GuideService {
 
     public String getDisplayName(Guide guide) {
         if (guide == null) return "";
-        return guide.getFullName() != null ? guide.getFullName() : "";
+        return guide.getUsername() != null ? guide.getUsername() : "";
     }
 
     public long countGuides(List<Guide> guides) {

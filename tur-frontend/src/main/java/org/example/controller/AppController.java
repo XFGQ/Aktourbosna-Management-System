@@ -5,6 +5,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.layout.StackPane;
+import org.example.model.Guide;
+import org.example.service.GuideService;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -33,19 +35,41 @@ public class AppController {
 
     public void setRole(String role) {
         sidebarController.setRole(role);
-        boolean isGuide = "GUIDE".equals(role);
-        navigateTo(isGuide ? "guideDashboard.fxml" : "dashboard.fxml");
-        new Thread(() -> {
-            try { Thread.sleep(500); } catch (InterruptedException ignored) {}
-            Platform.runLater(() -> {
-                if (isGuide) {
-                    preload("guideTourManagement.fxml");
-                } else {
+        if ("GUIDE".equals(role)) {
+            checkGuideProfileThenNavigate();
+        } else {
+            navigateTo("dashboard.fxml");
+            new Thread(() -> {
+                try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                Platform.runLater(() -> {
                     preload("tourManagement.fxml");
                     preload("expenseTracker.fxml");
                     preload("vehiclesGuides.fxml");
-                }
-            });
+                });
+            }).start();
+        }
+    }
+
+    private void checkGuideProfileThenNavigate() {
+        new Thread(() -> {
+            try {
+                Guide profile = new GuideService().getMyProfile();
+                boolean incomplete = profile.getPhone() == null || profile.getPhone().isBlank()
+                        || profile.getBaseCity() == null || profile.getBaseCity().isBlank();
+                Platform.runLater(() -> {
+                    if (incomplete) {
+                        GuideProfileSetupDialog.show(profile);
+                    }
+                    navigateTo("guideDashboard.fxml");
+                    new Thread(() -> {
+                        try { Thread.sleep(500); } catch (InterruptedException ignored) {}
+                        Platform.runLater(() -> preload("guideTourManagement.fxml"));
+                    }).start();
+                });
+            } catch (Exception e) {
+                System.err.println("[GuideProfile] getMyProfile failed: " + e.getMessage());
+                Platform.runLater(() -> navigateTo("guideDashboard.fxml"));
+            }
         }).start();
     }
 

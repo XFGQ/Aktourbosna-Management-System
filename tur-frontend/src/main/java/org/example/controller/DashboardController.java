@@ -125,7 +125,7 @@ public class DashboardController {
 
                 Map<Long, String> nameMap = new HashMap<>();
                 for (Guide g : guides)
-                    if (g.getId() != null && g.getFullName() != null) nameMap.put(g.getId(), g.getFullName());
+                    if (g.getId() != null && g.getUsername() != null) nameMap.put(g.getId(), g.getUsername());
 
                 double revenue = tourService.calculateTotalRevenue(tours);
                 long available = vehicleService.countAvailable(vehicles);

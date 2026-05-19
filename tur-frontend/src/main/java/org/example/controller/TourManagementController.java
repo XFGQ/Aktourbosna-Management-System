@@ -193,7 +193,7 @@ public class TourManagementController {
 
                 Map<Long, String> gNames = new HashMap<>();
                 for (Guide g : guides)
-                    if (g.getId() != null && g.getFullName() != null) gNames.put(g.getId(), g.getFullName());
+                    if (g.getId() != null && g.getUsername() != null) gNames.put(g.getId(), g.getUsername());
                 Map<Long, String> vNames = new HashMap<>();
                 for (Vehicle v : vehicles)
                     if (v.getId() != null) vNames.put(v.getId(), v.getBrand() + " " + v.getModel());

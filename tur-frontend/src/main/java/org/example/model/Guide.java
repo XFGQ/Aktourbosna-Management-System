@@ -8,7 +8,8 @@ import lombok.NoArgsConstructor;
 public class Guide {
     private Long id;
     private Long userId;
-    private String fullName;
+    private String username;
+    private String password;
     private String email;
     private String phone;
     private String baseCity;

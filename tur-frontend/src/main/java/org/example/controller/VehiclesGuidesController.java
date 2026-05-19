@@ -273,7 +273,7 @@ public class VehiclesGuidesController {
 
     private void onDeleteGuide(Guide guide) {
         if (!ConfirmDialog.show("Confirm deletion",
-                "Delete guide \"" + guide.getFullName() + "\"?")) return;
+                "Delete guide \"" + guide.getUsername() + "\"?")) return;
 
         runInBackground(
                 () -> guideService.deleteGuide(guide.getId()),

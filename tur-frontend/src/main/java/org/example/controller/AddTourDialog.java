@@ -58,13 +58,13 @@ public class AddTourDialog {
         guideBox.setCellFactory(lv -> new ListCell<>() {
             @Override protected void updateItem(Guide g, boolean empty) {
                 super.updateItem(g, empty);
-                setText(empty || g == null ? null : g.getFullName());
+                setText(empty || g == null ? null : g.getUsername());
             }
         });
         guideBox.setButtonCell(new ListCell<>() {
             @Override protected void updateItem(Guide g, boolean empty) {
                 super.updateItem(g, empty);
-                setText(empty || g == null ? null : g.getFullName());
+                setText(empty || g == null ? null : g.getUsername());
             }
         });
         if (isEdit && existing.getGuideId() != null) {

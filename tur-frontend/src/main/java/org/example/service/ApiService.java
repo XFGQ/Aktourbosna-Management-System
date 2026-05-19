@@ -73,6 +73,16 @@ public class ApiService {
         delete(BASE_URL + "/vehicles/" + id);
     }
 
+    public Guide getGuideMe() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/guides/me"), Guide.class);
+    }
+
+    public Guide updateGuideMe(Guide guide) throws Exception {
+        String json = gson.toJson(guide);
+        String response = put(BASE_URL + "/guides/me", json);
+        return gson.fromJson(response, Guide.class);
+    }
+
     public Guide createGuide(Guide guide) throws Exception {
         String json = gson.toJson(guide);
         String response = post(BASE_URL + "/guides", json);
@@ -166,6 +176,10 @@ public class ApiService {
     private String get(String url) throws Exception {
         HttpRequest request = authorizedBuilder(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        System.out.println("[GET " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
+        if (response.statusCode() >= 400) {
+            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
+        }
         return response.body();
     }
 

@@ -79,6 +79,14 @@ public class GuideService {
         return guideMapper.toResponse(guideRepository.save(guide));
     }
 
+    public GuideResponseDTO updateMyProfile(GuideUpdateDTO dto) {
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+        Guide guide = guideRepository.findByUser_Username(username)
+                .orElseThrow(() -> new ResourceNotFoundException("Guide profile not found for user: " + username));
+        guideMapper.updateEntityFromDto(dto, guide);
+        return guideMapper.toResponse(guideRepository.save(guide));
+    }
+
     public GuideResponseDTO updateGuide(Long id, GuideUpdateDTO dto) {
         Guide existing = guideRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Guide not found: " + id));
