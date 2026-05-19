@@ -5,6 +5,8 @@ import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
 import org.example.model.Vehicle;
 
+import java.time.LocalDate;
+
 public class AddVehicleDialog {
 
     public static Vehicle show() {
@@ -50,6 +52,8 @@ public class AddVehicleDialog {
         fuelConsumption.setPromptText("e.g. 7.5");
         TextField dailyFee = new TextField();
         dailyFee.setPromptText("e.g. 100.0");
+        DatePicker lastService = new DatePicker();
+        lastService.setPromptText("Last minor service date");
         CheckBox available = new CheckBox("Available");
         available.setSelected(true);
 
@@ -64,26 +68,27 @@ public class AddVehicleDialog {
             mileage.setText(existing.getCurrentMileage() != null ? existing.getCurrentMileage().toString() : "");
             fuelConsumption.setText(existing.getAvgFuelConsumption() != null ? existing.getAvgFuelConsumption().toString() : "");
             dailyFee.setText(existing.getDailyRentalFee() != null ? existing.getDailyRentalFee().toString() : "");
+            lastService.setValue(existing.getLastMinorService());
             available.setSelected(Boolean.TRUE.equals(existing.getAvailable()));
         }
 
-        grid.add(new Label("Brand:"), 0, 0);          grid.add(brand, 1, 0);
-        grid.add(new Label("Model:"), 0, 1);          grid.add(model, 1, 1);
-        grid.add(new Label("Year:"), 0, 2);           grid.add(year, 1, 2);
-        grid.add(new Label("Color:"), 0, 3);          grid.add(color, 1, 3);
-        grid.add(new Label("Plate Number:"), 0, 4);   grid.add(plate, 1, 4);
-        grid.add(new Label("Seat Capacity:"), 0, 5);  grid.add(seats, 1, 5);
-        grid.add(new Label("Fuel Type:"), 0, 6);      grid.add(fuel, 1, 6);
-        grid.add(new Label("Mileage (km):"), 0, 7);   grid.add(mileage, 1, 7);
-        grid.add(new Label("Fuel cons. (L/100km):"), 0, 8); grid.add(fuelConsumption, 1, 8);
-        grid.add(new Label("Daily Fee (€):"), 0, 9);  grid.add(dailyFee, 1, 9);
-        grid.add(available, 1, 10);
+        grid.add(new Label("Brand *:"),             0, 0);  grid.add(brand,           1, 0);
+        grid.add(new Label("Model *:"),             0, 1);  grid.add(model,           1, 1);
+        grid.add(new Label("Year *:"),              0, 2);  grid.add(year,            1, 2);
+        grid.add(new Label("Color:"),               0, 3);  grid.add(color,           1, 3);
+        grid.add(new Label("Plate Number *:"),      0, 4);  grid.add(plate,           1, 4);
+        grid.add(new Label("Seat Capacity *:"),     0, 5);  grid.add(seats,           1, 5);
+        grid.add(new Label("Fuel Type:"),           0, 6);  grid.add(fuel,            1, 6);
+        grid.add(new Label("Mileage (km):"),        0, 7);  grid.add(mileage,         1, 7);
+        grid.add(new Label("Fuel cons. (L/100km):"),0, 8);  grid.add(fuelConsumption, 1, 8);
+        grid.add(new Label("Daily Fee (€):"),       0, 9);  grid.add(dailyFee,        1, 9);
+        grid.add(new Label("Last Service:"),        0, 10); grid.add(lastService,     1, 10);
+        grid.add(available,                            1, 11);
 
         dialog.getDialogPane().setContent(grid);
 
         dialog.setResultConverter(btn -> {
             if (btn == saveButton) {
-                // Boş alan kontrolü
                 if (brand.getText().trim().isEmpty() || model.getText().trim().isEmpty()
                         || year.getText().trim().isEmpty() || plate.getText().trim().isEmpty()
                         || seats.getText().trim().isEmpty()) {
@@ -95,13 +100,14 @@ public class AddVehicleDialog {
                     v.setBrand(brand.getText().trim());
                     v.setModel(model.getText().trim());
                     v.setYear(Integer.parseInt(year.getText().trim()));
-                    v.setColor(color.getText().trim());
+                    v.setColor(color.getText().trim().isEmpty() ? null : color.getText().trim());
                     v.setPlateNumber(plate.getText().trim());
                     v.setSeatCapacity(Integer.parseInt(seats.getText().trim()));
                     v.setFuelType(fuel.getValue());
-                    v.setCurrentMileage(mileage.getText().isEmpty() ? 0f : Float.parseFloat(mileage.getText().trim()));
-                    v.setAvgFuelConsumption(fuelConsumption.getText().isEmpty() ? 0f : Float.parseFloat(fuelConsumption.getText().trim()));
-                    v.setDailyRentalFee(dailyFee.getText().isEmpty() ? 0.0 : Double.parseDouble(dailyFee.getText().trim()));
+                    v.setCurrentMileage(mileage.getText().isEmpty() ? null : Float.parseFloat(mileage.getText().trim()));
+                    v.setAvgFuelConsumption(fuelConsumption.getText().isEmpty() ? null : Float.parseFloat(fuelConsumption.getText().trim()));
+                    v.setDailyRentalFee(dailyFee.getText().isEmpty() ? null : Double.parseDouble(dailyFee.getText().trim()));
+                    v.setLastMinorService(lastService.getValue());
                     v.setAvailable(available.isSelected());
                     return v;
                 } catch (NumberFormatException e) {

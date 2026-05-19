@@ -337,14 +337,23 @@ public class VehiclesGuidesController {
                 totalGuidesValue.setText(String.valueOf(data.guides.size()));
             }
             loadingStage.close();
+            AppController app = AppController.getInstance();
+            if (app != null) app.invalidateOtherViews("vehiclesGuides.fxml");
             Toast.success(successMsg);
         });
 
         task.setOnFailed(e -> {
             loadingStage.close();
             Throwable ex = task.getException();
-            ex.printStackTrace();
-            Toast.error(errorTitle + ": " + ex.getMessage());
+            if (ex != null) ex.printStackTrace();
+            String errDetail = ex != null && ex.getMessage() != null ? ex.getMessage() : "Unknown error";
+            if (errDetail.contains("500") && errorTitle.startsWith("Failed to delete vehicle")) {
+                Toast.error("Bu araç bir veya daha fazla tura atanmış olduğu için silinemez. Önce turlardan kaldırın.");
+            } else if (errDetail.contains("500") && errorTitle.startsWith("Failed to delete guide")) {
+                Toast.error("Bu rehber bir veya daha fazla tura atanmış olduğu için silinemez. Önce turlardan kaldırın.");
+            } else {
+                Toast.error(errorTitle + ": " + errDetail);
+            }
         });
 
         Thread t = new Thread(task);

@@ -68,8 +68,15 @@ public class GuideTourManagementController {
                 cd.getValue().getHotelName() != null ? cd.getValue().getHotelName() : "—"));
         hotel.setCellFactory(col -> tooltipCell());
 
-        vehicle.setCellValueFactory(cd -> new SimpleStringProperty(
-                vehicleNames.getOrDefault(cd.getValue().getVehicleId(), "—")));
+        vehicle.setCellValueFactory(cd -> {
+            String vPlate = cd.getValue().getVehiclePlate();
+            String vName  = vehicleNames.getOrDefault(cd.getValue().getVehicleId(), null);
+            if (vName != null && vPlate != null && !vPlate.isEmpty())
+                return new SimpleStringProperty(vName + " · " + vPlate);
+            if (vPlate != null && !vPlate.isEmpty()) return new SimpleStringProperty(vPlate);
+            if (vName != null) return new SimpleStringProperty(vName);
+            return new SimpleStringProperty("—");
+        });
         vehicle.setCellFactory(col -> tooltipCell());
 
         status.setCellValueFactory(cd -> new SimpleStringProperty(tourService.deriveStatus(cd.getValue())));

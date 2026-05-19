@@ -2,6 +2,8 @@ package org.example.service;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import com.google.gson.JsonParser;
+import org.example.model.Customer;
 import org.example.model.Expense;
 import org.example.model.Guide;
 import org.example.model.Route;
@@ -12,7 +14,10 @@ import java.net.URI;
 import java.net.http.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.stream.Collectors;
 
 public class ApiService {
 
@@ -38,11 +43,48 @@ public class ApiService {
             .create();
 
     public List<Tour> fetchTours() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/tours"), new TypeToken<List<Tour>>() {}.getType());
+        List<Tour> summaries = gson.fromJson(get(BASE_URL + "/tours"),
+                new TypeToken<List<Tour>>() {}.getType());
+        if (summaries == null) return new ArrayList<>();
+
+        long start = System.currentTimeMillis();
+        List<CompletableFuture<Tour>> futures = summaries.stream()
+                .filter(t -> t.getTourId() != null)
+                .map(t -> {
+                    HttpRequest req = authorizedBuilder(BASE_URL + "/tours/" + t.getTourId()).GET().build();
+                    return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(r -> {
+                                Tour detail = gson.fromJson(r.body(), Tour.class);
+                                return detail != null ? detail : t;
+                            })
+                            .exceptionally(e -> t);
+                })
+                .collect(Collectors.toList());
+
+        List<Tour> result = futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
+        System.out.println("[GET /tours/{id} x" + result.size() + "] took " + (System.currentTimeMillis() - start) + " ms (parallel)");
+        return result;
     }
 
     public List<Vehicle> fetchVehicles() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/vehicles"), new TypeToken<List<Vehicle>>() {}.getType());
+        List<Vehicle> summaries = gson.fromJson(get(BASE_URL + "/vehicles"),
+                new TypeToken<List<Vehicle>>() {}.getType());
+        if (summaries == null) return new ArrayList<>();
+
+        List<CompletableFuture<Vehicle>> futures = summaries.stream()
+                .filter(v -> v.getId() != null)
+                .map(v -> {
+                    HttpRequest req = authorizedBuilder(BASE_URL + "/vehicles/" + v.getId()).GET().build();
+                    return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(r -> {
+                                Vehicle detail = gson.fromJson(r.body(), Vehicle.class);
+                                return detail != null ? detail : v;
+                            })
+                            .exceptionally(e -> v);
+                })
+                .collect(Collectors.toList());
+
+        return futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
     }
 
     public List<Guide> fetchGuides() throws Exception {
@@ -121,8 +163,49 @@ public class ApiService {
         return gson.fromJson(response, Expense.class);
     }
 
+    public Expense updateExpense(Long tourId, Long expenseId, Expense expense) throws Exception {
+        String json = gson.toJson(expense);
+        String response = put(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId, json);
+        return gson.fromJson(response, Expense.class);
+    }
+
     public void deleteExpense(Long tourId, Long expenseId) throws Exception {
         delete(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId);
+    }
+
+    public List<Customer> fetchCustomers(Long tourId) throws Exception {
+        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/customers"),
+                new TypeToken<List<Customer>>() {}.getType());
+    }
+
+    public Customer createCustomer(Long tourId, Customer customer) throws Exception {
+        String json = gson.toJson(customer);
+        String response = post(BASE_URL + "/tours/" + tourId + "/customers", json);
+        return gson.fromJson(response, Customer.class);
+    }
+
+    public void deleteCustomer(Long tourId, Long customerId) throws Exception {
+        delete(BASE_URL + "/tours/" + tourId + "/customers/" + customerId);
+    }
+
+    public List<Route> fetchRoutes() throws Exception {
+        List<Route> summaries = gson.fromJson(get(BASE_URL + "/routes"),
+                new TypeToken<List<Route>>() {}.getType());
+        if (summaries == null) return new ArrayList<>();
+        // GET /api/routes returns RouteSummaryDTO (no basePrice) — fetch full details in parallel
+        List<CompletableFuture<Route>> futures = summaries.stream()
+                .filter(r -> r.getRouteId() != null)
+                .map(r -> {
+                    HttpRequest req = authorizedBuilder(BASE_URL + "/routes/" + r.getRouteId()).GET().build();
+                    return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(resp -> {
+                                Route detail = gson.fromJson(resp.body(), Route.class);
+                                return detail != null ? detail : r;
+                            })
+                            .exceptionally(e -> r);
+                })
+                .collect(Collectors.toList());
+        return futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
     }
 
     public Route createRoute(Route route) throws Exception {

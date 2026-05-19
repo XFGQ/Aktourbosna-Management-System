@@ -6,6 +6,10 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import org.example.model.Guide;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class AddGuideDialog {
 
     public static Guide show() {
@@ -72,5 +76,14 @@ public class AddGuideDialog {
         });
 
         return dialog.showAndWait().orElse(null);
+    }
+
+    private static List<String> parseList(String input) {
+        if (input == null || input.trim().isEmpty()) return null;
+        List<String> items = Arrays.stream(input.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+        return items.isEmpty() ? null : items;
     }
 }

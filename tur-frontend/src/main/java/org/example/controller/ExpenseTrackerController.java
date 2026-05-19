@@ -60,6 +60,14 @@ public class ExpenseTrackerController {
                 cd.getValue().getCategory() != null ? cd.getValue().getCategory() : "—"));
 
         colExpAmount.setCellValueFactory(cd -> new SimpleObjectProperty<>(cd.getValue().getAmount()));
+        colExpAmount.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Number val, boolean empty) {
+                super.updateItem(val, empty);
+                if (empty) setText(null);
+                else if (val == null) setText("—");
+                else setText("€" + String.format("%,.0f", val.doubleValue()));
+            }
+        });
 
         colExpDate.setCellValueFactory(cd -> new SimpleStringProperty(
                 cd.getValue().getDate() != null ? cd.getValue().getDate().format(DATE_FMT) : "—"));
@@ -69,11 +77,14 @@ public class ExpenseTrackerController {
 
         colExpActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colExpActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(deleteBtn);
+            private final HBox box = new HBox(4, editBtn, deleteBtn);
             {
                 box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
                 deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e   -> onEditExpense(getTableView().getItems().get(getIndex())));
                 deleteBtn.setOnAction(e -> onDeleteExpense(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Expense item, boolean empty) {
@@ -172,6 +183,16 @@ public class ExpenseTrackerController {
                 "Adding expense...", "Expense added successfully.", "Failed to add expense");
     }
 
+    private void onEditExpense(Expense expense) {
+        Long tourId = expenseToTourId.get(expense.getExpenseId());
+        if (tourId == null) { Toast.error("Cannot edit: tour not found for this expense."); return; }
+        Object[] result = AddExpenseDialog.show(expense, tourId, cachedTours);
+        if (result == null) return;
+        runInBackground(
+                () -> expenseService.updateExpense(tourId, expense.getExpenseId(), (Expense) result[1]),
+                "Updating expense...", "Expense updated successfully.", "Failed to update expense");
+    }
+
     private void onDeleteExpense(Expense expense) {
         if (!ConfirmDialog.show("Confirm deletion",
                 "Delete this expense (" + expense.getCategory() + " — €" + expense.getAmount() + ")?")) return;
@@ -202,7 +223,13 @@ public class ExpenseTrackerController {
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception { op.run(); return null; }
         };
-        task.setOnSucceeded(e -> { loadingStage.close(); loadData(); Toast.success(successMsg); });
+        task.setOnSucceeded(e -> {
+            loadingStage.close();
+            loadData();
+            AppController app = AppController.getInstance();
+            if (app != null) app.invalidateOtherViews("expenseTracker.fxml");
+            Toast.success(successMsg);
+        });
         task.setOnFailed(e -> {
             loadingStage.close();
             Toast.error(errorTitle + ": " + task.getException().getMessage());

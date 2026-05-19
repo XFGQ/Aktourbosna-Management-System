@@ -10,6 +10,7 @@ import org.example.model.Vehicle;
 import org.example.service.TourService;
 import org.example.service.VehicleService;
 
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,8 @@ public class GuideDashboardController {
     @FXML private TableColumn<Tour, String> colHotel;
     @FXML private TableColumn<Tour, String> colGroupSize;
 
+    private static final DateTimeFormatter DATE_FMT = DateTimeFormatter.ofPattern("dd MMM yyyy");
+
     private final TourService tourService = new TourService();
     private final VehicleService vehicleService = new VehicleService();
 
@@ -51,7 +54,8 @@ public class GuideDashboardController {
                 cd.getValue().getHotelName() != null ? cd.getValue().getHotelName() : "—"));
         colDate.setCellValueFactory(cd -> new SimpleStringProperty(
                 cd.getValue().getStartDate() != null ? cd.getValue().getStartDate().toString() : "—"));
-        colGroupSize.setCellValueFactory(cd -> new SimpleStringProperty("—"));
+        colGroupSize.setCellValueFactory(cd -> new SimpleStringProperty(
+                cd.getValue().getCustomerCount() > 0 ? String.valueOf(cd.getValue().getCustomerCount()) : "—"));
         loadData();
     }
 
@@ -94,7 +98,7 @@ public class GuideDashboardController {
                     vehicleNames.clear(); vehicleNames.putAll(vNames);
                     upcomingToursTable.getItems().setAll(upcoming);
                     toursThisWeekValue.setText(String.valueOf(upcoming.size()));
-                    customersValue.setText("—");
+                    customersValue.setText(String.valueOf(tours.stream().mapToInt(Tour::getCustomerCount).sum()));
                     completedToursValue.setText(String.valueOf(recent.size()));
                     nextTourValue.setText(upcoming.isEmpty() ? "—" : upcoming.get(0).getTourName());
 
@@ -102,10 +106,20 @@ public class GuideDashboardController {
                         Tour next = upcoming.get(0);
                         todayTourName.setText(next.getTourName() != null ? next.getTourName() : "—");
                         todayHotel.setText(next.getHotelName() != null ? next.getHotelName() : "—");
-                        todayDestination.setText("—");
-                        todayGroupSize.setText("—");
-                        todayVehicle.setText(vNames.getOrDefault(next.getVehicleId(), "—"));
-                        todayTourTime.setText(next.getStartDate() != null ? next.getStartDate().toString() : "—");
+                        todayDestination.setText(next.getRouteName() != null ? next.getRouteName()
+                                : (next.getHotelName() != null ? next.getHotelName() : "—"));
+                        todayGroupSize.setText(next.getCustomerCount() > 0
+                                ? next.getCustomerCount() + " people" : "—");
+                        String plate = next.getVehiclePlate();
+                        String vName = vNames.getOrDefault(next.getVehicleId(), null);
+                        if (vName != null && plate != null && !plate.isEmpty())
+                            todayVehicle.setText(vName + " · " + plate);
+                        else if (plate != null && !plate.isEmpty())
+                            todayVehicle.setText(plate);
+                        else
+                            todayVehicle.setText(vName != null ? vName : "—");
+                        todayTourTime.setText(next.getStartDate() != null
+                                ? next.getStartDate().format(DATE_FMT) : "—");
                     }
                 });
             } catch (Exception e) {

@@ -59,7 +59,7 @@
                     <TableColumn fx:id="colRecentGuide"   text="Guide"      prefWidth="130.0" minWidth="100.0" />
                     <TableColumn fx:id="colRecentPrice"   text="Price (€)"  prefWidth="90.0"  minWidth="80.0" />
                     <TableColumn fx:id="colRecentStatus"  text="Status"     prefWidth="90.0"  minWidth="80.0" />
-                    <TableColumn fx:id="colRecentActions" text="Actions"    prefWidth="160.0" minWidth="140.0" sortable="false" />
+                    <TableColumn fx:id="colRecentActions" text="Actions"    prefWidth="220.0" minWidth="200.0" sortable="false" />
                 </columns>
             </TableView>
         </VBox>
@@ -81,7 +81,7 @@
                     <TableColumn fx:id="colUpcomingGuide"   text="Guide"      prefWidth="130.0" minWidth="100.0" />
                     <TableColumn fx:id="colUpcomingPrice"   text="Price (€)"  prefWidth="90.0"  minWidth="80.0" />
                     <TableColumn fx:id="colUpcomingStatus"  text="Status"     prefWidth="90.0"  minWidth="80.0" />
-                    <TableColumn fx:id="colUpcomingActions" text="Actions"    prefWidth="160.0" minWidth="140.0" sortable="false" />
+                    <TableColumn fx:id="colUpcomingActions" text="Actions"    prefWidth="220.0" minWidth="200.0" sortable="false" />
                 </columns>
             </TableView>
         </VBox>

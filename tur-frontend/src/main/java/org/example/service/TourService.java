@@ -10,8 +10,29 @@ public class TourService {
 
     private final ApiService apiService = new ApiService();
 
+    // --- Static cache shared across all controller instances ---
+    private static volatile List<Tour> cachedTours = null;
+    private static volatile long cacheTs = 0;
+    private static final long TTL_MS = 300_000;
+    private static final Object LOCK = new Object();
+
     public List<Tour> getAllTours() throws Exception {
-        return apiService.fetchTours();
+        if (cachedTours != null && System.currentTimeMillis() - cacheTs < TTL_MS) {
+            return cachedTours;
+        }
+        synchronized (LOCK) {
+            if (cachedTours != null && System.currentTimeMillis() - cacheTs < TTL_MS) {
+                return cachedTours;
+            }
+            List<Tour> fresh = apiService.fetchTours();
+            cachedTours = fresh;
+            cacheTs = System.currentTimeMillis();
+            return fresh;
+        }
+    }
+
+    public static void invalidateCache() {
+        cachedTours = null;
     }
 
     public List<Tour> getUpcomingTours(List<Tour> tours) {
@@ -47,14 +68,19 @@ public class TourService {
     }
 
     public Tour addTour(Tour tour) throws Exception {
-        return apiService.createTour(tour);
+        Tour result = apiService.createTour(tour);
+        invalidateCache();
+        return result;
     }
 
     public Tour updateTour(Long id, Tour tour) throws Exception {
-        return apiService.updateTour(id, tour);
+        Tour result = apiService.updateTour(id, tour);
+        invalidateCache();
+        return result;
     }
 
     public void deleteTour(Long id) throws Exception {
         apiService.deleteTour(id);
+        invalidateCache();
     }
 }
