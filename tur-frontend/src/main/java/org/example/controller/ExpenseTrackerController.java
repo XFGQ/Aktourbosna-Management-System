@@ -59,6 +59,13 @@ public class ExpenseTrackerController {
                 cd.getValue().getCategory() != null ? cd.getValue().getCategory() : "—"));
 
         colExpAmount.setCellValueFactory(cd -> new SimpleObjectProperty<>(cd.getValue().getAmount()));
+        colExpAmount.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Number val, boolean empty) {
+                super.updateItem(val, empty);
+                if (empty || val == null) setText("—");
+                else setText("€" + String.format("%,.0f", val.doubleValue()));
+            }
+        });
 
         colExpDate.setCellValueFactory(cd -> new SimpleStringProperty(
                 cd.getValue().getDate() != null ? cd.getValue().getDate().format(DATE_FMT) : "—"));
@@ -192,7 +199,13 @@ public class ExpenseTrackerController {
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception { op.run(); return null; }
         };
-        task.setOnSucceeded(e -> { loadingStage.close(); loadData(); Toast.success(successMsg); });
+        task.setOnSucceeded(e -> {
+            loadingStage.close();
+            loadData();
+            AppController app = AppController.getInstance();
+            if (app != null) app.invalidateOtherViews("expenseTracker.fxml");
+            Toast.success(successMsg);
+        });
         task.setOnFailed(e -> {
             loadingStage.close();
             Toast.error(errorTitle + ": " + task.getException().getMessage());

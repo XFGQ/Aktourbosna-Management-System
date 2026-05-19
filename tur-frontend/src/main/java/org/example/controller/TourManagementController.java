@@ -69,6 +69,7 @@ public class TourManagementController {
     private final Map<Long, String> vehicleNames = new HashMap<>();
     private List<Guide>   cachedGuides   = new ArrayList<>();
     private List<Vehicle> cachedVehicles = new ArrayList<>();
+    private List<Tour>    cachedTours    = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -105,10 +106,24 @@ public class TourManagementController {
         guide.setCellValueFactory(cd -> new SimpleStringProperty(
                 guideNames.getOrDefault(cd.getValue().getGuideId(), "—")));
         guide.setCellFactory(col -> tooltipCell());
-        vehicle.setCellValueFactory(cd -> new SimpleStringProperty(
-                vehicleNames.getOrDefault(cd.getValue().getVehicleId(), "—")));
+        vehicle.setCellValueFactory(cd -> {
+            String vPlate = cd.getValue().getVehiclePlate();
+            String vName  = vehicleNames.getOrDefault(cd.getValue().getVehicleId(), null);
+            if (vName != null && vPlate != null && !vPlate.isEmpty())
+                return new SimpleStringProperty(vName + " · " + vPlate);
+            if (vPlate != null && !vPlate.isEmpty()) return new SimpleStringProperty(vPlate);
+            if (vName != null) return new SimpleStringProperty(vName);
+            return new SimpleStringProperty("—");
+        });
         vehicle.setCellFactory(col -> tooltipCell());
         price.setCellValueFactory(cd -> new SimpleObjectProperty<>(cd.getValue().getFinalPrice()));
+        price.setCellFactory(col -> new TableCell<>() {
+            @Override protected void updateItem(Number val, boolean empty) {
+                super.updateItem(val, empty);
+                if (empty || val == null || val.doubleValue() == 0) setText("—");
+                else setText("€" + String.format("%,.0f", val.doubleValue()));
+            }
+        });
 
         // Status badge
         status.setCellValueFactory(cd -> new SimpleStringProperty(tourService.deriveStatus(cd.getValue())));
@@ -131,13 +146,16 @@ public class TourManagementController {
         // Actions
         actions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         actions.setCellFactory(col -> new TableCell<>() {
-            private final Button editBtn   = new Button("Edit");
-            private final Button deleteBtn = new Button("Delete");
-            private final HBox   box       = new HBox(6, editBtn, deleteBtn);
+            private final Button customersBtn = new Button("Customers");
+            private final Button editBtn      = new Button("Edit");
+            private final Button deleteBtn    = new Button("Delete");
+            private final HBox   box          = new HBox(4, customersBtn, editBtn, deleteBtn);
             {
                 box.setAlignment(Pos.CENTER);
+                customersBtn.getStyleClass().add("btn-secondary");
                 editBtn.getStyleClass().add("btn-secondary");
                 deleteBtn.getStyleClass().add("btn-danger");
+                customersBtn.setOnAction(e -> onViewCustomers(getTableView().getItems().get(getIndex())));
                 editBtn.setOnAction(e -> onEditTour(getTableView().getItems().get(getIndex())));
                 deleteBtn.setOnAction(e -> onDeleteTour(getTableView().getItems().get(getIndex())));
             }
@@ -161,6 +179,21 @@ public class TourManagementController {
             try { return vehicleService.getAllVehicles(); }
             catch (Exception e) { throw new CompletionException(e); }
         });
+
+        guidesFut.thenAccept(guides -> javafx.application.Platform.runLater(() -> {
+            Map<Long, String> gNames = new HashMap<>();
+            for (Guide g : guides)
+                if (g.getId() != null && g.getUsername() != null) gNames.put(g.getId(), g.getUsername());
+            guideNames.clear(); guideNames.putAll(gNames);
+            cachedGuides = guides;
+        }));
+        vehiclesFut.thenAccept(vehicles -> javafx.application.Platform.runLater(() -> {
+            Map<Long, String> vNames = new HashMap<>();
+            for (Vehicle v : vehicles)
+                if (v.getId() != null) vNames.put(v.getId(), v.getBrand() + " " + v.getModel());
+            vehicleNames.clear(); vehicleNames.putAll(vNames);
+            cachedVehicles = vehicles;
+        }));
 
         CompletableFuture.allOf(toursFut, guidesFut, vehiclesFut).whenComplete((ignored, ex) -> {
             if (ex != null) {
@@ -193,7 +226,7 @@ public class TourManagementController {
 
                 Map<Long, String> gNames = new HashMap<>();
                 for (Guide g : guides)
-                    if (g.getId() != null && g.getFullName() != null) gNames.put(g.getId(), g.getFullName());
+                    if (g.getId() != null && g.getUsername() != null) gNames.put(g.getId(), g.getUsername());
                 Map<Long, String> vNames = new HashMap<>();
                 for (Vehicle v : vehicles)
                     if (v.getId() != null) vNames.put(v.getId(), v.getBrand() + " " + v.getModel());
@@ -208,6 +241,7 @@ public class TourManagementController {
                     vehicleNames.clear(); vehicleNames.putAll(vNames);
                     cachedGuides   = guides;
                     cachedVehicles = vehicles;
+                    cachedTours = tours;
                     recentToursTable.getItems().setAll(recent);
                     upcomingToursTable.getItems().setAll(upcoming);
                     totalToursValue.setText(String.valueOf(tours.size()));
@@ -227,7 +261,12 @@ public class TourManagementController {
 
     @FXML
     private void onAddTour() {
-        Tour newTour = AddTourDialog.show(cachedGuides, cachedVehicles);
+        if (cachedGuides.isEmpty()) {
+            Toast.info("Guides are still loading, please wait a moment and try again.");
+            loadData();
+            return;
+        }
+        Tour newTour = AddTourDialog.show(cachedGuides, cachedVehicles, cachedTours);
         if (newTour == null) return;
         runInBackground(
                 () -> tourService.addTour(newTour),
@@ -235,11 +274,20 @@ public class TourManagementController {
     }
 
     private void onEditTour(Tour tour) {
-        Tour updated = AddTourDialog.show(tour, cachedGuides, cachedVehicles);
+        if (cachedGuides.isEmpty()) {
+            Toast.info("Guides are still loading, please wait a moment and try again.");
+            loadData();
+            return;
+        }
+        Tour updated = AddTourDialog.show(tour, cachedGuides, cachedVehicles, cachedTours);
         if (updated == null) return;
         runInBackground(
                 () -> tourService.updateTour(tour.getTourId(), updated),
                 "Updating tour...", "Tour updated successfully.", "Failed to update tour");
+    }
+
+    private void onViewCustomers(Tour tour) {
+        TourCustomersDialog.show(tour);
     }
 
     private void onDeleteTour(Tour tour) {
@@ -279,7 +327,11 @@ public class TourManagementController {
         });
         task.setOnFailed(e -> {
             loadingStage.close();
-            Toast.error(errorTitle + ": " + task.getException().getMessage());
+            Throwable ex = task.getException();
+            String detail = ex != null && ex.getMessage() != null ? ex.getMessage() : "Unknown error";
+            System.err.println("[TourManagement] " + errorTitle + ": " + detail);
+            if (ex != null) ex.printStackTrace();
+            Toast.error(errorTitle + ": " + detail);
         });
         new Thread(task).start();
     }

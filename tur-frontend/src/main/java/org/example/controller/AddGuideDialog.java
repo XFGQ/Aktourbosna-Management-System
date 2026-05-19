@@ -31,10 +31,25 @@ public class AddGuideDialog {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 20, 10, 20));
 
-        TextField fullName   = new TextField();
-        fullName.setPromptText("e.g. Hasan Yilmaz");
-        TextField email      = new TextField();
-        email.setPromptText("e.g. hasan@example.com");
+        int row = 0;
+
+        TextField usernameField = new TextField();
+        TextField passwordField = new TextField();
+        TextField emailField    = new TextField();
+
+        if (!editMode) {
+            usernameField.setPromptText("e.g. hasan.yilmaz");
+            passwordField.setPromptText("min. 6 characters");
+            emailField.setPromptText("e.g. hasan@example.com");
+            grid.add(new Label("Username *:"), 0, row); grid.add(usernameField, 1, row++);
+            grid.add(new Label("Password *:"), 0, row); grid.add(passwordField, 1, row++);
+            grid.add(new Label("Email *:"),    0, row); grid.add(emailField,    1, row++);
+        } else {
+            Label infoLabel = new Label(existing.getUsername() != null ? existing.getUsername() : "");
+            infoLabel.setStyle("-fx-font-weight: bold;");
+            grid.add(new Label("Guide:"), 0, row); grid.add(infoLabel, 1, row++);
+        }
+
         TextField phone      = new TextField();
         phone.setPromptText("e.g. +387601234567");
         TextField baseCity   = new TextField();
@@ -47,8 +62,6 @@ public class AddGuideDialog {
         dailyFee.setPromptText("e.g. 150");
 
         if (editMode) {
-            fullName.setText(existing.getFullName() != null ? existing.getFullName() : "");
-            email.setText(existing.getEmail() != null ? existing.getEmail() : "");
             phone.setText(existing.getPhone() != null ? existing.getPhone() : "");
             baseCity.setText(existing.getBaseCity() != null ? existing.getBaseCity() : "");
             licenseNo.setText(existing.getLicenseNo() != null ? existing.getLicenseNo() : "");
@@ -56,13 +69,11 @@ public class AddGuideDialog {
             dailyFee.setText(existing.getDailyFee() != null ? String.valueOf(existing.getDailyFee().intValue()) : "");
         }
 
-        grid.add(new Label("Full Name:"),        0, 0); grid.add(fullName,   1, 0);
-        grid.add(new Label("Email:"),            0, 1); grid.add(email,      1, 1);
-        grid.add(new Label("Phone:"),            0, 2); grid.add(phone,      1, 2);
-        grid.add(new Label("Base City:"),        0, 3); grid.add(baseCity,   1, 3);
-        grid.add(new Label("License No:"),       0, 4); grid.add(licenseNo,  1, 4);
-        grid.add(new Label("Experience (yrs):"), 0, 5); grid.add(experience, 1, 5);
-        grid.add(new Label("Daily Fee (€):"),    0, 6); grid.add(dailyFee,   1, 6);
+        grid.add(new Label("Phone:"),            0, row); grid.add(phone,      1, row++);
+        grid.add(new Label("Base City:"),        0, row); grid.add(baseCity,   1, row++);
+        grid.add(new Label("License No:"),       0, row); grid.add(licenseNo,  1, row++);
+        grid.add(new Label("Experience (yrs):"), 0, row); grid.add(experience, 1, row++);
+        grid.add(new Label("Daily Fee (€):"),    0, row); grid.add(dailyFee,   1, row);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -70,13 +81,19 @@ public class AddGuideDialog {
             if (btn == saveButton) {
                 try {
                     Guide g = new Guide();
-                    g.setFullName(fullName.getText().trim());
-                    g.setEmail(email.getText().trim());
-                    g.setPhone(phone.getText().trim());
-                    g.setBaseCity(baseCity.getText().trim());
-                    g.setLicenseNo(licenseNo.getText().trim());
-                    g.setExperience(experience.getText().isEmpty() ? 0 : Integer.parseInt(experience.getText().trim()));
-                    g.setDailyFee(dailyFee.getText().isEmpty() ? 0.0 : Double.parseDouble(dailyFee.getText().trim()));
+                    if (!editMode) {
+                        if (usernameField.getText().trim().isEmpty()) { Toast.error("Username is required."); return null; }
+                        if (passwordField.getText().trim().isEmpty()) { Toast.error("Password is required."); return null; }
+                        if (emailField.getText().trim().isEmpty())    { Toast.error("Email is required.");    return null; }
+                        g.setUsername(usernameField.getText().trim());
+                        g.setPassword(passwordField.getText().trim());
+                        g.setEmail(emailField.getText().trim());
+                    }
+                    g.setPhone(phone.getText().trim().isEmpty() ? null : phone.getText().trim());
+                    g.setBaseCity(baseCity.getText().trim().isEmpty() ? null : baseCity.getText().trim());
+                    g.setLicenseNo(licenseNo.getText().trim().isEmpty() ? null : licenseNo.getText().trim());
+                    g.setExperience(experience.getText().trim().isEmpty() ? null : Integer.parseInt(experience.getText().trim()));
+                    g.setDailyFee(dailyFee.getText().trim().isEmpty() ? null : Double.parseDouble(dailyFee.getText().trim()));
                     return g;
                 } catch (NumberFormatException e) {
                     Toast.error("Experience and Daily Fee must be numbers.");

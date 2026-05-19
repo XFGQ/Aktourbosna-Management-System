@@ -12,6 +12,7 @@ public class SidebarController {
     @FXML private Button btnTourManagement;
     @FXML private Button btnExpenseTracker;
     @FXML private Button btnVehiclesGuides;
+    @FXML private Button btnRouteManagement;
     @FXML private Button btnRefresh;
     @FXML private HBox logoHBox;
 
@@ -39,6 +40,8 @@ public class SidebarController {
             btnExpenseTracker.setManaged(false);
             btnVehiclesGuides.setVisible(false);
             btnVehiclesGuides.setManaged(false);
+            btnRouteManagement.setVisible(false);
+            btnRouteManagement.setManaged(false);
         }
     }
 
@@ -71,6 +74,12 @@ public class SidebarController {
     }
 
     @FXML
+    private void onRouteManagement() {
+        appController.navigateTo("routeManagement.fxml");
+        setActive(btnRouteManagement);
+    }
+
+    @FXML
     private void onRefresh() {
         if (appController != null) appController.refreshAllCached();
     }
@@ -82,7 +91,7 @@ public class SidebarController {
     }
 
     private void setActive(Button active) {
-        for (Button btn : new Button[]{btnDashboard, btnTourManagement, btnExpenseTracker, btnVehiclesGuides}) {
+        for (Button btn : new Button[]{btnDashboard, btnTourManagement, btnExpenseTracker, btnVehiclesGuides, btnRouteManagement}) {
             btn.getStyleClass().remove("nav-button-active");
             if (!btn.getStyleClass().contains("nav-button")) {
                 btn.getStyleClass().add("nav-button");

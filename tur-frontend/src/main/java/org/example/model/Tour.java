@@ -17,7 +17,12 @@ public class Tour {
     private Double calculatedPrice = 0.0;
     private Double finalPrice = 0.0;
     private Long guideId;
+    private String guideUsername;
     private Long vehicleId;
+    private String vehiclePlate;
     private Long routeId;
+    private String routeName;
     private List<Long> extraWaypointIds;
+    private int customerCount;
+    private Double totalExpense;
 }

@@ -26,7 +26,7 @@ public class GuideService {
 
     public String getDisplayName(Guide guide) {
         if (guide == null) return "";
-        return guide.getFullName() != null ? guide.getFullName() : "";
+        return guide.getUsername() != null ? guide.getUsername() : "";
     }
 
     public long countGuides(List<Guide> guides) {

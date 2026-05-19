@@ -12,10 +12,12 @@
 
     <VBox styleClass="logo-container" alignment="CENTER_LEFT" spacing="10.0">
         <HBox fx:id="logoHBox" alignment="CENTER_LEFT" spacing="12.0">
-            <VBox spacing="1.0">
+            <VBox spacing="1.0" HBox.hgrow="ALWAYS">
                 <Label styleClass="logo-text" text="Aktour" />
                 <Label styleClass="logo-subtitle" text="ViaBalkan" style="-fx-font-size: 22px; -fx-text-fill: white; -fx-font-weight: bold;" />
             </VBox>
+            <Button fx:id="btnRefresh" text="↻" onAction="#onRefresh"
+                    style="-fx-background-color: rgba(255,255,255,0.12); -fx-text-fill: white; -fx-font-size: 20px; -fx-cursor: hand; -fx-background-radius: 18px; -fx-min-width: 34px; -fx-min-height: 34px; -fx-max-width: 34px; -fx-max-height: 34px; -fx-padding: 0;" />
         </HBox>
     </VBox>
 
@@ -23,11 +25,11 @@
         <padding>
             <Insets left="12.0" right="12.0" top="16.0" />
         </padding>
-        <Button fx:id="btnDashboard"      maxWidth="Infinity" styleClass="nav-button" text="  Dashboard"             onAction="#onDashboard" />
-        <Button fx:id="btnTourManagement" maxWidth="Infinity" styleClass="nav-button" text="  Tour Management"       onAction="#onTourManagement" />
-        <Button fx:id="btnExpenseTracker" maxWidth="Infinity" styleClass="nav-button" text="  Expense Tracker"       onAction="#onExpenseTracker" />
-        <Button fx:id="btnVehiclesGuides" maxWidth="Infinity" styleClass="nav-button" text="  Vehicles &amp; Guides"  onAction="#onVehiclesGuides" />
-        <Button fx:id="btnRefresh"        maxWidth="Infinity" styleClass="nav-button" text="  Refresh All"           onAction="#onRefresh" />
+        <Button fx:id="btnDashboard"       maxWidth="Infinity" styleClass="nav-button" text="  Dashboard"             onAction="#onDashboard" />
+        <Button fx:id="btnTourManagement"  maxWidth="Infinity" styleClass="nav-button" text="  Tour Management"       onAction="#onTourManagement" />
+        <Button fx:id="btnExpenseTracker"  maxWidth="Infinity" styleClass="nav-button" text="  Expense Tracker"       onAction="#onExpenseTracker" />
+        <Button fx:id="btnVehiclesGuides"  maxWidth="Infinity" styleClass="nav-button" text="  Vehicles &amp; Guides"  onAction="#onVehiclesGuides" />
+        <Button fx:id="btnRouteManagement" maxWidth="Infinity" styleClass="nav-button" text="  Route Management"      onAction="#onRouteManagement" />
     </VBox>
 
     <VBox>

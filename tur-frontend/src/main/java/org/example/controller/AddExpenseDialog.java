@@ -3,12 +3,15 @@ package org.example.controller;
 import javafx.geometry.Insets;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import org.example.model.Expense;
 import org.example.model.Tour;
 
+import java.io.File;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -63,13 +66,30 @@ public class AddExpenseDialog {
         DatePicker datePicker = new DatePicker(LocalDate.now());
         datePicker.setPrefWidth(260);
 
+        TextField receiptField = new TextField();
+        receiptField.setPromptText("Select or type receipt path");
+        receiptField.setPrefWidth(200);
+        Button browseBtn = new Button("Browse…");
+        browseBtn.setOnAction(e -> {
+            FileChooser fc = new FileChooser();
+            fc.setTitle("Select Receipt File");
+            fc.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("Images / PDF", "*.png", "*.jpg", "*.jpeg", "*.pdf"),
+                    new FileChooser.ExtensionFilter("All Files", "*.*")
+            );
+            File file = fc.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
+            if (file != null) receiptField.setText(file.getAbsolutePath());
+        });
+        HBox receiptBox = new HBox(6, receiptField, browseBtn);
+
         grid.addRow(0, new Label("Tour *"),        tourBox);
         grid.addRow(1, new Label("Category *"),    categoryBox);
         grid.addRow(2, new Label("Amount (€) *"),  amountField);
         grid.addRow(3, new Label("Date"),          datePicker);
+        grid.addRow(4, new Label("Receipt"),       receiptBox);
 
         dialog.getDialogPane().setContent(new VBox(grid));
-        dialog.getDialogPane().setPrefWidth(440);
+        dialog.getDialogPane().setPrefWidth(480);
 
         dialog.setResultConverter(btn -> {
             if (btn != saveBtn) return null;
@@ -96,6 +116,8 @@ public class AddExpenseDialog {
             expense.setCategory(categoryBox.getValue().trim());
             expense.setAmount(amount);
             expense.setDate(datePicker.getValue());
+            String receipt = receiptField.getText().trim();
+            if (!receipt.isEmpty()) expense.setReceiptPath(receipt);
             return new Object[]{tourBox.getValue().getTourId(), expense};
         });
 

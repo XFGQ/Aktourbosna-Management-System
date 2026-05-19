@@ -6,11 +6,17 @@ import java.util.List;
 
 public class CustomerService {
 
-    public long countCustomers(List<Customer> customers) {
-        return customers != null ? customers.size() : 0;
+    private final ApiService apiService = new ApiService();
+
+    public List<Customer> getCustomers(Long tourId) throws Exception {
+        return apiService.fetchCustomers(tourId);
     }
 
-    public String getDisplayName(Customer customer) {
-        return customer != null ? customer.getFullName() : "";
+    public Customer addCustomer(Long tourId, Customer customer) throws Exception {
+        return apiService.createCustomer(tourId, customer);
+    }
+
+    public void deleteCustomer(Long tourId, Long customerId) throws Exception {
+        apiService.deleteCustomer(tourId, customerId);
     }
 }
