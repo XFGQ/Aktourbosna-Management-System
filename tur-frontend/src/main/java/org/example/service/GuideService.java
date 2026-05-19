@@ -32,4 +32,29 @@ public class GuideService {
     public long countGuides(List<Guide> guides) {
         return guides.size();
     }
+
+    public Guide getMe() throws Exception {
+        java.net.http.HttpClient client = java.net.http.HttpClient.newHttpClient();
+        java.net.http.HttpRequest request = java.net.http.HttpRequest.newBuilder()
+                .uri(java.net.URI.create("http://localhost:8080/api/guides/me"))
+                .header("Authorization", "Bearer " + SessionManager.getInstance().getToken())
+                .GET()
+                .build();
+        java.net.http.HttpResponse<String> response = client.send(request, java.net.http.HttpResponse.BodyHandlers.ofString());
+
+        if (response.statusCode() == 200) {
+            String body = response.body();
+            Guide guide = new Guide();
+            String searchId = "\"id\":";
+            int idIndex = body.indexOf(searchId);
+            if (idIndex != -1) {
+                int start = idIndex + searchId.length();
+                int end = body.indexOf(",", start);
+                if (end == -1) end = body.indexOf("}", start);
+                guide.setId(Long.parseLong(body.substring(start, end).trim()));
+            }
+            return guide;
+        }
+        return null;
+    }
 }
