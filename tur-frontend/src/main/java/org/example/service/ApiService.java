@@ -95,10 +95,6 @@ public class ApiService {
         return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/expenses"), new TypeToken<List<Expense>>() {}.getType());
     }
 
-    public List<Route> fetchRoutes() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/routes"), new TypeToken<List<Route>>() {}.getType());
-    }
-
     public Vehicle createVehicle(Vehicle vehicle) throws Exception {
         String json = gson.toJson(vehicle);
         String response = post(BASE_URL + "/vehicles", json);
@@ -257,6 +253,7 @@ public class ApiService {
     }
 
     private String get(String url) throws Exception {
+        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("[GET " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());

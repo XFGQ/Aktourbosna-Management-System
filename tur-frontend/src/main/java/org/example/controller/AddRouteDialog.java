@@ -22,6 +22,10 @@ public class AddRouteDialog {
 
     private static HBox draggedRow = null;
 
+    public static Route show() {
+        return show(null);
+    }
+
     public static Route show(Route existingRoute) {
         Stage stage = new Stage();
         stage.initModality(Modality.APPLICATION_MODAL);

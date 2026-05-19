@@ -3,11 +3,13 @@ package org.example.service;
 import org.example.model.Route;
 import java.util.List;
 
-import java.util.List;
-
 public class RouteService {
 
     private final ApiService apiService = new ApiService();
+
+    public static void invalidateCache() {
+        // RouteService fetches fresh from ApiService on every call; no local cache to clear.
+    }
 
     public List<Route> getAllRoutes() throws Exception {
         return apiService.fetchRoutes();
