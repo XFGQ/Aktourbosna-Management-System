@@ -62,7 +62,8 @@ public class ExpenseTrackerController {
         colExpAmount.setCellFactory(col -> new TableCell<>() {
             @Override protected void updateItem(Number val, boolean empty) {
                 super.updateItem(val, empty);
-                if (empty || val == null) setText("—");
+                if (empty) setText(null);
+                else if (val == null) setText("—");
                 else setText("€" + String.format("%,.0f", val.doubleValue()));
             }
         });
@@ -75,11 +76,14 @@ public class ExpenseTrackerController {
 
         colExpActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colExpActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(deleteBtn);
+            private final HBox box = new HBox(4, editBtn, deleteBtn);
             {
                 box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
                 deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e   -> onEditExpense(getTableView().getItems().get(getIndex())));
                 deleteBtn.setOnAction(e -> onDeleteExpense(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Expense item, boolean empty) {
@@ -167,6 +171,16 @@ public class ExpenseTrackerController {
         runInBackground(
                 () -> expenseService.addExpense(tourId, expense),
                 "Adding expense...", "Expense added successfully.", "Failed to add expense");
+    }
+
+    private void onEditExpense(Expense expense) {
+        Long tourId = expenseToTourId.get(expense.getExpenseId());
+        if (tourId == null) { Toast.error("Cannot edit: tour not found for this expense."); return; }
+        Object[] result = AddExpenseDialog.show(expense, tourId, cachedTours);
+        if (result == null) return;
+        runInBackground(
+                () -> expenseService.updateExpense(tourId, expense.getExpenseId(), (Expense) result[1]),
+                "Updating expense...", "Expense updated successfully.", "Failed to update expense");
     }
 
     private void onDeleteExpense(Expense expense) {

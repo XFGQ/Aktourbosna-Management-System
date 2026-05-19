@@ -6,6 +6,10 @@ import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import org.example.model.Guide;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class AddGuideDialog {
 
     public static Guide show() {
@@ -60,6 +64,21 @@ public class AddGuideDialog {
         experience.setPromptText("Years, e.g. 5");
         TextField dailyFee   = new TextField();
         dailyFee.setPromptText("e.g. 150");
+        TextField rating     = new TextField();
+        rating.setPromptText("0.0 – 5.0");
+        TextField currency   = new TextField();
+        currency.setPromptText("e.g. EUR");
+        TextField languages  = new TextField();
+        languages.setPromptText("e.g. English, German, Turkish");
+        TextField countries  = new TextField();
+        countries.setPromptText("e.g. Bosnia, Turkey, Greece");
+        TextField skills     = new TextField();
+        skills.setPromptText("e.g. History, Culture, Nature");
+
+        for (TextField f : new TextField[]{phone, baseCity, licenseNo, experience,
+                dailyFee, rating, currency, languages, countries, skills}) {
+            f.setPrefWidth(220);
+        }
 
         if (editMode) {
             phone.setText(existing.getPhone() != null ? existing.getPhone() : "");
@@ -67,13 +86,23 @@ public class AddGuideDialog {
             licenseNo.setText(existing.getLicenseNo() != null ? existing.getLicenseNo() : "");
             experience.setText(existing.getExperience() != null ? String.valueOf(existing.getExperience()) : "");
             dailyFee.setText(existing.getDailyFee() != null ? String.valueOf(existing.getDailyFee().intValue()) : "");
+            rating.setText(existing.getRating() != null ? String.valueOf(existing.getRating()) : "");
+            currency.setText(existing.getCurrency() != null ? existing.getCurrency() : "");
+            languages.setText(existing.getLanguages() != null ? String.join(", ", existing.getLanguages()) : "");
+            countries.setText(existing.getCountries() != null ? String.join(", ", existing.getCountries()) : "");
+            skills.setText(existing.getSkills() != null ? String.join(", ", existing.getSkills()) : "");
         }
 
         grid.add(new Label("Phone:"),            0, row); grid.add(phone,      1, row++);
         grid.add(new Label("Base City:"),        0, row); grid.add(baseCity,   1, row++);
         grid.add(new Label("License No:"),       0, row); grid.add(licenseNo,  1, row++);
         grid.add(new Label("Experience (yrs):"), 0, row); grid.add(experience, 1, row++);
-        grid.add(new Label("Daily Fee (€):"),    0, row); grid.add(dailyFee,   1, row);
+        grid.add(new Label("Daily Fee (€):"),    0, row); grid.add(dailyFee,   1, row++);
+        grid.add(new Label("Rating (0–5):"),     0, row); grid.add(rating,     1, row++);
+        grid.add(new Label("Currency:"),         0, row); grid.add(currency,   1, row++);
+        grid.add(new Label("Languages:"),        0, row); grid.add(languages,  1, row++);
+        grid.add(new Label("Countries:"),        0, row); grid.add(countries,  1, row++);
+        grid.add(new Label("Skills:"),           0, row); grid.add(skills,     1, row);
 
         dialog.getDialogPane().setContent(grid);
 
@@ -94,9 +123,19 @@ public class AddGuideDialog {
                     g.setLicenseNo(licenseNo.getText().trim().isEmpty() ? null : licenseNo.getText().trim());
                     g.setExperience(experience.getText().trim().isEmpty() ? null : Integer.parseInt(experience.getText().trim()));
                     g.setDailyFee(dailyFee.getText().trim().isEmpty() ? null : Double.parseDouble(dailyFee.getText().trim()));
+
+                    if (!rating.getText().trim().isEmpty()) {
+                        double r = Double.parseDouble(rating.getText().trim());
+                        if (r < 0 || r > 5) { Toast.error("Rating must be between 0 and 5."); return null; }
+                        g.setRating(r);
+                    }
+                    g.setCurrency(currency.getText().trim().isEmpty() ? null : currency.getText().trim());
+                    g.setLanguages(parseList(languages.getText()));
+                    g.setCountries(parseList(countries.getText()));
+                    g.setSkills(parseList(skills.getText()));
                     return g;
                 } catch (NumberFormatException e) {
-                    Toast.error("Experience and Daily Fee must be numbers.");
+                    Toast.error("Experience, Daily Fee and Rating must be numbers.");
                     return null;
                 }
             }
@@ -104,5 +143,14 @@ public class AddGuideDialog {
         });
 
         return dialog.showAndWait().orElse(null);
+    }
+
+    private static List<String> parseList(String input) {
+        if (input == null || input.trim().isEmpty()) return null;
+        List<String> items = Arrays.stream(input.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .collect(Collectors.toList());
+        return items.isEmpty() ? null : items;
     }
 }

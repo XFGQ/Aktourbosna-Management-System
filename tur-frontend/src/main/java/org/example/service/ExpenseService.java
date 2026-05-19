@@ -13,11 +13,20 @@ public class ExpenseService {
     }
 
     public Expense addExpense(Long tourId, Expense expense) throws Exception {
-        return apiService.createExpense(tourId, expense);
+        Expense result = apiService.createExpense(tourId, expense);
+        TourService.invalidateCache();
+        return result;
+    }
+
+    public Expense updateExpense(Long tourId, Long expenseId, Expense expense) throws Exception {
+        Expense result = apiService.updateExpense(tourId, expenseId, expense);
+        TourService.invalidateCache();
+        return result;
     }
 
     public void deleteExpense(Long tourId, Long expenseId) throws Exception {
         apiService.deleteExpense(tourId, expenseId);
+        TourService.invalidateCache();
     }
 
     public double calculateTotal(List<Expense> expenses) {

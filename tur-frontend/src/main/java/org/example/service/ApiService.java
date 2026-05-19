@@ -152,6 +152,12 @@ public class ApiService {
         return gson.fromJson(response, Expense.class);
     }
 
+    public Expense updateExpense(Long tourId, Long expenseId, Expense expense) throws Exception {
+        String json = gson.toJson(expense);
+        String response = put(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId, json);
+        return gson.fromJson(response, Expense.class);
+    }
+
     public void deleteExpense(Long tourId, Long expenseId) throws Exception {
         delete(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId);
     }
@@ -172,13 +178,34 @@ public class ApiService {
     }
 
     public List<Route> fetchRoutes() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/routes"),
+        List<Route> summaries = gson.fromJson(get(BASE_URL + "/routes"),
                 new TypeToken<List<Route>>() {}.getType());
+        if (summaries == null) return new ArrayList<>();
+        // GET /api/routes returns RouteSummaryDTO (no basePrice) — fetch full details in parallel
+        List<CompletableFuture<Route>> futures = summaries.stream()
+                .filter(r -> r.getRouteId() != null)
+                .map(r -> {
+                    HttpRequest req = authorizedBuilder(BASE_URL + "/routes/" + r.getRouteId()).GET().build();
+                    return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(resp -> {
+                                Route detail = gson.fromJson(resp.body(), Route.class);
+                                return detail != null ? detail : r;
+                            })
+                            .exceptionally(e -> r);
+                })
+                .collect(Collectors.toList());
+        return futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
     }
 
     public Route createRoute(Route route) throws Exception {
         String json = gson.toJson(route);
         String response = post(BASE_URL + "/routes", json);
+        return gson.fromJson(response, Route.class);
+    }
+
+    public Route updateRoute(Long id, Route route) throws Exception {
+        String json = gson.toJson(route);
+        String response = put(BASE_URL + "/routes/" + id, json);
         return gson.fromJson(response, Route.class);
     }
 

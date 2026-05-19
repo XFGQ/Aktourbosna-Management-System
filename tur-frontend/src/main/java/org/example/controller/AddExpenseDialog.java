@@ -22,9 +22,21 @@ public class AddExpenseDialog {
         "Entrance Fee", "Fuel", "Toll", "Insurance", "Other"
     };
 
+    /** Add mode — returns Object[]{tourId, expense} */
     public static Object[] show(List<Tour> tours) {
+        return showInternal(null, null, tours);
+    }
+
+    /** Edit mode — tourId is the existing tour, returns Object[]{tourId, expense} */
+    public static Object[] show(Expense existing, Long tourId, List<Tour> tours) {
+        return showInternal(existing, tourId, tours);
+    }
+
+    private static Object[] showInternal(Expense existing, Long existingTourId, List<Tour> tours) {
+        boolean editMode = existing != null;
+
         Dialog<Object[]> dialog = new Dialog<>();
-        dialog.setTitle("Add Expense");
+        dialog.setTitle(editMode ? "Edit Expense" : "Add Expense");
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initStyle(StageStyle.UTILITY);
 
@@ -36,22 +48,38 @@ public class AddExpenseDialog {
         grid.setVgap(10);
         grid.setPadding(new Insets(20, 28, 10, 28));
 
-        ComboBox<Tour> tourBox = new ComboBox<>();
-        tourBox.getItems().addAll(tours);
-        tourBox.setPromptText("Select tour");
-        tourBox.setPrefWidth(260);
-        tourBox.setCellFactory(lv -> new ListCell<>() {
-            @Override protected void updateItem(Tour t, boolean empty) {
-                super.updateItem(t, empty);
-                setText(empty || t == null ? null : t.getTourName());
-            }
-        });
-        tourBox.setButtonCell(new ListCell<>() {
-            @Override protected void updateItem(Tour t, boolean empty) {
-                super.updateItem(t, empty);
-                setText(empty || t == null ? null : t.getTourName());
-            }
-        });
+        int row = 0;
+
+        // Tour — selectable in add mode, read-only label in edit mode
+        Long[] resolvedTourId = {existingTourId};
+        if (editMode) {
+            String tourName = tours.stream()
+                    .filter(t -> existingTourId != null && existingTourId.equals(t.getTourId()))
+                    .map(Tour::getTourName)
+                    .findFirst().orElse("—");
+            Label tourLabel = new Label(tourName);
+            tourLabel.setStyle("-fx-font-weight: bold;");
+            grid.addRow(row++, new Label("Tour"), tourLabel);
+        } else {
+            ComboBox<Tour> tourBox = new ComboBox<>();
+            tourBox.getItems().addAll(tours);
+            tourBox.setPromptText("Select tour");
+            tourBox.setPrefWidth(260);
+            tourBox.setCellFactory(lv -> new ListCell<>() {
+                @Override protected void updateItem(Tour t, boolean empty) {
+                    super.updateItem(t, empty);
+                    setText(empty || t == null ? null : t.getTourName());
+                }
+            });
+            tourBox.setButtonCell(new ListCell<>() {
+                @Override protected void updateItem(Tour t, boolean empty) {
+                    super.updateItem(t, empty);
+                    setText(empty || t == null ? null : t.getTourName());
+                }
+            });
+            tourBox.valueProperty().addListener((obs, o, n) -> resolvedTourId[0] = n != null ? n.getTourId() : null);
+            grid.addRow(row++, new Label("Tour *"), tourBox);
+        }
 
         ComboBox<String> categoryBox = new ComboBox<>();
         categoryBox.getItems().addAll(CATEGORIES);
@@ -82,18 +110,24 @@ public class AddExpenseDialog {
         });
         HBox receiptBox = new HBox(6, receiptField, browseBtn);
 
-        grid.addRow(0, new Label("Tour *"),        tourBox);
-        grid.addRow(1, new Label("Category *"),    categoryBox);
-        grid.addRow(2, new Label("Amount (€) *"),  amountField);
-        grid.addRow(3, new Label("Date"),          datePicker);
-        grid.addRow(4, new Label("Receipt"),       receiptBox);
+        if (editMode) {
+            categoryBox.setValue(existing.getCategory());
+            amountField.setText(existing.getAmount() != null ? String.valueOf(existing.getAmount().intValue()) : "");
+            if (existing.getDate() != null) datePicker.setValue(existing.getDate());
+            if (existing.getReceiptPath() != null) receiptField.setText(existing.getReceiptPath());
+        }
+
+        grid.addRow(row++, new Label("Category *"),   categoryBox);
+        grid.addRow(row++, new Label("Amount (€) *"), amountField);
+        grid.addRow(row++, new Label("Date"),         datePicker);
+        grid.addRow(row,   new Label("Receipt"),      receiptBox);
 
         dialog.getDialogPane().setContent(new VBox(grid));
         dialog.getDialogPane().setPrefWidth(480);
 
         dialog.setResultConverter(btn -> {
             if (btn != saveBtn) return null;
-            if (tourBox.getValue() == null) {
+            if (!editMode && resolvedTourId[0] == null) {
                 Toast.error("Please select a tour.");
                 return null;
             }
@@ -112,13 +146,13 @@ public class AddExpenseDialog {
                 Toast.error("Amount must be a number.");
                 return null;
             }
-            Expense expense = new Expense();
+            Expense expense = editMode ? existing : new Expense();
             expense.setCategory(categoryBox.getValue().trim());
             expense.setAmount(amount);
             expense.setDate(datePicker.getValue());
             String receipt = receiptField.getText().trim();
-            if (!receipt.isEmpty()) expense.setReceiptPath(receipt);
-            return new Object[]{tourBox.getValue().getTourId(), expense};
+            expense.setReceiptPath(receipt.isEmpty() ? null : receipt);
+            return new Object[]{resolvedTourId[0], expense};
         });
 
         return dialog.showAndWait().orElse(null);

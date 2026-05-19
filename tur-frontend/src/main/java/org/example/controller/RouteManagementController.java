@@ -50,11 +50,14 @@ public class RouteManagementController {
 
         colActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colActions.setCellFactory(col -> new TableCell<>() {
+            private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(deleteBtn);
+            private final HBox box = new HBox(4, editBtn, deleteBtn);
             {
                 box.setAlignment(Pos.CENTER);
+                editBtn.getStyleClass().add("btn-secondary");
                 deleteBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e   -> onEditRoute(getTableView().getItems().get(getIndex())));
                 deleteBtn.setOnAction(e -> onDeleteRoute(getTableView().getItems().get(getIndex())));
             }
             @Override protected void updateItem(Route r, boolean empty) {
@@ -92,6 +95,14 @@ public class RouteManagementController {
         runInBackground(
                 () -> routeService.addRoute(newRoute),
                 "Adding route...", "Route added successfully.", "Failed to add route");
+    }
+
+    private void onEditRoute(Route route) {
+        Route updated = AddRouteDialog.show(route);
+        if (updated == null) return;
+        runInBackground(
+                () -> routeService.updateRoute(route.getRouteId(), updated),
+                "Updating route...", "Route updated successfully.", "Failed to update route");
     }
 
     private void onDeleteRoute(Route route) {

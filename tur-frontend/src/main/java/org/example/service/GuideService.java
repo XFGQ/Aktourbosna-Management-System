@@ -8,20 +8,46 @@ public class GuideService {
 
     private final ApiService apiService = new ApiService();
 
+    // --- Static cache shared across all controller instances ---
+    private static volatile List<Guide> cachedGuides = null;
+    private static volatile long cacheTs = 0;
+    private static final long TTL_MS = 300_000;
+    private static final Object LOCK = new Object();
+
     public List<Guide> getAllGuides() throws Exception {
-        return apiService.fetchGuides();
+        if (cachedGuides != null && System.currentTimeMillis() - cacheTs < TTL_MS) {
+            return cachedGuides;
+        }
+        synchronized (LOCK) {
+            if (cachedGuides != null && System.currentTimeMillis() - cacheTs < TTL_MS) {
+                return cachedGuides;
+            }
+            List<Guide> fresh = apiService.fetchGuides();
+            cachedGuides = fresh;
+            cacheTs = System.currentTimeMillis();
+            return fresh;
+        }
+    }
+
+    public static void invalidateCache() {
+        cachedGuides = null;
     }
 
     public Guide addGuide(Guide guide) throws Exception {
-        return apiService.createGuide(guide);
+        Guide result = apiService.createGuide(guide);
+        invalidateCache();
+        return result;
     }
 
     public Guide updateGuide(Long id, Guide guide) throws Exception {
-        return apiService.updateGuide(id, guide);
+        Guide result = apiService.updateGuide(id, guide);
+        invalidateCache();
+        return result;
     }
 
     public void deleteGuide(Long id) throws Exception {
         apiService.deleteGuide(id);
+        invalidateCache();
     }
 
     public String getDisplayName(Guide guide) {

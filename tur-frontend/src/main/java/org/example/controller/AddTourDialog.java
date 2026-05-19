@@ -7,6 +7,7 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
 import org.example.model.Guide;
+import org.example.model.Route;
 import org.example.model.Tour;
 import org.example.model.Vehicle;
 
@@ -16,11 +17,11 @@ import java.util.stream.Collectors;
 
 public class AddTourDialog {
 
-    public static Tour show(List<Guide> guides, List<Vehicle> vehicles, List<Tour> allTours) {
-        return show(null, guides, vehicles, allTours);
+    public static Tour show(List<Guide> guides, List<Vehicle> vehicles, List<Tour> allTours, List<Route> routes) {
+        return show(null, guides, vehicles, allTours, routes);
     }
 
-    public static Tour show(Tour existing, List<Guide> guides, List<Vehicle> vehicles, List<Tour> allTours) {
+    public static Tour show(Tour existing, List<Guide> guides, List<Vehicle> vehicles, List<Tour> allTours, List<Route> routes) {
         boolean isEdit  = existing != null;
         Long  excludeId = isEdit ? existing.getTourId() : null;
 
@@ -50,10 +51,49 @@ public class AddTourDialog {
         hotelField.setPromptText("Hotel name");
         hotelField.setPrefWidth(260);
 
+        // --- Route combo ---
+        ComboBox<Route> routeBox = new ComboBox<>();
+        if (routes != null) routeBox.getItems().addAll(routes);
+        routeBox.setPromptText("Select route (optional)");
+        routeBox.setPrefWidth(260);
+        routeBox.setCellFactory(lv -> new ListCell<>() {
+            @Override protected void updateItem(Route r, boolean empty) {
+                super.updateItem(r, empty);
+                setText(empty || r == null ? null
+                        : (r.getRouteName() != null ? r.getRouteName() + " (" : "(")
+                          + r.getStartCity() + " → " + r.getEndCity() + ")");
+            }
+        });
+        routeBox.setButtonCell(new ListCell<>() {
+            @Override protected void updateItem(Route r, boolean empty) {
+                super.updateItem(r, empty);
+                setText(empty || r == null ? null
+                        : (r.getRouteName() != null ? r.getRouteName() + " (" : "(")
+                          + r.getStartCity() + " → " + r.getEndCity() + ")");
+            }
+        });
+        if (isEdit && existing.getRouteId() != null && routes != null) {
+            routes.stream().filter(r -> existing.getRouteId().equals(r.getRouteId())).findFirst()
+                    .ifPresent(routeBox::setValue);
+        }
+
+        TextField calculatedPriceField = new TextField(isEdit && existing.getCalculatedPrice() != null && existing.getCalculatedPrice() > 0
+                ? String.valueOf(existing.getCalculatedPrice().intValue()) : "");
+        calculatedPriceField.setPromptText("Calculated price (€) — auto from route");
+        calculatedPriceField.setPrefWidth(260);
+
         TextField priceField = new TextField(isEdit && existing.getFinalPrice() != null && existing.getFinalPrice() > 0
                 ? String.valueOf(existing.getFinalPrice().intValue()) : "");
         priceField.setPromptText("Final price (€)");
         priceField.setPrefWidth(260);
+
+        // Auto-suggest calculatedPrice from route basePrice when field is empty
+        routeBox.valueProperty().addListener((obs, oldR, newR) -> {
+            if (calculatedPriceField.getText().trim().isEmpty() && newR != null
+                    && newR.getBasePrice() != null && newR.getBasePrice() > 0) {
+                calculatedPriceField.setText(String.valueOf(newR.getBasePrice().intValue()));
+            }
+        });
 
         // --- Guide combo ---
         ComboBox<Guide> guideBox = new ComboBox<>();
@@ -147,15 +187,17 @@ public class AddTourDialog {
         }
 
         // --- Layout ---
-        grid.addRow(0, new Label("Tour Name *"), nameField);
-        grid.addRow(1, new Label("Start Date *"), startPicker);
-        grid.addRow(2, new Label("End Date *"),   endPicker);
-        grid.addRow(3, new Label("Hotel"),        hotelField);
-        grid.addRow(4, new Label("Guide *"),      guideBox);
-        grid.add(new Label(), 0, 5);
-        grid.add(guideWarning, 1, 5);
-        grid.addRow(6, new Label("Vehicle"),      vehicleBox);
-        grid.addRow(7, new Label("Price (€)"),    priceField);
+        grid.addRow(0, new Label("Tour Name *"),       nameField);
+        grid.addRow(1, new Label("Start Date *"),      startPicker);
+        grid.addRow(2, new Label("End Date *"),        endPicker);
+        grid.addRow(3, new Label("Hotel"),             hotelField);
+        grid.addRow(4, new Label("Route"),             routeBox);
+        grid.addRow(5, new Label("Guide *"),           guideBox);
+        grid.add(new Label(), 0, 6);
+        grid.add(guideWarning, 1, 6);
+        grid.addRow(7, new Label("Vehicle"),           vehicleBox);
+        grid.addRow(8, new Label("Calc. Price (€)"),   calculatedPriceField);
+        grid.addRow(9, new Label("Final Price (€)"),   priceField);
 
         dialog.getDialogPane().setContent(new VBox(grid));
         dialog.getDialogPane().setPrefWidth(460);
@@ -186,9 +228,14 @@ public class AddTourDialog {
             tour.setHotelName(hotelField.getText().trim().isEmpty() ? null : hotelField.getText().trim());
             tour.setGuideId(guideBox.getValue().getId());
             tour.setVehicleId(vehicleBox.getValue() != null ? vehicleBox.getValue().getId() : null);
+            tour.setRouteId(routeBox.getValue() != null ? routeBox.getValue().getRouteId() : null);
+            if (!calculatedPriceField.getText().trim().isEmpty()) {
+                try { tour.setCalculatedPrice(Double.parseDouble(calculatedPriceField.getText().trim())); }
+                catch (NumberFormatException e) { Toast.error("Calculated price must be a number."); return null; }
+            }
             if (!priceField.getText().trim().isEmpty()) {
                 try { tour.setFinalPrice(Double.parseDouble(priceField.getText().trim())); }
-                catch (NumberFormatException e) { Toast.error("Price must be a number."); return null; }
+                catch (NumberFormatException e) { Toast.error("Final price must be a number."); return null; }
             }
             return tour;
         });
