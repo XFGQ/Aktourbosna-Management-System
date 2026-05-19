@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.geometry.*?>
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<ScrollPane fitToWidth="true" styleClass="content-area"
+            stylesheets="@../styles/styles.css"
+            xmlns="http://javafx.com/javafx/17"
+            xmlns:fx="http://javafx.com/fxml/1"
+            fx:controller="org.example.controller.RoutesController">
+
+    <VBox spacing="20.0">
+        <padding>
+            <Insets bottom="28.0" left="28.0" right="28.0" top="28.0" />
+        </padding>
+
+        <Label styleClass="page-title" text="Routes Management" />
+        <Label styleClass="page-subtitle" text="Overview of all routes, waypoints, and tolls" />
+
+        <HBox spacing="16.0">
+            <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
+                <Label styleClass="stat-label" text="Total Routes" />
+                <Label fx:id="totalRoutesValue" styleClass="stat-value" text="—" />
+            </VBox>
+        </HBox>
+
+        <VBox styleClass="panel" spacing="0">
+            <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10.0">
+                <Label styleClass="panel-title" text="Routes" />
+                <Pane HBox.hgrow="ALWAYS" />
+                <Button fx:id="addRouteBtn" styleClass="btn-primary" text="+ Add Route" onAction="#onAddRoute" />
+            </HBox>
+            <TableView fx:id="routesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
+                       prefHeight="400.0" fixedCellSize="44.0">
+                <columnResizePolicy>
+                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                </columnResizePolicy>
+                <columns>
+                    <TableColumn fx:id="colRouteId" text="ID" prefWidth="50.0" minWidth="50.0" />
+                    <TableColumn fx:id="colRouteName" text="Route Name" prefWidth="200.0" minWidth="200.0" />
+                    <TableColumn fx:id="colRouteStart" text="Start Location" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colRouteEnd" text="End Location" prefWidth="150.0" minWidth="150.0" />
+                    <TableColumn fx:id="colRouteDistance" text="Distance (km)" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colRouteActions" text="Actions" prefWidth="160.0" minWidth="160.0" sortable="false" />
+                </columns>
+            </TableView>
+        </VBox>
+
+    </VBox>
+</ScrollPane>

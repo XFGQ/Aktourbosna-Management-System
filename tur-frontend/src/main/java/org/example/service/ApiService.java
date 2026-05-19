@@ -2,9 +2,9 @@ package org.example.service;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import com.google.gson.JsonParser;
 import org.example.model.Expense;
 import org.example.model.Guide;
+import org.example.model.Route;
 import org.example.model.Tour;
 import org.example.model.Vehicle;
 
@@ -17,7 +17,6 @@ import java.util.List;
 public class ApiService {
 
     private static final String BASE_URL = "http://localhost:8080/api";
-
     private static String authToken = null;
 
     public static void setToken(String token) { authToken = token; }
@@ -39,23 +38,23 @@ public class ApiService {
             .create();
 
     public List<Tour> fetchTours() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/tours"),
-                new TypeToken<List<Tour>>() {}.getType());
+        return gson.fromJson(get(BASE_URL + "/tours"), new TypeToken<List<Tour>>() {}.getType());
     }
 
     public List<Vehicle> fetchVehicles() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/vehicles"),
-                new TypeToken<List<Vehicle>>() {}.getType());
+        return gson.fromJson(get(BASE_URL + "/vehicles"), new TypeToken<List<Vehicle>>() {}.getType());
     }
 
     public List<Guide> fetchGuides() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/guides"),
-                new TypeToken<List<Guide>>() {}.getType());
+        return gson.fromJson(get(BASE_URL + "/guides"), new TypeToken<List<Guide>>() {}.getType());
     }
 
     public List<Expense> fetchExpensesByTour(Long tourId) throws Exception {
-        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/expenses"),
-                new TypeToken<List<Expense>>() {}.getType());
+        return gson.fromJson(get(BASE_URL + "/tours/" + tourId + "/expenses"), new TypeToken<List<Expense>>() {}.getType());
+    }
+
+    public List<Route> fetchRoutes() throws Exception {
+        return gson.fromJson(get(BASE_URL + "/routes"), new TypeToken<List<Route>>() {}.getType());
     }
 
     public Vehicle createVehicle(Vehicle vehicle) throws Exception {
@@ -126,6 +125,22 @@ public class ApiService {
         delete(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId);
     }
 
+    public Route createRoute(Route route) throws Exception {
+        String json = gson.toJson(route);
+        String response = post(BASE_URL + "/routes", json);
+        return gson.fromJson(response, Route.class);
+    }
+
+    public Route updateRoute(Long id, Route route) throws Exception {
+        String json = gson.toJson(route);
+        String response = put(BASE_URL + "/routes/" + id, json);
+        return gson.fromJson(response, Route.class);
+    }
+
+    public void deleteRoute(Long id) throws Exception {
+        delete(BASE_URL + "/routes/" + id);
+    }
+
     public String[] login(String username, String password) throws Exception {
         String body = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
         HttpRequest request = HttpRequest.newBuilder()
@@ -159,7 +174,6 @@ public class ApiService {
     }
 
     private String get(String url) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url).GET().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
         System.out.println("[GET " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
@@ -170,40 +184,28 @@ public class ApiService {
     }
 
     private String post(String url, String jsonBody) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url)
                 .header("Content-Type", "application/json")
                 .POST(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[POST " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
-        }
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
         return response.body();
     }
 
     private String put(String url, String jsonBody) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url)
                 .header("Content-Type", "application/json")
                 .PUT(HttpRequest.BodyPublishers.ofString(jsonBody))
                 .build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[PUT " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
-        }
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
         return response.body();
     }
 
     private void delete(String url) throws Exception {
-        long start = System.currentTimeMillis();
         HttpRequest request = authorizedBuilder(url).DELETE().build();
         HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        System.out.println("[DELETE " + url + "] took " + (System.currentTimeMillis() - start) + " ms, status=" + response.statusCode());
-        if (response.statusCode() >= 400) {
-            throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
-        }
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
     }
 }
