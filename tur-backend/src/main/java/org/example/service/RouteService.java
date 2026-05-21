@@ -75,6 +75,13 @@ public class RouteService {
     }
 
     @Transactional
+    public void deleteRoute(Long id) {
+        Route route = routeRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + id));
+        routeRepository.delete(route);
+    }
+
+    @Transactional
     public RouteResponseDTO addWaypointToRoute(Long routeId, Long waypointId) {
         Route route = routeRepository.findById(routeId)
                 .orElseThrow(() -> new ResourceNotFoundException("Route not found: " + routeId));

@@ -189,6 +189,8 @@ public class RoutesController {
         task.setOnSucceeded(e -> {
             loadingStage.close();
             loadData();
+            AppController app = AppController.getInstance();
+            if (app != null) app.invalidateOtherViews("routes.fxml");
             Toast.success(successMsg);
         });
 
