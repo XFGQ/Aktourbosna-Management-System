@@ -26,8 +26,8 @@ public class SidebarController {
             ImageView logo = LogoView.create(46);
             logoHBox.getChildren().add(0, logo);
         }
-        if (SessionManager.getInstance().isGuide() && btnVehiclesGuides != null) {
-            btnVehiclesGuides.setText("  Vehicles");
+        if (SessionManager.getInstance().isGuide()) {
+            if (btnVehiclesGuides != null) btnVehiclesGuides.setText("  Vehicles");
         }
     }
 

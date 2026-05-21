@@ -111,8 +111,13 @@ public class GuideDashboardController {
                 return;
             }
             try {
-                List<Tour>    tours    = toursFut.join();
+                List<Tour>    allTours = toursFut.join();
                 List<Vehicle> vehicles = vehiclesFut.join();
+
+                Long myGuideId = SessionManager.getInstance().getGuideId();
+                List<Tour> tours = (SessionManager.getInstance().isGuide() && myGuideId != null)
+                        ? allTours.stream().filter(t -> myGuideId.equals(t.getGuideId())).collect(java.util.stream.Collectors.toList())
+                        : allTours;
 
                 Map<Long, String> vNames = new HashMap<>();
                 for (Vehicle v : vehicles)

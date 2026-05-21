@@ -10,6 +10,7 @@ import org.example.model.Guide;
 import org.example.model.Route;
 import org.example.model.Tour;
 import org.example.model.Vehicle;
+import org.example.service.SessionManager;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -187,17 +188,24 @@ public class AddTourDialog {
         }
 
         // --- Layout ---
+        boolean isGuideUser = SessionManager.getInstance().isGuide();
         grid.addRow(0, new Label("Tour Name *"),       nameField);
         grid.addRow(1, new Label("Start Date *"),      startPicker);
         grid.addRow(2, new Label("End Date *"),        endPicker);
         grid.addRow(3, new Label("Hotel"),             hotelField);
         grid.addRow(4, new Label("Route"),             routeBox);
-        grid.addRow(5, new Label("Guide *"),           guideBox);
-        grid.add(new Label(), 0, 6);
-        grid.add(guideWarning, 1, 6);
-        grid.addRow(7, new Label("Vehicle"),           vehicleBox);
-        grid.addRow(8, new Label("Calc. Price (€)"),   calculatedPriceField);
-        grid.addRow(9, new Label("Final Price (€)"),   priceField);
+        if (!isGuideUser) {
+            grid.addRow(5, new Label("Guide *"),       guideBox);
+            grid.add(new Label(), 0, 6);
+            grid.add(guideWarning, 1, 6);
+            grid.addRow(7, new Label("Vehicle"),       vehicleBox);
+            grid.addRow(8, new Label("Calc. Price (€)"), calculatedPriceField);
+            grid.addRow(9, new Label("Final Price (€)"), priceField);
+        } else {
+            grid.addRow(5, new Label("Vehicle"),       vehicleBox);
+            grid.addRow(6, new Label("Calc. Price (€)"), calculatedPriceField);
+            grid.addRow(7, new Label("Final Price (€)"), priceField);
+        }
 
         dialog.getDialogPane().setContent(new VBox(grid));
         dialog.getDialogPane().setPrefWidth(460);
@@ -210,7 +218,7 @@ public class AddTourDialog {
                 Toast.error("Tour name is required.");
                 return null;
             }
-            if (guideBox.getValue() == null) {
+            if (!SessionManager.getInstance().isGuide() && guideBox.getValue() == null) {
                 Toast.error("Please select a Guide.");
                 return null;
             }
@@ -226,7 +234,11 @@ public class AddTourDialog {
             tour.setStartDate(start);
             tour.setEndDate(end);
             tour.setHotelName(hotelField.getText().trim().isEmpty() ? null : hotelField.getText().trim());
-            tour.setGuideId(guideBox.getValue().getId());
+            if (SessionManager.getInstance().isGuide()) {
+                tour.setGuideId(SessionManager.getInstance().getGuideId());
+            } else {
+                tour.setGuideId(guideBox.getValue().getId());
+            }
             tour.setVehicleId(vehicleBox.getValue() != null ? vehicleBox.getValue().getId() : null);
             tour.setRouteId(routeBox.getValue() != null ? routeBox.getValue().getRouteId() : null);
             if (!calculatedPriceField.getText().trim().isEmpty()) {

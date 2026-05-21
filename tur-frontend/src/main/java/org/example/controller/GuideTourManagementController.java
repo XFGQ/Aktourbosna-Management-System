@@ -1,15 +1,27 @@
 package org.example.controller;
 
 import javafx.beans.property.SimpleStringProperty;
+import javafx.concurrent.Task;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.layout.VBox;
+import javafx.stage.Modality;
+import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.example.model.Guide;
+import org.example.model.Route;
 import org.example.model.Tour;
 import org.example.model.Vehicle;
+import org.example.service.GuideService;
+import org.example.service.RouteService;
 import org.example.service.SessionManager;
 import org.example.service.TourService;
 import org.example.service.VehicleService;
 
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -41,8 +53,15 @@ public class GuideTourManagementController {
 
     private final TourService    tourService    = new TourService();
     private final VehicleService vehicleService = new VehicleService();
+    private final GuideService   guideService   = new GuideService();
+    private final RouteService   routeService   = new RouteService();
 
     private final Map<Long, String> vehicleNames = new HashMap<>();
+
+    private List<Guide>   cachedGuides   = new ArrayList<>();
+    private List<Vehicle> cachedVehicles = new ArrayList<>();
+    private List<Tour>    cachedTours    = new ArrayList<>();
+    private List<Route>   cachedRoutes   = new ArrayList<>();
 
     @FXML
     public void initialize() {
@@ -101,10 +120,10 @@ public class GuideTourManagementController {
         CompletableFuture<List<Tour>> toursFut = CompletableFuture.supplyAsync(() -> {
             try {
                 List<Tour> allTours = tourService.getAllTours();
-                if (SessionManager.getInstance().isGuide() && SessionManager.getInstance().getGuideId() != null) {
-                    Long myGuideId = SessionManager.getInstance().getGuideId();
+                Long myGuideId = SessionManager.getInstance().getGuideId();
+                if (SessionManager.getInstance().isGuide() && myGuideId != null) {
                     return allTours.stream()
-                            .filter(t -> t.getGuideId() != null && t.getGuideId().equals(myGuideId))
+                            .filter(t -> myGuideId.equals(t.getGuideId()))
                             .collect(Collectors.toList());
                 }
                 return allTours;
@@ -117,7 +136,17 @@ public class GuideTourManagementController {
             catch (Exception e) { throw new CompletionException(e); }
         });
 
-        CompletableFuture.allOf(toursFut, vehiclesFut).whenComplete((ignored, ex) -> {
+        CompletableFuture<List<Guide>> guidesFut = CompletableFuture.supplyAsync(() -> {
+            try { return guideService.getAllGuides(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+
+        CompletableFuture<List<Route>> routesFut = CompletableFuture.supplyAsync(() -> {
+            try { return routeService.getAllRoutes(); }
+            catch (Exception e) { throw new CompletionException(e); }
+        });
+
+        CompletableFuture.allOf(toursFut, vehiclesFut, guidesFut, routesFut).whenComplete((ignored, ex) -> {
             if (ex != null) {
                 ex.printStackTrace();
                 javafx.application.Platform.runLater(() -> {
@@ -130,6 +159,8 @@ public class GuideTourManagementController {
             try {
                 List<Tour>    tours    = toursFut.join();
                 List<Vehicle> vehicles = vehiclesFut.join();
+                List<Guide>   guides   = guidesFut.join();
+                List<Route>   routes   = routesFut.join();
 
                 Map<Long, String> vNames = new HashMap<>();
                 for (Vehicle v : vehicles)
@@ -142,6 +173,10 @@ public class GuideTourManagementController {
 
                 javafx.application.Platform.runLater(() -> {
                     vehicleNames.clear(); vehicleNames.putAll(vNames);
+                    cachedVehicles = vehicles;
+                    cachedGuides   = guides;
+                    cachedTours    = tours;
+                    cachedRoutes   = routes;
                     recentToursTable.getItems().setAll(recent);
                     upcomingToursTable.getItems().setAll(upcoming);
                     totalEarningsValue.setText("€" + String.format("%,.0f", totalEarnings));
@@ -159,6 +194,58 @@ public class GuideTourManagementController {
         });
     }
 
+    @FXML
+    private void onAddTour() {
+        if (cachedGuides.isEmpty()) {
+            Toast.info("Data is still loading, please wait a moment.");
+            loadData();
+            return;
+        }
+        Tour newTour = AddTourDialog.show(cachedGuides, cachedVehicles, cachedTours, cachedRoutes);
+        if (newTour == null) return;
+        Long myGuideId = SessionManager.getInstance().getGuideId();
+        if (myGuideId != null) newTour.setGuideId(myGuideId);
+        runInBackground(
+                () -> tourService.addTour(newTour),
+                "Adding tour...", "Tour added successfully.", "Failed to add tour");
+    }
+
+    private void runInBackground(BackgroundOp op, String loadingMsg, String successMsg, String errorTitle) {
+        Stage loadingStage = new Stage();
+        loadingStage.initModality(Modality.APPLICATION_MODAL);
+        loadingStage.initStyle(StageStyle.UNDECORATED);
+        loadingStage.setResizable(false);
+
+        ProgressIndicator spinner = new ProgressIndicator();
+        spinner.setPrefSize(40, 40);
+        Label msg = new Label(loadingMsg);
+        msg.setStyle("-fx-font-size: 14px;");
+        VBox box = new VBox(12, spinner, msg);
+        box.setAlignment(Pos.CENTER);
+        box.setPadding(new Insets(24));
+        box.setStyle("-fx-background-color: white; -fx-border-color: #BDBDBD; -fx-border-width: 1px;");
+        loadingStage.setScene(new javafx.scene.Scene(box));
+        loadingStage.show();
+
+        Task<Void> task = new Task<>() {
+            @Override protected Void call() throws Exception { op.run(); return null; }
+        };
+        task.setOnSucceeded(e -> {
+            loadingStage.close();
+            loadData();
+            AppController app = AppController.getInstance();
+            if (app != null) app.invalidateOtherViews("guideTourManagement.fxml");
+            Toast.success(successMsg);
+        });
+        task.setOnFailed(e -> {
+            loadingStage.close();
+            Throwable ex = task.getException();
+            String detail = ex != null && ex.getMessage() != null ? ex.getMessage() : "Unknown error";
+            Toast.error(errorTitle + ": " + detail);
+        });
+        new Thread(task).start();
+    }
+
     private static TableCell<Tour, String> tooltipCell() {
         return new TableCell<>() {
             @Override protected void updateItem(String s, boolean empty) {
@@ -169,6 +256,6 @@ public class GuideTourManagementController {
         };
     }
 
-    @FXML
-    private void onAddTour() {}
+    @FunctionalInterface
+    private interface BackgroundOp { void run() throws Exception; }
 }
