@@ -25,4 +25,5 @@ public class Tour {
     private List<Long> extraWaypointIds;
     private int customerCount;
     private Double totalExpense;
+    private List<Customer> customers;
 }
