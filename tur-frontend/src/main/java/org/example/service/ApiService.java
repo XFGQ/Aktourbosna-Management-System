@@ -180,6 +180,12 @@ public class ApiService {
         return gson.fromJson(response, Customer.class);
     }
 
+    public Customer updateCustomer(Long tourId, Long customerId, Customer customer) throws Exception {
+        String json = gson.toJson(customer);
+        String response = put(BASE_URL + "/tours/" + tourId + "/customers/" + customerId, json);
+        return gson.fromJson(response, Customer.class);
+    }
+
     public void deleteCustomer(Long tourId, Long customerId) throws Exception {
         delete(BASE_URL + "/tours/" + tourId + "/customers/" + customerId);
     }
