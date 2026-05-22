@@ -42,6 +42,12 @@ public class RouteController {
         return ResponseEntity.ok(routeService.updateRoute(id, dto));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteRoute(@PathVariable Long id) {
+        routeService.deleteRoute(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @PostMapping("/{routeId}/waypoints/{waypointId}")
     public ResponseEntity<RouteResponseDTO> addWaypointToRoute(@PathVariable Long routeId,
                                                                @PathVariable Long waypointId) {

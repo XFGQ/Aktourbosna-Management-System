@@ -27,13 +27,17 @@ public class AddRouteDialog {
     }
 
     public static Route show(Route existingRoute) {
-        Stage stage = new Stage();
-        stage.initModality(Modality.APPLICATION_MODAL);
-        stage.initStyle(StageStyle.UNDECORATED);
-
         boolean isEdit = (existingRoute != null);
-        Label titleLabel = new Label(isEdit ? "Edit Route" : "Add New Route");
-        titleLabel.setStyle("-fx-font-size: 18px; -fx-font-weight: bold; -fx-text-fill: #1A237E;");
+        
+        Dialog<Route> dialog = new Dialog<>();
+        dialog.setTitle(isEdit ? "Edit Route" : "Add Route");
+        dialog.initModality(Modality.APPLICATION_MODAL);
+        dialog.initStyle(StageStyle.UTILITY);
+
+        ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
+        
+        try { dialog.getDialogPane().getStylesheets().add(AddRouteDialog.class.getResource("/styles/styles.css").toExternalForm()); } catch (Exception ignored) {}
 
         TextField nameField = new TextField();
         nameField.setPromptText("Route Name");
@@ -58,20 +62,22 @@ public class AddRouteDialog {
         }
 
         GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
+        grid.setHgap(12);
+        grid.setVgap(8);
+        grid.setPadding(new Insets(20, 28, 10, 28));
         grid.addRow(0, new Label("Route Name *:"), nameField, new Label("Country:"), countryField);
         grid.addRow(1, new Label("Start City *:"), startCityField, new Label("Distance:"), distanceField);
         grid.addRow(2, new Label("End City *:"), endCityField, new Label("Base Price:"), basePriceField);
 
         VBox waypointsContainer = new VBox(8);
+        waypointsContainer.setPadding(new Insets(0, 28, 0, 28));
         Button addWaypointBtn = new Button("+ Add Waypoint");
         addWaypointBtn.getStyleClass().add("btn-secondary");
         addWaypointBtn.setOnAction(e -> waypointsContainer.getChildren().add(createWaypointRow(null, waypointsContainer)));
 
         HBox wpHeader = new HBox(15, new Label("Waypoints (Drag ≡ to reorder)"), addWaypointBtn);
         wpHeader.setAlignment(Pos.CENTER_LEFT);
-        wpHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 5 0;");
+        wpHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 28 5 28;");
 
         if (isEdit && existingRoute.getDefaultWaypoints() != null) {
             for (Waypoint wp : existingRoute.getDefaultWaypoints()) {
@@ -80,13 +86,14 @@ public class AddRouteDialog {
         }
 
         VBox tollsContainer = new VBox(8);
+        tollsContainer.setPadding(new Insets(0, 28, 0, 28));
         Button addTollBtn = new Button("+ Add Toll");
         addTollBtn.getStyleClass().add("btn-secondary");
         addTollBtn.setOnAction(e -> tollsContainer.getChildren().add(createTollRow(null, tollsContainer)));
 
         HBox tollHeader = new HBox(15, new Label("Tolls"), addTollBtn);
         tollHeader.setAlignment(Pos.CENTER_LEFT);
-        tollHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 0 5 0;");
+        tollHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 28 5 28;");
 
         if (isEdit && existingRoute.getTolls() != null) {
             for (Toll t : existingRoute.getTolls()) {
@@ -94,36 +101,38 @@ public class AddRouteDialog {
             }
         }
 
-        Label errorLabel = new Label();
-        errorLabel.setStyle("-fx-text-fill: red; -fx-font-size: 12px;");
+        VBox contentBox = new VBox(5, grid, wpHeader, waypointsContainer, tollHeader, tollsContainer);
+        contentBox.setPadding(new Insets(0, 0, 20, 0));
 
-        Button saveBtn = new Button("Save");
-        saveBtn.getStyleClass().add("btn-primary");
-        Button cancelBtn = new Button("Cancel");
-        cancelBtn.getStyleClass().add("btn-secondary");
+        ScrollPane scrollPane = new ScrollPane(contentBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: white; -fx-border-color: transparent;");
+        scrollPane.setPrefSize(800, 500);
 
-        Route[] result = {null};
+        dialog.getDialogPane().setContent(scrollPane);
 
-        saveBtn.setOnAction(e -> {
+        dialog.setResultConverter(btn -> {
+            if (btn != saveBtn) return null;
+
             String name = nameField.getText().trim();
             String start = startCityField.getText().trim();
             String end = endCityField.getText().trim();
 
             if (name.isEmpty() || start.isEmpty() || end.isEmpty()) {
-                errorLabel.setText("Route Name, Start City, and End City are required!");
-                return;
+                Toast.error("Route Name, Start City, and End City are required!");
+                return null;
             }
 
             Float distance = null;
             if (!distanceField.getText().trim().isEmpty()) {
                 try { distance = Float.parseFloat(distanceField.getText().trim()); }
-                catch (Exception ex) { errorLabel.setText("Invalid Distance."); return; }
+                catch (Exception ex) { Toast.error("Invalid Distance."); return null; }
             }
 
             Double basePrice = null;
             if (!basePriceField.getText().trim().isEmpty()) {
                 try { basePrice = Double.parseDouble(basePriceField.getText().trim()); }
-                catch (Exception ex) { errorLabel.setText("Invalid Base Price."); return; }
+                catch (Exception ex) { Toast.error("Invalid Base Price."); return null; }
             }
 
             Route r = new Route();
@@ -170,30 +179,10 @@ public class AddRouteDialog {
             }
             r.setTolls(tolls);
 
-            result[0] = r;
-            stage.close();
+            return r;
         });
 
-        cancelBtn.setOnAction(e -> stage.close());
-
-        HBox btnBox = new HBox(10, cancelBtn, saveBtn);
-        btnBox.setAlignment(Pos.CENTER_RIGHT);
-
-        VBox contentBox = new VBox(15, titleLabel, grid, wpHeader, waypointsContainer, tollHeader, tollsContainer, errorLabel, btnBox);
-        contentBox.setPadding(new Insets(25));
-        contentBox.setStyle("-fx-background-color: white;");
-
-        ScrollPane scrollPane = new ScrollPane(contentBox);
-        scrollPane.setFitToWidth(true);
-        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: white; -fx-border-color: #cfd8dc; -fx-border-width: 1px;");
-        scrollPane.setPrefSize(800, 600);
-
-        Scene scene = new Scene(scrollPane);
-        try { scene.getStylesheets().add(AddRouteDialog.class.getResource("/styles/styles.css").toExternalForm()); } catch (Exception ignored) {}
-        stage.setScene(scene);
-        stage.showAndWait();
-
-        return result[0];
+        return dialog.showAndWait().orElse(null);
     }
 
     private static HBox createWaypointRow(Waypoint wp, VBox container) {
