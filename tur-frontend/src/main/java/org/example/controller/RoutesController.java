@@ -38,6 +38,7 @@ public class RoutesController {
     @FXML private TableColumn<Route, String> colRouteWaypoints;
     @FXML private TableColumn<Route, String> colRouteTolls;
     @FXML private TableColumn<Route, Float> colRouteDistance;
+    @FXML private TableColumn<Route, Double> colRoutePrice;
     @FXML private TableColumn<Route, Route> colRouteActions;
 
     private final RouteService routeService = new RouteService();
@@ -84,6 +85,7 @@ public class RoutesController {
         });
 
         colRouteDistance.setCellValueFactory(new PropertyValueFactory<>("distance"));
+        colRoutePrice.setCellValueFactory(new PropertyValueFactory<>("basePrice"));
 
         if (!isGuide) {
             colRouteActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));

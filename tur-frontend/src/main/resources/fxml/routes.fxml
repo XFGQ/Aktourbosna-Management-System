@@ -44,6 +44,7 @@
                     <TableColumn fx:id="colRouteWaypoints" text="Waypoints" prefWidth="200.0" minWidth="200.0" />
                     <TableColumn fx:id="colRouteTolls" text="Tolls" prefWidth="200.0" minWidth="200.0" />
                     <TableColumn fx:id="colRouteDistance" text="Distance (km)" prefWidth="100.0" minWidth="100.0" />
+                    <TableColumn fx:id="colRoutePrice" text="Base Price (€)" prefWidth="100.0" minWidth="100.0" />
                     <TableColumn fx:id="colRouteActions" text="Actions" prefWidth="160.0" minWidth="160.0" sortable="false" />
                 </columns>
             </TableView>
