@@ -56,16 +56,34 @@ public class AddGuideDialog {
 
         dialog.getDialogPane().setContent(grid);
 
+        final Button btSave = (Button) dialog.getDialogPane().lookupButton(saveButton);
+        btSave.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            boolean valid = true;
+            fullName.setStyle("");
+            password.setStyle("");
+            email.setStyle("");
+
+            if (fullName.getText().trim().isEmpty()) {
+                fullName.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (!editMode && password.getText().trim().length() <= 6) {
+                password.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (email.getText().trim().isEmpty() || !email.getText().contains("@")) {
+                email.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+
+            if (!valid) {
+                event.consume();
+                Toast.error("Lütfen kırmızı ile işaretli alanları uygun formatta doldurunuz.");
+            }
+        });
+
         dialog.setResultConverter(btn -> {
             if (btn == saveButton) {
-                if (fullName.getText().trim().isEmpty() || email.getText().trim().isEmpty()) {
-                    Toast.error("Username and Email are required.");
-                    return null;
-                }
-                if (!editMode && password.getText().trim().length() < 6) {
-                    Toast.error("Password must be at least 6 characters.");
-                    return null;
-                }
                 Guide g = new Guide();
                 g.setUsername(fullName.getText().trim());
                 g.setPassword(password.getText().trim());

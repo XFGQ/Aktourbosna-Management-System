@@ -60,8 +60,9 @@ public class AddExpenseDialog {
             Label tourLabel = new Label(tourName);
             tourLabel.setStyle("-fx-font-weight: bold;");
             grid.addRow(row++, new Label("Tour"), tourLabel);
-        } else {
-            ComboBox<Tour> tourBox = new ComboBox<>();
+        }
+        ComboBox<Tour> tourBox = new ComboBox<>();
+        if (!editMode) {
             tourBox.getItems().addAll(tours);
             tourBox.setPromptText("Select tour");
             tourBox.setPrefWidth(260);
@@ -125,27 +126,43 @@ public class AddExpenseDialog {
         dialog.getDialogPane().setContent(new VBox(grid));
         dialog.getDialogPane().setPrefWidth(480);
 
-        dialog.setResultConverter(btn -> {
-            if (btn != saveBtn) return null;
+        final Button btSave = (Button) dialog.getDialogPane().lookupButton(saveBtn);
+        btSave.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            boolean valid = true;
+            if (!editMode) tourBox.setStyle("");
+            categoryBox.setStyle("");
+            amountField.setStyle("");
+
             if (!editMode && resolvedTourId[0] == null) {
-                Toast.error("Please select a tour.");
-                return null;
+                tourBox.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
             }
             if (categoryBox.getValue() == null || categoryBox.getValue().trim().isEmpty()) {
-                Toast.error("Category is required.");
-                return null;
+                categoryBox.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
             }
             if (amountField.getText().trim().isEmpty()) {
-                Toast.error("Amount is required.");
-                return null;
+                amountField.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            } else {
+                try {
+                    Float.parseFloat(amountField.getText().trim());
+                } catch (NumberFormatException e) {
+                    amountField.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
             }
-            float amount;
-            try {
-                amount = Float.parseFloat(amountField.getText().trim());
-            } catch (NumberFormatException e) {
-                Toast.error("Amount must be a number.");
-                return null;
+
+            if (!valid) {
+                event.consume();
+                Toast.error("Lütfen kırmızı ile işaretli alanları kontrol ediniz.");
             }
+        });
+
+        dialog.setResultConverter(btn -> {
+            if (btn != saveBtn) return null;
+            
+            float amount = Float.parseFloat(amountField.getText().trim());
             Expense expense = editMode ? existing : new Expense();
             expense.setCategory(categoryBox.getValue().trim());
             expense.setAmount(amount);

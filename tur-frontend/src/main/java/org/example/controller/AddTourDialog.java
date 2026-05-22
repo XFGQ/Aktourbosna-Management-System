@@ -6,6 +6,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.StageStyle;
+import org.example.model.Customer;
 import org.example.model.Guide;
 import org.example.model.Route;
 import org.example.model.Tour;
@@ -13,8 +14,12 @@ import org.example.model.Vehicle;
 import org.example.service.SessionManager;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Priority;
+import javafx.geometry.Pos;
 
 public class AddTourDialog {
 
@@ -55,7 +60,7 @@ public class AddTourDialog {
         // --- Route combo ---
         ComboBox<Route> routeBox = new ComboBox<>();
         if (routes != null) routeBox.getItems().addAll(routes);
-        routeBox.setPromptText("Select route (optional)");
+        routeBox.setPromptText("Select route");
         routeBox.setPrefWidth(260);
         routeBox.setCellFactory(lv -> new ListCell<>() {
             @Override protected void updateItem(Route r, boolean empty) {
@@ -80,21 +85,27 @@ public class AddTourDialog {
 
         TextField calculatedPriceField = new TextField(isEdit && existing.getCalculatedPrice() != null && existing.getCalculatedPrice() > 0
                 ? String.valueOf(existing.getCalculatedPrice().intValue()) : "");
-        calculatedPriceField.setPromptText("Calculated price (€) — auto from route");
+        calculatedPriceField.setPromptText("Calculated price (€) — auto from route & vehicle");
         calculatedPriceField.setPrefWidth(260);
+        calculatedPriceField.setEditable(false);
+
+        Label vehicleFeeInfo = new Label();
+        vehicleFeeInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
+        vehicleFeeInfo.setManaged(false);
+        vehicleFeeInfo.setVisible(false);
+
+        VBox calcBox = new VBox(2, calculatedPriceField, vehicleFeeInfo);
 
         TextField priceField = new TextField(isEdit && existing.getFinalPrice() != null && existing.getFinalPrice() > 0
                 ? String.valueOf(existing.getFinalPrice().intValue()) : "");
         priceField.setPromptText("Final price (€)");
         priceField.setPrefWidth(260);
 
-        // Auto-suggest calculatedPrice from route basePrice when field is empty
-        routeBox.valueProperty().addListener((obs, oldR, newR) -> {
-            if (calculatedPriceField.getText().trim().isEmpty() && newR != null
-                    && newR.getBasePrice() != null && newR.getBasePrice() > 0) {
-                calculatedPriceField.setText(String.valueOf(newR.getBasePrice().intValue()));
-            }
-        });
+        Label priceInfo = new Label("Doldurulmaması halinde calculated price final price olacaktır.");
+        priceInfo.setStyle("-fx-font-size: 10px; -fx-text-fill: gray;");
+        VBox priceBox = new VBox(2, priceField, priceInfo);
+
+
 
         // --- Guide combo ---
         ComboBox<Guide> guideBox = new ComboBox<>();
@@ -126,7 +137,7 @@ public class AddTourDialog {
 
         // --- Vehicle combo ---
         ComboBox<Vehicle> vehicleBox = new ComboBox<>();
-        vehicleBox.setPromptText("Select vehicle (optional)");
+        vehicleBox.setPromptText("Select vehicle");
         vehicleBox.setPrefWidth(260);
         vehicleBox.setCellFactory(lv -> new ListCell<>() {
             @Override protected void updateItem(Vehicle v, boolean empty) {
@@ -142,6 +153,46 @@ public class AddTourDialog {
         });
 
         Long initialVehicleId = isEdit ? existing.getVehicleId() : null;
+
+        Runnable updatePrice = () -> {
+            double routePrice = 0.0;
+            Route selRoute = routeBox.getValue();
+            if (selRoute != null && selRoute.getBasePrice() != null) {
+                routePrice = selRoute.getBasePrice();
+            }
+
+            double vehicleTotal = 0.0;
+            long days = 0;
+            Vehicle selVehicle = vehicleBox.getValue();
+            LocalDate start = startPicker.getValue();
+            LocalDate end = endPicker.getValue();
+
+            if (selVehicle != null && selVehicle.getDailyRentalFee() != null && start != null && end != null) {
+                days = java.time.temporal.ChronoUnit.DAYS.between(start, end) + 1;
+                if (days > 0) {
+                    vehicleTotal = selVehicle.getDailyRentalFee() * days;
+                }
+            }
+
+            double total = routePrice + vehicleTotal;
+            if (total > 0) {
+                calculatedPriceField.setText(String.valueOf(total));
+            } else {
+                calculatedPriceField.setText("");
+            }
+
+            if (selVehicle != null && selVehicle.getDailyRentalFee() != null && vehicleTotal > 0) {
+                vehicleFeeInfo.setText("Günlük araç ücreti dahildir (" + days + " gün)");
+                vehicleFeeInfo.setManaged(true);
+                vehicleFeeInfo.setVisible(true);
+            } else {
+                vehicleFeeInfo.setManaged(false);
+                vehicleFeeInfo.setVisible(false);
+            }
+        };
+
+        routeBox.valueProperty().addListener((obs, oldR, newR) -> updatePrice.run());
+        vehicleBox.valueProperty().addListener((obs, oldV, newV) -> updatePrice.run());
 
         // --- Availability updater ---
         Runnable updateAvailability = () -> {
@@ -173,12 +224,13 @@ public class AddTourDialog {
             }
         };
 
-        startPicker.valueProperty().addListener((obs, o, n) -> updateAvailability.run());
-        endPicker.valueProperty().addListener((obs, o, n)   -> updateAvailability.run());
+        startPicker.valueProperty().addListener((obs, o, n) -> { updateAvailability.run(); updatePrice.run(); });
+        endPicker.valueProperty().addListener((obs, o, n)   -> { updateAvailability.run(); updatePrice.run(); });
         guideBox.valueProperty().addListener((obs, o, n)    -> updateAvailability.run());
 
         // Initial populate
         updateAvailability.run();
+        updatePrice.run();
 
         // Restore vehicle selection in edit mode
         if (initialVehicleId != null) {
@@ -186,48 +238,114 @@ public class AddTourDialog {
                     .filter(v -> initialVehicleId.equals(v.getId()))
                     .findFirst().ifPresent(vehicleBox::setValue);
         }
+        updatePrice.run();
 
         // --- Layout ---
         boolean isGuideUser = SessionManager.getInstance().isGuide();
         grid.addRow(0, new Label("Tour Name *"),       nameField);
         grid.addRow(1, new Label("Start Date *"),      startPicker);
         grid.addRow(2, new Label("End Date *"),        endPicker);
-        grid.addRow(3, new Label("Hotel"),             hotelField);
-        grid.addRow(4, new Label("Route"),             routeBox);
+        grid.addRow(3, new Label("Hotel *"),             hotelField);
+        grid.addRow(4, new Label("Route *"),             routeBox);
         if (!isGuideUser) {
             grid.addRow(5, new Label("Guide *"),       guideBox);
             grid.add(new Label(), 0, 6);
             grid.add(guideWarning, 1, 6);
-            grid.addRow(7, new Label("Vehicle"),       vehicleBox);
-            grid.addRow(8, new Label("Calc. Price (€)"), calculatedPriceField);
-            grid.addRow(9, new Label("Final Price (€)"), priceField);
+            grid.addRow(7, new Label("Vehicle *"),       vehicleBox);
+            grid.addRow(8, new Label("Calc. Price (€)"), calcBox);
+            grid.addRow(9, new Label("Final Price (€)"), priceBox);
         } else {
-            grid.addRow(5, new Label("Vehicle"),       vehicleBox);
-            grid.addRow(6, new Label("Calc. Price (€)"), calculatedPriceField);
-            grid.addRow(7, new Label("Final Price (€)"), priceField);
+            grid.addRow(5, new Label("Vehicle *"),       vehicleBox);
+            grid.addRow(6, new Label("Calc. Price (€)"), calcBox);
+            grid.addRow(7, new Label("Final Price (€)"), priceBox);
         }
 
-        dialog.getDialogPane().setContent(new VBox(grid));
-        dialog.getDialogPane().setPrefWidth(460);
+        // --- Customers Layout ---
+        VBox customersContainer = new VBox(8);
+        Button addCustomerBtn = new Button("+ Add Customer");
+        addCustomerBtn.getStyleClass().add("btn-secondary");
+        addCustomerBtn.setOnAction(e -> customersContainer.getChildren().add(createCustomerRow(customersContainer)));
+
+        HBox customerHeader = new HBox(15, new Label("New Customers"), addCustomerBtn);
+        customerHeader.setAlignment(Pos.CENTER_LEFT);
+        customerHeader.setStyle("-fx-font-weight: bold; -fx-padding: 10 28 5 28;");
+        
+        customersContainer.setPadding(new Insets(0, 28, 0, 28));
+
+        VBox contentBox = new VBox(10, grid, customerHeader, customersContainer);
+        contentBox.setPadding(new Insets(0, 0, 20, 0));
+
+        ScrollPane scrollPane = new ScrollPane(contentBox);
+        scrollPane.setFitToWidth(true);
+        scrollPane.setStyle("-fx-background-color: transparent; -fx-background: white; -fx-border-color: transparent;");
+        scrollPane.setPrefSize(500, 500);
+
+        dialog.getDialogPane().setContent(scrollPane);
+        dialog.getDialogPane().setPrefWidth(520);
+
+        final Button btSave = (Button) dialog.getDialogPane().lookupButton(saveBtn);
+        btSave.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            boolean valid = true;
+            nameField.setStyle("");
+            guideBox.setStyle("");
+            startPicker.setStyle("");
+            endPicker.setStyle("");
+            hotelField.setStyle("");
+            routeBox.setStyle("");
+            vehicleBox.setStyle("");
+            priceField.setStyle("");
+
+            if (nameField.getText().trim().isEmpty()) {
+                nameField.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (hotelField.getText().trim().isEmpty()) {
+                hotelField.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (routeBox.getValue() == null) {
+                routeBox.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (vehicleBox.getValue() == null) {
+                vehicleBox.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (!SessionManager.getInstance().isGuide() && guideBox.getValue() == null) {
+                guideBox.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            LocalDate start = startPicker.getValue();
+            LocalDate end   = endPicker.getValue();
+            if (start == null) {
+                startPicker.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (end == null || (start != null && end.isBefore(start))) {
+                endPicker.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (!priceField.getText().trim().isEmpty()) {
+                try {
+                    Double.parseDouble(priceField.getText().trim());
+                } catch (NumberFormatException e) {
+                    priceField.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
+            }
+
+            if (!valid) {
+                event.consume();
+                Toast.error("Lütfen kırmızı ile işaretli alanları kontrol ediniz.");
+            }
+        });
 
         // --- Result converter ---
         dialog.setResultConverter(btn -> {
             if (btn != saveBtn) return null;
 
-            if (nameField.getText().trim().isEmpty()) {
-                Toast.error("Tour name is required.");
-                return null;
-            }
-            if (!SessionManager.getInstance().isGuide() && guideBox.getValue() == null) {
-                Toast.error("Please select a Guide.");
-                return null;
-            }
             LocalDate start = startPicker.getValue();
             LocalDate end   = endPicker.getValue();
-            if (start != null && end != null && end.isBefore(start)) {
-                Toast.error("End date cannot be before start date.");
-                return null;
-            }
 
             Tour tour = isEdit ? existing : new Tour();
             tour.setTourName(nameField.getText().trim());
@@ -243,12 +361,38 @@ public class AddTourDialog {
             tour.setRouteId(routeBox.getValue() != null ? routeBox.getValue().getRouteId() : null);
             if (!calculatedPriceField.getText().trim().isEmpty()) {
                 try { tour.setCalculatedPrice(Double.parseDouble(calculatedPriceField.getText().trim())); }
-                catch (NumberFormatException e) { Toast.error("Calculated price must be a number."); return null; }
+                catch (NumberFormatException ignored) {}
             }
             if (!priceField.getText().trim().isEmpty()) {
                 try { tour.setFinalPrice(Double.parseDouble(priceField.getText().trim())); }
-                catch (NumberFormatException e) { Toast.error("Final price must be a number."); return null; }
+                catch (NumberFormatException ignored) {}
+            } else {
+                if (!calculatedPriceField.getText().trim().isEmpty()) {
+                    try { tour.setFinalPrice(Double.parseDouble(calculatedPriceField.getText().trim())); }
+                    catch (NumberFormatException ignored) {}
+                }
             }
+
+            List<Customer> newCustomers = new ArrayList<>();
+            for (javafx.scene.Node node : customersContainer.getChildren()) {
+                if (node instanceof HBox row) {
+                    TextField nameF = (TextField) row.getChildren().get(0);
+                    TextField passF = (TextField) row.getChildren().get(1);
+                    TextField phoneF = (TextField) row.getChildren().get(2);
+                    TextField natF = (TextField) row.getChildren().get(3);
+                    
+                    if (!nameF.getText().trim().isEmpty()) {
+                        Customer c = new Customer();
+                        c.setFullName(nameF.getText().trim());
+                        c.setPassportNumber(passF.getText().trim());
+                        c.setPhone(phoneF.getText().trim());
+                        c.setNationality(natF.getText().trim());
+                        newCustomers.add(c);
+                    }
+                }
+            }
+            tour.setCustomers(newCustomers);
+
             return tour;
         });
 
@@ -276,5 +420,34 @@ public class AddTourDialog {
                 .filter(t -> vehicleId.equals(t.getVehicleId()))
                 .filter(t -> t.getStartDate() != null && t.getEndDate() != null)
                 .anyMatch(t -> !end.isBefore(t.getStartDate()) && !start.isAfter(t.getEndDate()));
+    }
+
+    private static HBox createCustomerRow(VBox container) {
+        HBox row = new HBox(10);
+        row.setAlignment(Pos.CENTER_LEFT);
+        row.setStyle("-fx-background-color: #f5f5f5; -fx-padding: 8; -fx-background-radius: 4; -fx-border-color: #e0e0e0; -fx-border-radius: 4;");
+
+        TextField nameField = new TextField();
+        nameField.setPromptText("Full Name");
+        HBox.setHgrow(nameField, Priority.ALWAYS);
+
+        TextField passportField = new TextField();
+        passportField.setPromptText("Passport");
+        HBox.setHgrow(passportField, Priority.ALWAYS);
+
+        TextField phoneField = new TextField();
+        phoneField.setPromptText("Phone");
+        phoneField.setPrefWidth(100);
+
+        TextField natField = new TextField();
+        natField.setPromptText("Nationality");
+        natField.setPrefWidth(90);
+
+        Button removeBtn = new Button("✕");
+        removeBtn.setStyle("-fx-background-color: #ffcdd2; -fx-text-fill: #c62828; -fx-font-weight: bold; -fx-cursor: hand;");
+        removeBtn.setOnAction(e -> container.getChildren().remove(row));
+
+        row.getChildren().addAll(nameField, passportField, phoneField, natField, removeBtn);
+        return row;
     }
 }

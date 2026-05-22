@@ -77,43 +77,105 @@ public class AddVehicleDialog {
         grid.add(new Label("Year *:"),              0, 2);  grid.add(year,            1, 2);
         grid.add(new Label("Color:"),               0, 3);  grid.add(color,           1, 3);
         grid.add(new Label("Plate Number *:"),      0, 4);  grid.add(plate,           1, 4);
-        grid.add(new Label("Seat Capacity *:"),     0, 5);  grid.add(seats,           1, 5);
-        grid.add(new Label("Fuel Type:"),           0, 6);  grid.add(fuel,            1, 6);
+        grid.add(new Label("Seat Capacity:"),       0, 5);  grid.add(seats,           1, 5);
+        grid.add(new Label("Fuel Type *:"),         0, 6);  grid.add(fuel,            1, 6);
         grid.add(new Label("Mileage (km):"),        0, 7);  grid.add(mileage,         1, 7);
         grid.add(new Label("Fuel cons. (L/100km):"),0, 8);  grid.add(fuelConsumption, 1, 8);
-        grid.add(new Label("Daily Fee (€):"),       0, 9);  grid.add(dailyFee,        1, 9);
+        grid.add(new Label("Daily Fee (€) *:"),     0, 9);  grid.add(dailyFee,        1, 9);
         grid.add(new Label("Last Service:"),        0, 10); grid.add(lastService,     1, 10);
         grid.add(available,                            1, 11);
 
         dialog.getDialogPane().setContent(grid);
 
+        final Button btSave = (Button) dialog.getDialogPane().lookupButton(saveButton);
+        btSave.addEventFilter(javafx.event.ActionEvent.ACTION, event -> {
+            boolean valid = true;
+            brand.setStyle("");
+            model.setStyle("");
+            year.setStyle("");
+            plate.setStyle("");
+            fuel.setStyle("");
+            dailyFee.setStyle("");
+            seats.setStyle("");
+            mileage.setStyle("");
+            fuelConsumption.setStyle("");
+
+            if (brand.getText().trim().isEmpty()) {
+                brand.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (model.getText().trim().isEmpty()) {
+                model.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (year.getText().trim().isEmpty()) {
+                year.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            } else {
+                try { Integer.parseInt(year.getText().trim()); } catch (NumberFormatException e) {
+                    year.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
+            }
+            if (plate.getText().trim().isEmpty()) {
+                plate.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (fuel.getValue() == null) {
+                fuel.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            }
+            if (dailyFee.getText().trim().isEmpty()) {
+                dailyFee.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                valid = false;
+            } else {
+                try { Double.parseDouble(dailyFee.getText().trim()); } catch (NumberFormatException e) {
+                    dailyFee.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
+            }
+            
+            if (!seats.getText().trim().isEmpty()) {
+                try { Integer.parseInt(seats.getText().trim()); } catch (NumberFormatException e) {
+                    seats.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
+            }
+            if (!mileage.getText().trim().isEmpty()) {
+                try { Float.parseFloat(mileage.getText().trim()); } catch (NumberFormatException e) {
+                    mileage.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
+            }
+            if (!fuelConsumption.getText().trim().isEmpty()) {
+                try { Float.parseFloat(fuelConsumption.getText().trim()); } catch (NumberFormatException e) {
+                    fuelConsumption.setStyle("-fx-border-color: red; -fx-border-width: 1px; -fx-border-radius: 4px;");
+                    valid = false;
+                }
+            }
+
+            if (!valid) {
+                event.consume();
+                Toast.error("Lütfen kırmızı ile işaretli alanları kontrol ediniz.");
+            }
+        });
+
         dialog.setResultConverter(btn -> {
             if (btn == saveButton) {
-                if (brand.getText().trim().isEmpty() || model.getText().trim().isEmpty()
-                        || year.getText().trim().isEmpty() || plate.getText().trim().isEmpty()
-                        || seats.getText().trim().isEmpty()) {
-                    Toast.error("Brand, Model, Year, Plate Number and Seats are required.");
-                    return null;
-                }
-                try {
-                    Vehicle v = editMode ? existing : new Vehicle();
-                    v.setBrand(brand.getText().trim());
-                    v.setModel(model.getText().trim());
-                    v.setYear(Integer.parseInt(year.getText().trim()));
-                    v.setColor(color.getText().trim().isEmpty() ? null : color.getText().trim());
-                    v.setPlateNumber(plate.getText().trim());
-                    v.setSeatCapacity(Integer.parseInt(seats.getText().trim()));
-                    v.setFuelType(fuel.getValue());
-                    v.setCurrentMileage(mileage.getText().isEmpty() ? null : Float.parseFloat(mileage.getText().trim()));
-                    v.setAvgFuelConsumption(fuelConsumption.getText().isEmpty() ? null : Float.parseFloat(fuelConsumption.getText().trim()));
-                    v.setDailyRentalFee(dailyFee.getText().isEmpty() ? null : Double.parseDouble(dailyFee.getText().trim()));
-                    v.setLastMinorService(lastService.getValue());
-                    v.setAvailable(available.isSelected());
-                    return v;
-                } catch (NumberFormatException e) {
-                    Toast.error("Year, seats, mileage, fuel consumption and daily fee must be numbers.");
-                    return null;
-                }
+                Vehicle v = editMode ? existing : new Vehicle();
+                v.setBrand(brand.getText().trim());
+                v.setModel(model.getText().trim());
+                v.setYear(Integer.parseInt(year.getText().trim()));
+                v.setColor(color.getText().trim().isEmpty() ? null : color.getText().trim());
+                v.setPlateNumber(plate.getText().trim());
+                v.setSeatCapacity(seats.getText().trim().isEmpty() ? null : Integer.parseInt(seats.getText().trim()));
+                v.setFuelType(fuel.getValue());
+                v.setCurrentMileage(mileage.getText().isEmpty() ? null : Float.parseFloat(mileage.getText().trim()));
+                v.setAvgFuelConsumption(fuelConsumption.getText().isEmpty() ? null : Float.parseFloat(fuelConsumption.getText().trim()));
+                v.setDailyRentalFee(Double.parseDouble(dailyFee.getText().trim()));
+                v.setLastMinorService(lastService.getValue());
+                v.setAvailable(available.isSelected());
+                return v;
             }
             return null;
         });
