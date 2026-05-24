@@ -58,13 +58,25 @@ public class TourCustomersDialog {
         colNationality.setMinWidth(100);
 
         TableColumn<Customer, Customer> colActions = new TableColumn<>("Actions");
-        colActions.setMinWidth(80);
+        colActions.setMinWidth(150);
         colActions.setSortable(false);
         colActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colActions.setCellFactory(col -> new TableCell<>() {
-            private final Button delBtn = new Button("Delete");
+            private final Button editBtn = new Button("Edit");
+            private final Button delBtn  = new Button("Delete");
+            private final HBox box = new HBox(6, editBtn, delBtn);
             {
+                box.setAlignment(Pos.CENTER_LEFT);
+                editBtn.getStyleClass().add("btn-secondary");
                 delBtn.getStyleClass().add("btn-danger");
+                editBtn.setOnAction(e -> {
+                    Customer c = getTableView().getItems().get(getIndex());
+                    Customer updated = AddCustomerDialog.show(c);
+                    if (updated == null) return;
+                    runOp(() -> customerService.updateCustomer(tour.getTourId(), c.getId(), updated),
+                            "Customer updated.", "Failed to update",
+                            table, countLabel, customerService, tour.getTourId());
+                });
                 delBtn.setOnAction(e -> {
                     Customer c = getTableView().getItems().get(getIndex());
                     if (!ConfirmDialog.show("Confirm deletion",
@@ -76,7 +88,7 @@ public class TourCustomersDialog {
             }
             @Override protected void updateItem(Customer c, boolean empty) {
                 super.updateItem(c, empty);
-                setGraphic(empty || c == null ? null : delBtn);
+                setGraphic(empty || c == null ? null : box);
             }
         });
 

@@ -10,12 +10,18 @@ import org.example.model.Customer;
 public class AddCustomerDialog {
 
     public static Customer show() {
+        return show(null);
+    }
+
+    public static Customer show(Customer existing) {
+        boolean editing = existing != null;
+
         Dialog<Customer> dialog = new Dialog<>();
-        dialog.setTitle("Add Customer");
+        dialog.setTitle(editing ? "Edit Customer" : "Add Customer");
         dialog.initModality(Modality.APPLICATION_MODAL);
         dialog.initStyle(StageStyle.UTILITY);
 
-        ButtonType saveBtn = new ButtonType("Save", ButtonBar.ButtonData.OK_DONE);
+        ButtonType saveBtn = new ButtonType(editing ? "Update" : "Save", ButtonBar.ButtonData.OK_DONE);
         dialog.getDialogPane().getButtonTypes().addAll(saveBtn, ButtonType.CANCEL);
 
         GridPane grid = new GridPane();
@@ -39,6 +45,13 @@ public class AddCustomerDialog {
         nationalityField.setPromptText("e.g. Bosnian");
         nationalityField.setPrefWidth(240);
 
+        if (editing) {
+            nameField.setText(existing.getFullName() != null ? existing.getFullName() : "");
+            passportField.setText(existing.getPassportNumber() != null ? existing.getPassportNumber() : "");
+            phoneField.setText(existing.getPhone() != null ? existing.getPhone() : "");
+            nationalityField.setText(existing.getNationality() != null ? existing.getNationality() : "");
+        }
+
         grid.addRow(0, new Label("Full Name *"),    nameField);
         grid.addRow(1, new Label("Passport No"),    passportField);
         grid.addRow(2, new Label("Phone"),          phoneField);
@@ -54,6 +67,7 @@ public class AddCustomerDialog {
                 return null;
             }
             Customer c = new Customer();
+            if (editing) c.setId(existing.getId());
             c.setFullName(nameField.getText().trim());
             c.setPassportNumber(passportField.getText().trim().isEmpty() ? null : passportField.getText().trim());
             c.setPhone(phoneField.getText().trim().isEmpty() ? null : phoneField.getText().trim());

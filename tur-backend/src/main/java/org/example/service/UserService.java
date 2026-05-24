@@ -2,6 +2,7 @@ package org.example.service;
 
 import org.example.application.dto.UserRegistrationDTO;
 import org.example.application.dto.UserResponseDTO;
+import org.example.application.dto.UserUpdateDTO;
 import org.example.application.exception.ResourceNotFoundException;
 import org.example.application.mapper.UserMapper;
 import org.example.model.Guide;
@@ -39,6 +40,13 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public UserResponseDTO getUserById(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+        return userMapper.toResponseDto(user);
+    }
+
     @Transactional
     public UserResponseDTO createUser(UserRegistrationDTO registrationDTO) {
         if (userRepository.existsByUsername(registrationDTO.getUsername())) {
@@ -54,5 +62,37 @@ public class UserService {
             guideRepository.save(Guide.builder().user(savedUser).build());
         }
         return userMapper.toResponseDto(savedUser);
+    }
+
+    @Transactional
+    public UserResponseDTO updateUser(Long id, UserUpdateDTO dto) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + id));
+
+        if (dto.getEmail() != null && !dto.getEmail().equals(user.getEmail())) {
+            if (userRepository.existsByEmail(dto.getEmail())) {
+                throw new IllegalArgumentException("Email already exists: " + dto.getEmail());
+            }
+            user.setEmail(dto.getEmail());
+        }
+        if (dto.getPassword() != null && !dto.getPassword().isBlank()) {
+            user.setPassword(passwordEncoder.encode(dto.getPassword()));
+        }
+        if (dto.getRole() != null) {
+            try {
+                user.setRole(UserRole.valueOf(dto.getRole().toUpperCase()));
+            } catch (IllegalArgumentException e) {
+                throw new IllegalArgumentException("Invalid role: " + dto.getRole());
+            }
+        }
+        return userMapper.toResponseDto(userRepository.save(user));
+    }
+
+    @Transactional
+    public void deleteUser(Long id) {
+        if (!userRepository.existsById(id)) {
+            throw new ResourceNotFoundException("User not found: " + id);
+        }
+        userRepository.deleteById(id);
     }
 }

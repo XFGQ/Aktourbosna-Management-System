@@ -95,11 +95,15 @@ public class GuideService {
         return guideMapper.toResponse(guideRepository.save(existing));
     }
 
+    @Transactional
     public void deleteGuide(Long id) {
-        if (!guideRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Guide not found: " + id);
+        Guide guide = guideRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Guide not found: " + id));
+        User user = guide.getUser();
+        guideRepository.delete(guide);
+        if (user != null) {
+            userRepository.delete(user);
         }
-        guideRepository.deleteById(id);
     }
 
     private void checkOwnership(Guide guide) {

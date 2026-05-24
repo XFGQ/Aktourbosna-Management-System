@@ -16,6 +16,10 @@ public class CustomerService {
         return apiService.createCustomer(tourId, customer);
     }
 
+    public Customer updateCustomer(Long tourId, Long customerId, Customer customer) throws Exception {
+        return apiService.updateCustomer(tourId, customerId, customer);
+    }
+
     public void deleteCustomer(Long tourId, Long customerId) throws Exception {
         apiService.deleteCustomer(tourId, customerId);
     }
