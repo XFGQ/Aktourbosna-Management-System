@@ -20,6 +20,7 @@
                 <Label styleClass="page-title" text="Tour Management" />
                 <Label styleClass="page-subtitle" text="Your assigned tours" />
             </VBox>
+            <Button styleClass="btn-primary" text="+ Add Tour" onAction="#onAddTour" />
         </HBox>
 
         <HBox spacing="16.0">

@@ -47,7 +47,7 @@
                 <Label styleClass="panel-title" text="Recent Tours" />
             </HBox>
             <TableView fx:id="recentToursTable" styleClass="table-view"
-                       prefHeight="180.0" fixedCellSize="42.0">
+                       prefHeight="350.0" VBox.vgrow="ALWAYS" fixedCellSize="42.0">
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>
@@ -69,7 +69,7 @@
                 <Label styleClass="panel-title" text="Upcoming Tours" />
             </HBox>
             <TableView fx:id="upcomingToursTable" styleClass="table-view"
-                       prefHeight="260.0" fixedCellSize="42.0">
+                       prefHeight="450.0" VBox.vgrow="ALWAYS" fixedCellSize="42.0">
                 <columnResizePolicy>
                     <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
                 </columnResizePolicy>

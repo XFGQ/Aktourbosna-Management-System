@@ -78,8 +78,8 @@ public class RoutesController {
                 return new ReadOnlyObjectWrapper<>("-");
             }
             String tollsString = tolls.stream()
-                    .map(t -> (t.getName() != null ? t.getName() : "") + 
-                              (t.getLocation() != null && !t.getLocation().isEmpty() ? ", " + t.getLocation() : ""))
+                    .map(t -> (t.getName() != null ? t.getName() : "") +
+                            (t.getLocation() != null && !t.getLocation().isEmpty() ? ", " + t.getLocation() : ""))
                     .collect(Collectors.joining(" | "));
             return new ReadOnlyObjectWrapper<>(tollsString);
         });
@@ -100,6 +100,7 @@ public class RoutesController {
                     editBtn.setOnAction(e -> onEditRoute(getTableView().getItems().get(getIndex())));
                     deleteBtn.setOnAction(e -> onDeleteRoute(getTableView().getItems().get(getIndex())));
                 }
+
                 @Override
                 protected void updateItem(Route item, boolean empty) {
                     super.updateItem(item, empty);
@@ -139,35 +140,36 @@ public class RoutesController {
     @FXML
     private void onAddRoute() {
         Route newRoute = AddRouteDialog.show(null);
-        if (newRoute == null) return;
+        if (newRoute == null)
+            return;
         runInBackground(
                 () -> routeService.addRoute(newRoute),
                 "Adding route...",
                 "Route added successfully.",
-                "Failed to add route"
-        );
+                "Failed to add route");
     }
 
     private void onEditRoute(Route route) {
-        if (route == null) return;
+        if (route == null)
+            return;
         Route updated = AddRouteDialog.show(route);
-        if (updated == null) return;
+        if (updated == null)
+            return;
         runInBackground(
                 () -> routeService.updateRoute(route.getRouteId(), updated),
                 "Updating route...",
                 "Route updated successfully.",
-                "Failed to update route"
-        );
+                "Failed to update route");
     }
 
     private void onDeleteRoute(Route route) {
-        if (!ConfirmDialog.show("Confirm deletion", "Delete route \"" + route.getRouteName() + "\"?")) return;
+        if (!ConfirmDialog.show("Confirm deletion", "Delete route \"" + route.getRouteName() + "\"?"))
+            return;
         runInBackground(
                 () -> routeService.deleteRoute(route.getRouteId()),
                 "Deleting route...",
                 "Route deleted.",
-                "Failed to delete route"
-        );
+                "Failed to delete route");
     }
 
     private void runInBackground(BackgroundOp op, String loadingMsg, String successMsg, String errorTitle) {
@@ -192,7 +194,8 @@ public class RoutesController {
             loadingStage.close();
             loadData();
             AppController app = AppController.getInstance();
-            if (app != null) app.invalidateOtherViews("routes.fxml");
+            if (app != null)
+                app.invalidateOtherViews("routes.fxml");
             Toast.success(successMsg);
         });
 

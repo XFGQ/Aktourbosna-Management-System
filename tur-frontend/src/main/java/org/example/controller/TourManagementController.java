@@ -21,6 +21,8 @@ import org.example.service.GuideService;
 import org.example.service.RouteService;
 import org.example.service.TourService;
 import org.example.service.VehicleService;
+import org.example.service.CustomerService;
+import org.example.model.Customer;
 
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -63,6 +65,7 @@ public class TourManagementController {
     private final GuideService   guideService   = new GuideService();
     private final VehicleService vehicleService = new VehicleService();
     private final RouteService   routeService   = new RouteService();
+    private final CustomerService customerService = new CustomerService();
 
     private final Map<Long, String> guideNames   = new HashMap<>();
     private final Map<Long, String> vehicleNames = new HashMap<>();
@@ -266,7 +269,14 @@ public class TourManagementController {
         Tour newTour = AddTourDialog.show(cachedGuides, cachedVehicles, cachedTours, cachedRoutes);
         if (newTour == null) return;
         runInBackground(
-                () -> tourService.addTour(newTour),
+                () -> {
+                    Tour savedTour = tourService.addTour(newTour);
+                    if (newTour.getCustomers() != null) {
+                        for (Customer c : newTour.getCustomers()) {
+                            customerService.addCustomer(savedTour.getTourId(), c);
+                        }
+                    }
+                },
                 "Adding tour...", "Tour added successfully.", "Failed to add tour");
     }
 
@@ -279,7 +289,14 @@ public class TourManagementController {
         Tour updated = AddTourDialog.show(tour, cachedGuides, cachedVehicles, cachedTours, cachedRoutes);
         if (updated == null) return;
         runInBackground(
-                () -> tourService.updateTour(tour.getTourId(), updated),
+                () -> {
+                    tourService.updateTour(tour.getTourId(), updated);
+                    if (updated.getCustomers() != null) {
+                        for (Customer c : updated.getCustomers()) {
+                            customerService.addCustomer(tour.getTourId(), c);
+                        }
+                    }
+                },
                 "Updating tour...", "Tour updated successfully.", "Failed to update tour");
     }
 
