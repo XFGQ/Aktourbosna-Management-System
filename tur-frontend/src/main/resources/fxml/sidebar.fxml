@@ -39,6 +39,11 @@
         <Separator styleClass="sidebar-separator">
             <VBox.margin><Insets bottom="10.0" /></VBox.margin>
         </Separator>
+
+        <Button fx:id="btnSupport" maxWidth="Infinity" styleClass="nav-button" text="  Support &amp; Info" onAction="#onSupport">
+            <VBox.margin><Insets bottom="8.0" /></VBox.margin>
+        </Button>
+
         <Button maxWidth="Infinity" styleClass="logout-button" text="  Logout" onAction="#onLogout" />
     </VBox>
 
