@@ -66,11 +66,31 @@ public class RouteManagementController {
             }
         });
 
+        setupContextMenu(routesTable);
+
         loadData();
     }
 
     @FXML
     public void refresh() { loadData(); }
+
+    private void setupContextMenu(TableView<Route> table) {
+        table.setRowFactory(tv -> {
+            TableRow<Route> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem mnuEdit = new MenuItem("Edit");
+            mnuEdit.setOnAction(e -> onEditRoute(row.getItem()));
+            MenuItem mnuDelete = new MenuItem("Delete");
+            mnuDelete.setOnAction(e -> onDeleteRoute(row.getItem()));
+            menu.getItems().addAll(mnuEdit, mnuDelete);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
+        });
+    }
 
     private void loadData() {
         CompletableFuture<List<Route>> fut = CompletableFuture.supplyAsync(() -> {

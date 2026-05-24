@@ -109,12 +109,33 @@ public class RoutesController {
             });
         }
 
+        setupContextMenu(routesTable, isGuide);
+
         loadData();
     }
 
     @FXML
     public void refresh() {
         loadData();
+    }
+
+    private void setupContextMenu(TableView<Route> table, boolean isGuide) {
+        if (isGuide) return;
+        table.setRowFactory(tv -> {
+            TableRow<Route> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem editBtn = new MenuItem("Edit");
+            editBtn.setOnAction(e -> onEditRoute(row.getItem()));
+            MenuItem deleteBtn = new MenuItem("Delete");
+            deleteBtn.setOnAction(e -> onDeleteRoute(row.getItem()));
+            menu.getItems().addAll(editBtn, deleteBtn);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
+        });
     }
 
     private void loadData() {

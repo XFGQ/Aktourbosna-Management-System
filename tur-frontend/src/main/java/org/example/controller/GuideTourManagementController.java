@@ -80,6 +80,8 @@ public class GuideTourManagementController {
     public void initialize() {
         bindColumns(colRecentName, colRecentDate, colRecentHotel, colRecentVehicle, colRecentGuide, colRecentPrice, colRecentStatus, colRecentActions);
         bindColumns(colUpcomingName, colUpcomingDate, colUpcomingHotel, colUpcomingVehicle, colUpcomingGuide, colUpcomingPrice, colUpcomingStatus, colUpcomingActions);
+        setupContextMenu(recentToursTable);
+        setupContextMenu(upcomingToursTable);
         loadData();
     }
 
@@ -162,6 +164,26 @@ public class GuideTourManagementController {
                 super.updateItem(t, empty);
                 setGraphic(empty || t == null ? null : box);
             }
+        });
+    }
+
+    private void setupContextMenu(TableView<Tour> table) {
+        table.setRowFactory(tv -> {
+            TableRow<Tour> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem mnuCustomers = new MenuItem("Customers");
+            mnuCustomers.setOnAction(e -> onViewCustomers(row.getItem()));
+            MenuItem mnuEdit = new MenuItem("Edit");
+            mnuEdit.setOnAction(e -> onEditTour(row.getItem()));
+            MenuItem mnuDelete = new MenuItem("Delete");
+            mnuDelete.setOnAction(e -> onDeleteTour(row.getItem()));
+            menu.getItems().addAll(mnuCustomers, mnuEdit, mnuDelete);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
         });
     }
 
