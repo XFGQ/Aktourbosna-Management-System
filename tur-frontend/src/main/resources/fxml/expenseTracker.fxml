@@ -35,7 +35,8 @@
 
         <VBox styleClass="panel" spacing="0">
             <HBox alignment="CENTER_LEFT" styleClass="panel-header" spacing="10">
-                <Label styleClass="panel-title" text="All Expenses" HBox.hgrow="ALWAYS" />
+                <Label styleClass="panel-title" text="All Expenses" />
+                <Pane HBox.hgrow="ALWAYS" />
                 <Button text="+ Add Expense" styleClass="btn-primary" onAction="#onAddExpense" />
             </HBox>
             <TableView fx:id="expensesTable" styleClass="table-view" VBox.vgrow="ALWAYS"
