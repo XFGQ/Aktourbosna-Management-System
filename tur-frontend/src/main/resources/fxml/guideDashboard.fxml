@@ -26,12 +26,12 @@
                 <Label fx:id="toursThisWeekValue" styleClass="stat-value" text="—" />
             </VBox>
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="stat-label" text="Customers" />
-                <Label fx:id="customersValue" styleClass="stat-value" text="—" />
+                <Label styleClass="stat-label" text="Monthly Earnings" />
+                <Label fx:id="earningsValue" styleClass="stat-value" text="—" />
             </VBox>
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
-                <Label styleClass="stat-label" text="Completed Tours" />
-                <Label fx:id="completedToursValue" styleClass="stat-value" text="—" />
+                <Label styleClass="stat-label" text="Expenses" />
+                <Label fx:id="expensesValue" styleClass="stat-value" text="—" />
             </VBox>
             <VBox styleClass="stat-card" HBox.hgrow="ALWAYS">
                 <Label styleClass="stat-label" text="Next Tour" />
@@ -51,9 +51,10 @@
                 <columns>
                     <TableColumn fx:id="colTodayDate" text="Date" prefWidth="100.0" minWidth="100.0" />
                     <TableColumn fx:id="colTodayTourName" text="Tour Name" prefWidth="170.0" minWidth="170.0" />
+                    <TableColumn fx:id="colTodayOrigin" text="Origin" prefWidth="120.0" minWidth="120.0" />
                     <TableColumn fx:id="colTodayDestination" text="Destination" prefWidth="150.0" minWidth="150.0" />
                     <TableColumn fx:id="colTodayHotel" text="Hotel" prefWidth="150.0" minWidth="150.0" />
-                    <TableColumn fx:id="colTodayGroupSize" text="Group" prefWidth="80.0" minWidth="80.0" />
+                    <TableColumn fx:id="colTodayPrice" text="Price" prefWidth="80.0" minWidth="80.0" />
                     <TableColumn fx:id="colTodayVehicle" text="Vehicle" prefWidth="120.0" minWidth="120.0" />
                 </columns>
             </TableView>
@@ -71,9 +72,10 @@
                 <columns>
                     <TableColumn fx:id="colDate" text="Date" prefWidth="100.0" minWidth="100.0" />
                     <TableColumn fx:id="colTourName" text="Tour Name" prefWidth="170.0" minWidth="170.0" />
+                    <TableColumn fx:id="colOrigin" text="Origin" prefWidth="120.0" minWidth="120.0" />
                     <TableColumn fx:id="colDestination" text="Destination" prefWidth="150.0" minWidth="150.0" />
                     <TableColumn fx:id="colHotel" text="Hotel" prefWidth="150.0" minWidth="150.0" />
-                    <TableColumn fx:id="colGroupSize" text="Group" prefWidth="80.0" minWidth="80.0" />
+                    <TableColumn fx:id="colPrice" text="Price" prefWidth="80.0" minWidth="80.0" />
                 </columns>
             </TableView>
         </VBox>
