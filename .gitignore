@@ -37,3 +37,4 @@ Thumbs.db
 
 # Secrets
 application.properties.example
+/application-secret.properties

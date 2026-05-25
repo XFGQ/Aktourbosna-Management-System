@@ -3,23 +3,79 @@ name: Deploy Backend
 on:
   push:
     branches: [ main ]
+  pull_request:
+    branches: [ main ]
 
 jobs:
-  build-and-deploy:
+  build-and-test:
     runs-on: ubuntu-latest
+
+    # PR açıldığında testlerin koşabilmesi için GitHub üzerinde geçici bir MariaDB başlatıyoruz
+    services:
+      mariadb:
+        image: mariadb:10.11
+        env:
+          MYSQL_ALLOW_EMPTY_PASSWORD: 'yes'
+          MYSQL_DATABASE: aktour_db
+        ports:
+          - 27060:3306
+        options: --health-cmd="healthcheck.sh --connect --innodb_initialized" --health-interval=10s --health-timeout=5s --health-retries=3
+
     steps:
-      - uses: actions/checkout@v3
+      # Güncel ve güvenli versiyonlar (v4) kullanıldı
+      - uses: actions/checkout@v4
 
       - name: Set up JDK 21
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '21'
           distribution: 'temurin'
+          cache: 'maven' # Bağımlılıkları önbelleğe alarak sonraki buildleri hızlandırır
 
-      # Hatanın çözümü burası:
-      - name: Build with Maven
+      # GitHub ortamında testlerin 'secret' profil hatası vermemesi için geçici sahte ayarlar oluşturuyoruz
+      # Bu sayede gerçek şifrelerinize ihtiyaç kalmadan testleriniz başarıyla koşar
+      - name: Create Dummy Secret Properties for Testing
+        run: |
+          mkdir -p tur-backend/src/main/resources
+          cat <<EOF > tur-backend/src/main/resources/application-secret.properties
+          spring.datasource.url=jdbc:mysql://127.0.0.1:27060/aktour_db?serverTimezone=UTC
+          spring.datasource.username=root
+          spring.datasource.password=
+          admin1.username=admin
+          admin1.password=admin123
+          admin1.email=admin@aktourbosna.com
+          admin2.username=admin2
+          admin2.password=admin456
+          admin2.email=admin2@aktourbosna.com
+          jwt.secret=abcdefghijklmnopqrstuvwxyz1234567890abcdefghijklmnopqrstuvwxyz1234567890
+          jwt.expiration=86400000
+          EOF
+
+      # PR açıldığında testleri de çalıştırır. Eğer testler patlarsa build kalır ve main'e birleşemez!
+      - name: Build and Test with Maven
         working-directory: tur-backend
-        run: mvn clean package -DskipTests
+        run: mvn clean package
+
+      # Oluşan başarılı JAR dosyasını sonraki "deploy" adımına aktarmak üzere GitHub hafızasına alır
+      - name: Upload JAR Artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-jar
+          path: tur-backend/target/*.jar
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    # SADECE main branch'ine push veya merge yapıldığında devreye girer (PR aşamasında çalışmaz)
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+    steps:
+      - name: Download JAR Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: backend-jar
+          path: tur-backend/target/
 
       - name: Copy JAR to Server
         uses: appleboy/scp-action@master
@@ -27,7 +83,6 @@ jobs:
           host: ${{ secrets.HOST }}
           username: ${{ secrets.USERNAME }}
           key: ${{ secrets.SSH_KEY }}
-          # Dosyanın yeri artık belli:
           source: "tur-backend/target/*.jar"
           target: "/home/ius2026/app/"
           strip_components: 2
