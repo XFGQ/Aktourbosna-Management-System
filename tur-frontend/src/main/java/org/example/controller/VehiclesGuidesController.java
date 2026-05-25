@@ -162,12 +162,53 @@ public class VehiclesGuidesController {
             });
         }
 
+        setupVehicleContextMenu(vehiclesTable, isGuide);
+        setupGuideContextMenu(guidesTable, isGuide);
+
         loadData();
     }
 
     @FXML
     public void refresh() {
         loadData();
+    }
+
+    private void setupVehicleContextMenu(TableView<Vehicle> table, boolean isGuide) {
+        if (isGuide) return;
+        table.setRowFactory(tv -> {
+            TableRow<Vehicle> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem editBtn = new MenuItem("Edit");
+            editBtn.setOnAction(e -> onEditVehicle(row.getItem()));
+            MenuItem deleteBtn = new MenuItem("Delete");
+            deleteBtn.setOnAction(e -> onDeleteVehicle(row.getItem()));
+            menu.getItems().addAll(editBtn, deleteBtn);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
+        });
+    }
+
+    private void setupGuideContextMenu(TableView<Guide> table, boolean isGuide) {
+        if (isGuide) return;
+        table.setRowFactory(tv -> {
+            TableRow<Guide> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem editBtn = new MenuItem("Edit");
+            editBtn.setOnAction(e -> onEditGuide(row.getItem()));
+            MenuItem deleteBtn = new MenuItem("Delete");
+            deleteBtn.setOnAction(e -> onDeleteGuide(row.getItem()));
+            menu.getItems().addAll(editBtn, deleteBtn);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
+        });
     }
 
     private void loadData() {

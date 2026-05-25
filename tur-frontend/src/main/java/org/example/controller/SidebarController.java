@@ -2,10 +2,16 @@ package org.example.controller;
 
 import javafx.application.Platform;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import org.example.service.SessionManager;
+
+import java.awt.Desktop;
+import java.net.URI;
 
 public class SidebarController {
 
@@ -15,6 +21,7 @@ public class SidebarController {
     @FXML private Button btnVehiclesGuides;
     @FXML private Button btnRoutes;
     @FXML private Button btnRefresh;
+    @FXML private Button btnSupport;
     @FXML private HBox logoHBox;
 
     private AppController appController;
@@ -76,6 +83,33 @@ public class SidebarController {
     @FXML
     private void onRefresh() {
         if (appController != null) appController.refreshAllCached();
+    }
+
+    @FXML
+    private void onSupport() {
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Support & Contact");
+        alert.setHeaderText("Need help or found an error?");
+        alert.setContentText("You can contact us using the following emails:\n\n" +
+                "• Company Owner: info@aktourbosna.com\n" +
+                "• Developer: info@rinnesoft.com");
+
+        ButtonType openMailBtn = new ButtonType("Send Email");
+        ButtonType closeBtn = new ButtonType("Close", ButtonBar.ButtonData.CANCEL_CLOSE);
+        alert.getButtonTypes().setAll(openMailBtn, closeBtn);
+
+        alert.showAndWait().ifPresent(response -> {
+            if (response == openMailBtn) {
+                try {
+                    if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.MAIL)) {
+                        String mailto = "mailto:info@aktourbosna.com,info@rinnesoft.com?subject=Aktour%20ViaBalkan%20Support%20Request";
+                        Desktop.getDesktop().mail(new URI(mailto));
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     @FXML

@@ -1,24 +1,49 @@
-target/
-!.mvn/wrapper/maven-wrapper.jar
-!**/src/main/**/target/
-!**/src/test/**/target/
-.kotlin
+# Java & Maven
+**/target/
+*.class
+*.jar
+*.war
+*.nar
+*.ear
+*.log
+*.ctxt
+
+# Package archives
+*.zip
+*.tar.gz
+*.rar
+
+# JVM crash logs
+hs_err_pid*
+replay_pid*
+
+# Mobile Tools for Java (J2ME)
+.mtj.tmp/
+
+application.properties.example
+src/main/resources/application-secret.properties
+/application-secret.properties
+# =========================
+# IDE & OS AYARLARI
+# =========================
 
 ### IntelliJ IDEA ###
+.idea/
 .idea/modules.xml
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
-*.iws
 *.iml
+*.iws
 *.ipr
 
 ### Eclipse ###
-.apt_generated
-.classpath
-.factorypath
+.metadata/
+.settings/
 .project
-.settings
+.classpath
+.apt_generated
+.factorypath
 .springBeans
 .sts4-cache
 
@@ -35,5 +60,13 @@ build/
 ### VS Code ###
 .vscode/
 
-### Mac OS ###
+### OS ###
 .DS_Store
+Thumbs.db
+
+### Diğerleri ###
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+.kotlin

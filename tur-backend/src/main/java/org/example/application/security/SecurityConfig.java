@@ -58,17 +58,17 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/vehicles/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers("/api/vehicles/**").hasRole("ADMIN")
 
+                        // Customers — GET, POST, PUT, DELETE for both roles
+                        .requestMatchers(HttpMethod.GET, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers(HttpMethod.POST, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers(HttpMethod.PUT, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
+                        .requestMatchers(HttpMethod.DELETE, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
+
                         // Tours — GET, POST, PUT for both roles; DELETE ADMIN only
                         .requestMatchers(HttpMethod.GET, "/api/tours/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers(HttpMethod.POST, "/api/tours/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers(HttpMethod.PUT, "/api/tours/**").hasAnyRole("ADMIN", "GUIDE")
                         .requestMatchers(HttpMethod.DELETE, "/api/tours/**").hasRole("ADMIN")
-
-                        // Customers — GET, POST, PUT for both roles; DELETE ADMIN only
-                        .requestMatchers(HttpMethod.GET, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
-                        .requestMatchers(HttpMethod.POST, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
-                        .requestMatchers(HttpMethod.PUT, "/api/tours/*/customers/**").hasAnyRole("ADMIN", "GUIDE")
-                        .requestMatchers(HttpMethod.DELETE, "/api/tours/*/customers/**").hasRole("ADMIN")
 
                         // Routes — GET for both roles, mutations ADMIN only
                         .requestMatchers(HttpMethod.GET, "/api/routes/**").hasAnyRole("ADMIN", "GUIDE")

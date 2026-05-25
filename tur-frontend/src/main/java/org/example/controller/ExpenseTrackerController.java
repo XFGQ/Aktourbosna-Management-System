@@ -93,11 +93,31 @@ public class ExpenseTrackerController {
             }
         });
 
+        setupContextMenu(expensesTable);
+
         loadData();
     }
 
     @FXML
     public void refresh() { loadData(); }
+
+    private void setupContextMenu(TableView<Expense> table) {
+        table.setRowFactory(tv -> {
+            TableRow<Expense> row = new TableRow<>();
+            ContextMenu menu = new ContextMenu();
+            MenuItem mnuEdit = new MenuItem("Edit");
+            mnuEdit.setOnAction(e -> onEditExpense(row.getItem()));
+            MenuItem mnuDelete = new MenuItem("Delete");
+            mnuDelete.setOnAction(e -> onDeleteExpense(row.getItem()));
+            menu.getItems().addAll(mnuEdit, mnuDelete);
+            row.contextMenuProperty().bind(
+                    javafx.beans.binding.Bindings.when(row.emptyProperty())
+                            .then((ContextMenu) null)
+                            .otherwise(menu)
+            );
+            return row;
+        });
+    }
 
     private void loadData() {
         CompletableFuture.supplyAsync(() -> {
