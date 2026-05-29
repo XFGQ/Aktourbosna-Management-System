@@ -83,6 +83,7 @@ public class SidebarController {
     @FXML
     private void onRefresh() {
         if (appController != null) appController.refreshAllCached();
+        Toast.info("Database Updated!");
     }
 
     @FXML
