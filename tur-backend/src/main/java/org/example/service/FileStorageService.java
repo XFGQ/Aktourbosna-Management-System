@@ -28,17 +28,16 @@ public class FileStorageService {
 
     public String storeFile(MultipartFile file, String subFolder) {
         String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
+        validateSafeFileName(originalFileName);
         String fileName = UUID.randomUUID().toString() + "_" + originalFileName;
 
         try {
-            if (fileName.contains("..")) {
-                throw new RuntimeException("Sorry! Filename contains invalid path sequence: " + fileName);
-            }
-
-            Path targetLocation = this.fileStorageLocation.resolve(subFolder);
+            Path targetLocation = this.fileStorageLocation.resolve(subFolder).normalize().toAbsolutePath();
+            validatePathWithinBase(targetLocation, this.fileStorageLocation);
             Files.createDirectories(targetLocation);
 
-            Path targetFile = targetLocation.resolve(fileName);
+            Path targetFile = targetLocation.resolve(fileName).normalize().toAbsolutePath();
+            validatePathWithinBase(targetFile, targetLocation);
             Files.copy(file.getInputStream(), targetFile, StandardCopyOption.REPLACE_EXISTING);
 
             return subFolder + "/" + fileName;
@@ -48,15 +47,32 @@ public class FileStorageService {
     }
 
     public Path loadFileAsResource(String filePath) {
-        return this.fileStorageLocation.resolve(filePath).normalize();
+        Path resolved = this.fileStorageLocation.resolve(filePath).normalize().toAbsolutePath();
+        validatePathWithinBase(resolved, this.fileStorageLocation);
+        return resolved;
     }
 
     public void deleteFile(String filePath) {
         try {
-            Path targetLocation = this.fileStorageLocation.resolve(filePath).normalize();
+            Path targetLocation = this.fileStorageLocation.resolve(filePath).normalize().toAbsolutePath();
+            validatePathWithinBase(targetLocation, this.fileStorageLocation);
             Files.deleteIfExists(targetLocation);
         } catch (IOException ex) {
             throw new RuntimeException("Could not delete file: " + filePath, ex);
+        }
+    }
+
+    private void validateSafeFileName(String fileName) {
+        if (!StringUtils.hasText(fileName) || fileName.contains("..") || fileName.contains("/") || fileName.contains("\\")) {
+            throw new RuntimeException("Sorry! Filename contains invalid path sequence: " + fileName);
+        }
+    }
+
+    private void validatePathWithinBase(Path targetPath, Path basePath) {
+        Path normalizedBase = basePath.normalize().toAbsolutePath();
+        Path normalizedTarget = targetPath.normalize().toAbsolutePath();
+        if (!normalizedTarget.startsWith(normalizedBase)) {
+            throw new RuntimeException("Invalid file path: " + targetPath);
         }
     }
 }
