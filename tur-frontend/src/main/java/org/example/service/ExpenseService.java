@@ -29,6 +29,22 @@ public class ExpenseService {
         TourService.invalidateCache();
     }
 
+    public Expense uploadReceipt(Long tourId, Long expenseId, java.io.File file) throws Exception {
+        Expense result = apiService.uploadReceipt(tourId, expenseId, file);
+        TourService.invalidateCache();
+        return result;
+    }
+
+    public Expense deleteReceipt(Long tourId, Long expenseId) throws Exception {
+        Expense result = apiService.deleteReceipt(tourId, expenseId);
+        TourService.invalidateCache();
+        return result;
+    }
+
+    public void downloadReceipt(Long tourId, Long expenseId, java.io.File saveFile) throws Exception {
+        apiService.downloadReceipt(tourId, expenseId, saveFile);
+    }
+
     public double calculateTotal(List<Expense> expenses) {
         if (expenses == null) return 0.0;
         return expenses.stream()

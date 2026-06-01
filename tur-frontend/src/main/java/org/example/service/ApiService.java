@@ -18,10 +18,14 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 
 public class ApiService {
 
-    private static final String BASE_URL = "http://localhost:8080/api";
+    private static final String BASE_URL = "https://aktour.rinnesoft.com/api";
     private static String authToken = null;
 
     public static void setToken(String token) { authToken = token; }
@@ -167,6 +171,51 @@ public class ApiService {
 
     public void deleteExpense(Long tourId, Long expenseId) throws Exception {
         delete(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId);
+    }
+
+    public Expense uploadReceipt(Long tourId, Long expenseId, File file) throws Exception {
+        String boundary = "Boundary-" + System.currentTimeMillis();
+        byte[] fileBytes = Files.readAllBytes(file.toPath());
+        String head = "--" + boundary + "\r\n" +
+                "Content-Disposition: form-data; name=\"file\"; filename=\"" + file.getName() + "\"\r\n" +
+                "Content-Type: application/octet-stream\r\n\r\n";
+        String tail = "\r\n--" + boundary + "--\r\n";
+        
+        byte[] headBytes = head.getBytes();
+        byte[] tailBytes = tail.getBytes();
+        byte[] body = new byte[headBytes.length + fileBytes.length + tailBytes.length];
+        System.arraycopy(headBytes, 0, body, 0, headBytes.length);
+        System.arraycopy(fileBytes, 0, body, headBytes.length, fileBytes.length);
+        System.arraycopy(tailBytes, 0, body, headBytes.length + fileBytes.length, tailBytes.length);
+
+        HttpRequest request = authorizedBuilder(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId + "/receipt")
+                .header("Content-Type", "multipart/form-data; boundary=" + boundary)
+                .POST(HttpRequest.BodyPublishers.ofByteArray(body))
+                .build();
+        
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
+        return gson.fromJson(response.body(), Expense.class);
+    }
+
+    public Expense deleteReceipt(Long tourId, Long expenseId) throws Exception {
+        HttpRequest request = authorizedBuilder(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId + "/receipt")
+                .DELETE()
+                .build();
+        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+        if (response.statusCode() >= 400) throw new RuntimeException("HTTP " + response.statusCode() + ": " + response.body());
+        return gson.fromJson(response.body(), Expense.class);
+    }
+
+    public void downloadReceipt(Long tourId, Long expenseId, File saveFile) throws Exception {
+        HttpRequest request = authorizedBuilder(BASE_URL + "/tours/" + tourId + "/expenses/" + expenseId + "/receipt")
+                .GET()
+                .build();
+        HttpResponse<InputStream> response = client.send(request, HttpResponse.BodyHandlers.ofInputStream());
+        if (response.statusCode() >= 400) throw new RuntimeException("Failed to download receipt");
+        try (InputStream in = response.body()) {
+            Files.copy(in, saveFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+        }
     }
 
     public List<Customer> fetchCustomers(Long tourId) throws Exception {

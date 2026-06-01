@@ -99,6 +99,7 @@ public class AddExpenseDialog {
         receiptField.setPromptText("Select or type receipt path");
         receiptField.setPrefWidth(200);
         Button browseBtn = new Button("Browse…");
+        File[] selectedFile = new File[1];
         browseBtn.setOnAction(e -> {
             FileChooser fc = new FileChooser();
             fc.setTitle("Select Receipt File");
@@ -107,7 +108,10 @@ public class AddExpenseDialog {
                     new FileChooser.ExtensionFilter("All Files", "*.*")
             );
             File file = fc.showOpenDialog(dialog.getDialogPane().getScene().getWindow());
-            if (file != null) receiptField.setText(file.getAbsolutePath());
+            if (file != null) {
+                receiptField.setText(file.getAbsolutePath());
+                selectedFile[0] = file;
+            }
         });
         HBox receiptBox = new HBox(6, receiptField, browseBtn);
 
@@ -167,9 +171,17 @@ public class AddExpenseDialog {
             expense.setCategory(categoryBox.getValue().trim());
             expense.setAmount(amount);
             expense.setDate(datePicker.getValue());
-            String receipt = receiptField.getText().trim();
-            expense.setReceiptPath(receipt.isEmpty() ? null : receipt);
-            return new Object[]{resolvedTourId[0], expense};
+            
+            File fileToUpload = null;
+            String receiptText = receiptField.getText().trim();
+            if (selectedFile[0] != null && selectedFile[0].getAbsolutePath().equals(receiptText)) {
+                fileToUpload = selectedFile[0];
+            } else if (!receiptText.isEmpty() && new File(receiptText).exists()) {
+                fileToUpload = new File(receiptText);
+            } else {
+                expense.setReceiptPath(receiptText.isEmpty() ? null : receiptText);
+            }
+            return new Object[]{resolvedTourId[0], expense, fileToUpload};
         });
 
         return dialog.showAndWait().orElse(null);

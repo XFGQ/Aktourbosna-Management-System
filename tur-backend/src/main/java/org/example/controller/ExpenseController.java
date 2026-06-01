@@ -5,8 +5,12 @@ import org.example.application.dto.expense.ExpenseCreateDTO;
 import org.example.application.dto.expense.ExpenseResponseDTO;
 import org.example.application.dto.expense.ExpenseUpdateDTO;
 import org.example.service.ExpenseService;
+import org.springframework.core.io.Resource;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -49,5 +53,35 @@ public class ExpenseController {
                                               @PathVariable Long expenseId) {
         expenseService.deleteExpense(expenseId);
         return ResponseEntity.noContent().build();
+    }
+
+    @PostMapping(value = "/{expenseId}/receipt", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<ExpenseResponseDTO> uploadReceipt(@PathVariable Long tourId,
+                                                            @PathVariable Long expenseId,
+                                                            @RequestParam("file") MultipartFile file) {
+        return ResponseEntity.ok(expenseService.uploadReceipt(expenseId, file));
+    }
+
+    @DeleteMapping("/{expenseId}/receipt")
+    public ResponseEntity<ExpenseResponseDTO> deleteReceipt(@PathVariable Long tourId,
+                                                            @PathVariable Long expenseId) {
+        return ResponseEntity.ok(expenseService.deleteReceipt(expenseId));
+    }
+
+    @GetMapping("/{expenseId}/receipt")
+    public ResponseEntity<Resource> downloadReceipt(@PathVariable Long tourId,
+                                                    @PathVariable Long expenseId) {
+        Resource resource = expenseService.loadReceiptAsResource(expenseId);
+        String contentType = "application/octet-stream";
+        String filename = resource.getFilename();
+        if (filename != null) {
+            if (filename.toLowerCase().endsWith(".pdf")) contentType = MediaType.APPLICATION_PDF_VALUE;
+            else if (filename.toLowerCase().endsWith(".png")) contentType = MediaType.IMAGE_PNG_VALUE;
+            else if (filename.toLowerCase().endsWith(".jpg") || filename.toLowerCase().endsWith(".jpeg")) contentType = MediaType.IMAGE_JPEG_VALUE;
+        }
+        return ResponseEntity.ok()
+                .contentType(MediaType.parseMediaType(contentType))
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + filename + "\"")
+                .body(resource);
     }
 }

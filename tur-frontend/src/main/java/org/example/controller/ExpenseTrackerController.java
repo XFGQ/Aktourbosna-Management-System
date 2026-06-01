@@ -79,11 +79,14 @@ public class ExpenseTrackerController {
         colExpActions.setCellFactory(col -> new TableCell<>() {
             private final Button editBtn   = new Button("Edit");
             private final Button deleteBtn = new Button("Delete");
-            private final HBox box = new HBox(4, editBtn, deleteBtn);
+            private final Button receiptsBtn = new Button("Receipts");
+            private final HBox box = new HBox(4, receiptsBtn, editBtn, deleteBtn);
             {
                 box.setAlignment(Pos.CENTER);
+                receiptsBtn.getStyleClass().add("btn-secondary");
                 editBtn.getStyleClass().add("btn-secondary");
                 deleteBtn.getStyleClass().add("btn-danger");
+                receiptsBtn.setOnAction(e -> onManageReceipts(getTableView().getItems().get(getIndex())));
                 editBtn.setOnAction(e   -> onEditExpense(getTableView().getItems().get(getIndex())));
                 deleteBtn.setOnAction(e -> onDeleteExpense(getTableView().getItems().get(getIndex())));
             }
@@ -105,11 +108,13 @@ public class ExpenseTrackerController {
         table.setRowFactory(tv -> {
             TableRow<Expense> row = new TableRow<>();
             ContextMenu menu = new ContextMenu();
+            MenuItem mnuReceipts = new MenuItem("Manage Receipts");
+            mnuReceipts.setOnAction(e -> onManageReceipts(row.getItem()));
             MenuItem mnuEdit = new MenuItem("Edit");
             mnuEdit.setOnAction(e -> onEditExpense(row.getItem()));
             MenuItem mnuDelete = new MenuItem("Delete");
             mnuDelete.setOnAction(e -> onDeleteExpense(row.getItem()));
-            menu.getItems().addAll(mnuEdit, mnuDelete);
+            menu.getItems().addAll(mnuReceipts, mnuEdit, mnuDelete);
             row.contextMenuProperty().bind(
                     javafx.beans.binding.Bindings.when(row.emptyProperty())
                             .then((ContextMenu) null)
@@ -192,15 +197,100 @@ public class ExpenseTrackerController {
         TourExpenses(Tour tour, List<Expense> expenses) { this.tour = tour; this.expenses = expenses; }
     }
 
+    private void onManageReceipts(Expense expense) {
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Manage Receipt");
+        alert.setHeaderText("Receipt options for " + expense.getCategory());
+        alert.setContentText("Choose an action:");
+
+        ButtonType btnUpload = new ButtonType("Upload");
+        ButtonType btnView = new ButtonType("View");
+        ButtonType btnDownload = new ButtonType("Download");
+        ButtonType btnDelete = new ButtonType("Delete");
+        ButtonType btnCancel = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(btnUpload, btnView, btnDownload, btnDelete, btnCancel);
+
+        alert.showAndWait().ifPresent(type -> {
+            Long tourId = expenseToTourId.get(expense.getExpenseId());
+            if (tourId == null) return;
+            
+            if (type == btnUpload) {
+                javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+                fileChooser.getExtensionFilters().addAll(
+                    new javafx.stage.FileChooser.ExtensionFilter("Image/PDF Files", "*.jpg", "*.jpeg", "*.png", "*.pdf")
+                );
+                java.io.File file = fileChooser.showOpenDialog(null);
+                if (file != null) {
+                    runInBackground(() -> expenseService.uploadReceipt(tourId, expense.getExpenseId(), file),
+                            "Uploading...", "Receipt uploaded.", "Failed to upload");
+                }
+            } else if (type == btnView) {
+                if (expense.getReceiptPath() == null || expense.getReceiptPath().isEmpty() || "-".equals(expense.getReceiptPath())) {
+                    Toast.error("No receipt available to view.");
+                    return;
+                }
+                try {
+                    String ext = ".tmp";
+                    if (expense.getReceiptPath().contains(".")) {
+                        ext = expense.getReceiptPath().substring(expense.getReceiptPath().lastIndexOf("."));
+                    }
+                    java.io.File tempFile = java.io.File.createTempFile("receipt_view_", ext);
+                    tempFile.deleteOnExit();
+                    runInBackground(() -> {
+                        expenseService.downloadReceipt(tourId, expense.getExpenseId(), tempFile);
+                        try {
+                            java.awt.Desktop.getDesktop().open(tempFile);
+                        } catch (Exception ex) {
+                            throw new RuntimeException("Dosya açılamadı. İşletim sistemi bu eylemi desteklemiyor olabilir.", ex);
+                        }
+                    }, "Loading receipt...", "Receipt opened.", "Failed to open receipt");
+                } catch (Exception e) {
+                    Toast.error("Error creating temp file: " + e.getMessage());
+                }
+            } else if (type == btnDownload) {
+                if (expense.getReceiptPath() == null || expense.getReceiptPath().isEmpty() || "-".equals(expense.getReceiptPath())) {
+                    Toast.error("No receipt available for this expense.");
+                    return;
+                }
+                javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
+                String fileName = "receipt_" + expense.getExpenseId();
+                if (expense.getReceiptPath().contains(".")) {
+                    fileName += expense.getReceiptPath().substring(expense.getReceiptPath().lastIndexOf("."));
+                }
+                fileChooser.setInitialFileName(fileName);
+                java.io.File saveFile = fileChooser.showSaveDialog(null);
+                if (saveFile != null) {
+                    runInBackground(() -> expenseService.downloadReceipt(tourId, expense.getExpenseId(), saveFile),
+                            "Downloading...", "Receipt downloaded.", "Failed to download");
+                }
+            } else if (type == btnDelete) {
+                if (expense.getReceiptPath() == null || expense.getReceiptPath().isEmpty() || "-".equals(expense.getReceiptPath())) {
+                    Toast.error("No receipt available to delete.");
+                    return;
+                }
+                if (ConfirmDialog.show("Delete Receipt", "Are you sure?")) {
+                    runInBackground(() -> expenseService.deleteReceipt(tourId, expense.getExpenseId()),
+                            "Deleting...", "Receipt deleted.", "Failed to delete");
+                }
+            }
+        });
+    }
+
     @FXML
     private void onAddExpense() {
         Object[] result = AddExpenseDialog.show(cachedTours);
         if (result == null) return;
         Long tourId = (Long) result[0];
         Expense expense = (Expense) result[1];
-        runInBackground(
-                () -> expenseService.addExpense(tourId, expense),
-                "Adding expense...", "Expense added successfully.", "Failed to add expense");
+        java.io.File fileToUpload = result.length > 2 ? (java.io.File) result[2] : null;
+
+        runInBackground(() -> {
+            Expense created = expenseService.addExpense(tourId, expense);
+            if (fileToUpload != null && created != null && created.getExpenseId() != null) {
+                expenseService.uploadReceipt(tourId, created.getExpenseId(), fileToUpload);
+            }
+        }, "Adding expense...", "Expense added successfully.", "Failed to add expense");
     }
 
     private void onEditExpense(Expense expense) {
@@ -208,9 +298,14 @@ public class ExpenseTrackerController {
         if (tourId == null) { Toast.error("Cannot edit: tour not found for this expense."); return; }
         Object[] result = AddExpenseDialog.show(expense, tourId, cachedTours);
         if (result == null) return;
-        runInBackground(
-                () -> expenseService.updateExpense(tourId, expense.getExpenseId(), (Expense) result[1]),
-                "Updating expense...", "Expense updated successfully.", "Failed to update expense");
+        java.io.File fileToUpload = result.length > 2 ? (java.io.File) result[2] : null;
+
+        runInBackground(() -> {
+            Expense updated = expenseService.updateExpense(tourId, expense.getExpenseId(), (Expense) result[1]);
+            if (fileToUpload != null && updated != null) {
+                expenseService.uploadReceipt(tourId, updated.getExpenseId(), fileToUpload);
+            }
+        }, "Updating expense...", "Expense updated successfully.", "Failed to update expense");
     }
 
     private void onDeleteExpense(Expense expense) {
