@@ -5,6 +5,7 @@ on:
   push:
     tags:
       - 'v*'
+      - 'AktourViaBalkan-v*'
 
 permissions:
   contents: write
