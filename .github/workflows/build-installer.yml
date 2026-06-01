@@ -1,0 +1,177 @@
+name: Build Installers
+
+on:
+  workflow_dispatch:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build frontend JAR
+        working-directory: tur-frontend
+        run: mvn clean package -Pwindows -DskipTests
+
+      - name: Collect dependencies
+        working-directory: tur-frontend
+        run: mvn dependency:copy-dependencies -Pwindows -DoutputDirectory=target/deps
+
+      - name: Prepare app directory
+        working-directory: tur-frontend
+        run: Copy-Item "target\tur-frontend-1.0-SNAPSHOT.jar" "target\deps\"
+
+      - name: Create MSI installer
+        working-directory: tur-frontend
+        run: |
+          jpackage `
+            --input target\deps `
+            --name "AktourViaBalkan" `
+            --main-jar tur-frontend-1.0-SNAPSHOT.jar `
+            --main-class org.example.MainLauncher `
+            --type msi `
+            --win-dir-chooser `
+            --win-shortcut `
+            --win-menu `
+            --win-menu-group "AktourViaBalkan" `
+            --dest target\installer `
+            --app-version "1.0.0" `
+            --description "Aktour ViaBalkan Management System" `
+            --vendor "AktourBosna" `
+            --icon src\main\resources\installer\logo.ico `
+            --java-options '--module-path=$APPDIR' `
+            --java-options '--add-modules=javafx.controls,javafx.fxml,javafx.graphics,javafx.base'
+
+      - name: Upload MSI
+        uses: actions/upload-artifact@v4
+        with:
+          name: AktourViaBalkan-Windows-MSI
+          path: tur-frontend/target/installer/*.msi
+          retention-days: 30
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tur-frontend/target/installer/*.msi
+
+  build-deb:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Build frontend JAR
+        working-directory: tur-frontend
+        run: mvn clean package -Plinux -DskipTests
+
+      - name: Collect dependencies
+        working-directory: tur-frontend
+        run: mvn dependency:copy-dependencies -Plinux -DoutputDirectory=target/deps
+
+      - name: Prepare app directory
+        working-directory: tur-frontend
+        run: cp target/tur-frontend-1.0-SNAPSHOT.jar target/deps/
+
+      - name: Create DEB installer
+        working-directory: tur-frontend
+        run: |
+          jpackage \
+            --input target/deps \
+            --name "aktour-viabalkan" \
+            --main-jar tur-frontend-1.0-SNAPSHOT.jar \
+            --main-class org.example.MainLauncher \
+            --type deb \
+            --dest target/installer \
+            --app-version "1.0.0" \
+            --description "Aktour ViaBalkan Management System" \
+            --vendor "AktourBosna" \
+            --icon src/main/resources/images/logo.png \
+            --java-options '--module-path=$APPDIR' \
+            --java-options '--add-modules=javafx.controls,javafx.fxml,javafx.graphics,javafx.base'
+
+      - name: Upload DEB
+        uses: actions/upload-artifact@v4
+        with:
+          name: AktourViaBalkan-Linux-DEB
+          path: tur-frontend/target/installer/*.deb
+          retention-days: 30
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tur-frontend/target/installer/*.deb
+
+  build-rpm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 21
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: 'maven'
+
+      - name: Install rpmbuild
+        run: sudo apt-get install -y rpm
+
+      - name: Build frontend JAR
+        working-directory: tur-frontend
+        run: mvn clean package -Plinux -DskipTests
+
+      - name: Collect dependencies
+        working-directory: tur-frontend
+        run: mvn dependency:copy-dependencies -Plinux -DoutputDirectory=target/deps
+
+      - name: Prepare app directory
+        working-directory: tur-frontend
+        run: cp target/tur-frontend-1.0-SNAPSHOT.jar target/deps/
+
+      - name: Create RPM installer
+        working-directory: tur-frontend
+        run: |
+          jpackage \
+            --input target/deps \
+            --name "aktour-viabalkan" \
+            --main-jar tur-frontend-1.0-SNAPSHOT.jar \
+            --main-class org.example.MainLauncher \
+            --type rpm \
+            --dest target/installer \
+            --app-version "1.0.0" \
+            --description "Aktour ViaBalkan Management System" \
+            --vendor "AktourBosna" \
+            --icon src/main/resources/images/logo.png \
+            --java-options '--module-path=$APPDIR' \
+            --java-options '--add-modules=javafx.controls,javafx.fxml,javafx.graphics,javafx.base'
+
+      - name: Upload RPM
+        uses: actions/upload-artifact@v4
+        with:
+          name: AktourViaBalkan-Linux-RPM
+          path: tur-frontend/target/installer/*.rpm
+          retention-days: 30
+
+      - name: Attach to GitHub Release
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: tur-frontend/target/installer/*.rpm
