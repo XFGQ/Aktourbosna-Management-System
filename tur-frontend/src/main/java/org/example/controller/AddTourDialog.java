@@ -53,6 +53,17 @@ public class AddTourDialog {
         startPicker.setPrefWidth(260);
         endPicker.setPrefWidth(260);
 
+        java.time.format.DateTimeFormatter DATE_FMT = java.time.format.DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        javafx.util.StringConverter<LocalDate> dateConverter = new javafx.util.StringConverter<>() {
+            @Override public String toString(LocalDate d) { return d != null ? d.format(DATE_FMT) : ""; }
+            @Override public LocalDate fromString(String s) {
+                try { return (s != null && !s.isEmpty()) ? LocalDate.parse(s, DATE_FMT) : null; }
+                catch (Exception e) { return null; }
+            }
+        };
+        startPicker.setConverter(dateConverter);
+        endPicker.setConverter(dateConverter);
+
         TextField hotelField = new TextField(isEdit && existing.getHotelName() != null ? existing.getHotelName() : "");
         hotelField.setPromptText("Hotel name");
         hotelField.setPrefWidth(260);
@@ -222,6 +233,7 @@ public class AddTourDialog {
                 avail.stream().filter(v -> currentVehId.equals(v.getId()))
                         .findFirst().ifPresent(vehicleBox::setValue);
             }
+            updatePrice.run();
         };
 
         startPicker.valueProperty().addListener((obs, o, n) -> { updateAvailability.run(); updatePrice.run(); });

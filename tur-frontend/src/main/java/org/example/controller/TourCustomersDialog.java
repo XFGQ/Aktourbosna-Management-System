@@ -27,7 +27,9 @@ public class TourCustomersDialog {
         stage.setTitle("Customers — " + tour.getTourName());
         stage.initModality(Modality.APPLICATION_MODAL);
         stage.initStyle(StageStyle.UTILITY);
-        stage.setResizable(false);
+        stage.setResizable(true);
+        stage.setMinWidth(720);
+        stage.setMinHeight(420);
 
         CustomerService customerService = new CustomerService();
 
@@ -35,30 +37,35 @@ public class TourCustomersDialog {
         countLabel.setStyle("-fx-text-fill: #555; -fx-font-size: 13px;");
 
         TableView<Customer> table = new TableView<>();
-        table.setPrefWidth(580);
-        table.setPrefHeight(300);
+        table.setPrefWidth(680);
+        table.setPrefHeight(360);
         table.setFixedCellSize(40);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY_ALL_COLUMNS);
+        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 
         TableColumn<Customer, String> colName = new TableColumn<>("Full Name");
         colName.setCellValueFactory(new PropertyValueFactory<>("fullName"));
-        colName.setMinWidth(160);
+        colName.setPrefWidth(170);
+        colName.setMinWidth(100);
 
         TableColumn<Customer, String> colPassport = new TableColumn<>("Passport No");
         colPassport.setCellValueFactory(new PropertyValueFactory<>("passportNumber"));
-        colPassport.setMinWidth(110);
+        colPassport.setPrefWidth(120);
+        colPassport.setMinWidth(80);
 
         TableColumn<Customer, String> colPhone = new TableColumn<>("Phone");
         colPhone.setCellValueFactory(new PropertyValueFactory<>("phone"));
-        colPhone.setMinWidth(120);
+        colPhone.setPrefWidth(120);
+        colPhone.setMinWidth(80);
 
         TableColumn<Customer, String> colNationality = new TableColumn<>("Nationality");
         colNationality.setCellValueFactory(cd -> new SimpleStringProperty(
                 cd.getValue().getNationality() != null ? cd.getValue().getNationality() : "—"));
-        colNationality.setMinWidth(100);
+        colNationality.setPrefWidth(110);
+        colNationality.setMinWidth(80);
 
         TableColumn<Customer, Customer> colActions = new TableColumn<>("Actions");
-        colActions.setMinWidth(150);
+        colActions.setPrefWidth(160);
+        colActions.setMinWidth(160);
         colActions.setSortable(false);
         colActions.setCellValueFactory(cd -> new ReadOnlyObjectWrapper<>(cd.getValue()));
         colActions.setCellFactory(col -> new TableCell<>() {
@@ -131,7 +138,7 @@ public class TourCustomersDialog {
     }
 
     private static void loadCustomers(TableView<Customer> table, Label countLabel,
-                                       CustomerService customerService, Long tourId) {
+                                      CustomerService customerService, Long tourId) {
         Task<List<Customer>> task = new Task<>() {
             @Override protected List<Customer> call() throws Exception {
                 return customerService.getCustomers(tourId);
@@ -150,8 +157,8 @@ public class TourCustomersDialog {
     private interface Op { void run() throws Exception; }
 
     private static void runOp(Op op, String successMsg, String errorTitle,
-                               TableView<Customer> table, Label countLabel,
-                               CustomerService customerService, Long tourId) {
+                              TableView<Customer> table, Label countLabel,
+                              CustomerService customerService, Long tourId) {
         Task<Void> task = new Task<>() {
             @Override protected Void call() throws Exception { op.run(); return null; }
         };

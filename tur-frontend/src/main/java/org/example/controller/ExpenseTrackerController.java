@@ -254,14 +254,30 @@ public class ExpenseTrackerController {
                     return;
                 }
                 javafx.stage.FileChooser fileChooser = new javafx.stage.FileChooser();
-                String fileName = "receipt_" + expense.getExpenseId();
+                String ext = "";
                 if (expense.getReceiptPath().contains(".")) {
-                    fileName += expense.getReceiptPath().substring(expense.getReceiptPath().lastIndexOf("."));
+                    ext = expense.getReceiptPath()
+                            .substring(expense.getReceiptPath().lastIndexOf("."))
+                            .toLowerCase();
                 }
+                String fileName = "receipt_" + expense.getExpenseId() + ext;
                 fileChooser.setInitialFileName(fileName);
+                if (!ext.isEmpty()) {
+                    String extUpper = ext.substring(1).toUpperCase();
+                    fileChooser.getExtensionFilters().add(
+                        new javafx.stage.FileChooser.ExtensionFilter(extUpper + " Files (*" + ext + ")", "*" + ext)
+                    );
+                }
+                fileChooser.getExtensionFilters().add(
+                    new javafx.stage.FileChooser.ExtensionFilter("All Files", "*.*")
+                );
                 java.io.File saveFile = fileChooser.showSaveDialog(null);
                 if (saveFile != null) {
-                    runInBackground(() -> expenseService.downloadReceipt(tourId, expense.getExpenseId(), saveFile),
+                    final String finalExt = ext;
+                    java.io.File target = (!finalExt.isEmpty() && !saveFile.getName().toLowerCase().endsWith(finalExt))
+                            ? new java.io.File(saveFile.getAbsolutePath() + finalExt)
+                            : saveFile;
+                    runInBackground(() -> expenseService.downloadReceipt(tourId, expense.getExpenseId(), target),
                             "Downloading...", "Receipt downloaded.", "Failed to download");
                 }
             } else if (type == btnDelete) {

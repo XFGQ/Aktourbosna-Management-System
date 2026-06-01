@@ -92,7 +92,23 @@ public class ApiService {
     }
 
     public List<Guide> fetchGuides() throws Exception {
-        return gson.fromJson(get(BASE_URL + "/guides"), new TypeToken<List<Guide>>() {}.getType());
+        List<Guide> summaries = gson.fromJson(get(BASE_URL + "/guides"),
+                new TypeToken<List<Guide>>() {}.getType());
+        if (summaries == null) return new ArrayList<>();
+        // GET /api/guides returns GuideSummaryDTO (no email/phone) — fetch full details in parallel
+        List<CompletableFuture<Guide>> futures = summaries.stream()
+                .filter(g -> g.getId() != null)
+                .map(g -> {
+                    HttpRequest req = authorizedBuilder(BASE_URL + "/guides/" + g.getId()).GET().build();
+                    return client.sendAsync(req, HttpResponse.BodyHandlers.ofString())
+                            .thenApply(r -> {
+                                Guide detail = gson.fromJson(r.body(), Guide.class);
+                                return detail != null ? detail : g;
+                            })
+                            .exceptionally(e -> g);
+                })
+                .collect(Collectors.toList());
+        return futures.stream().map(CompletableFuture::join).collect(Collectors.toList());
     }
 
     public List<Expense> fetchExpensesByTour(Long tourId) throws Exception {
