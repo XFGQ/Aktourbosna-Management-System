@@ -73,4 +73,79 @@ class FileStorageServiceTest {
 
         assertThat(Files.exists(file)).isFalse();
     }
+
+    @Test
+    void storeFile_fileNameWithSlash_throwsException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("some/evil.pdf");
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream("x".getBytes()));
+
+        assertThatThrownBy(() -> fileStorageService.storeFile(file, "receipts"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("invalid path sequence");
+    }
+
+    @Test
+    void storeFile_fileNameWithBackslash_throwsException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("some\\evil.pdf");
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream("x".getBytes()));
+
+        assertThatThrownBy(() -> fileStorageService.storeFile(file, "receipts"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("invalid path sequence");
+    }
+
+    @Test
+    void storeFile_emptyFileName_throwsException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("   ");
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream("x".getBytes()));
+
+        assertThatThrownBy(() -> fileStorageService.storeFile(file, "receipts"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("invalid path sequence");
+    }
+
+    @Test
+    void storeFile_subFolderWithPathTraversal_throwsException() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("receipt.pdf");
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream("x".getBytes()));
+
+        assertThatThrownBy(() -> fileStorageService.storeFile(file, "../../evil"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Invalid file path");
+    }
+
+    @Test
+    void storeFile_createsSubFolderIfNotExists() throws IOException {
+        MultipartFile file = mock(MultipartFile.class);
+        when(file.getOriginalFilename()).thenReturn("receipt.pdf");
+        when(file.getInputStream()).thenReturn(new ByteArrayInputStream("content".getBytes()));
+
+        fileStorageService.storeFile(file, "new-folder");
+
+        assertThat(Files.exists(tempDir.resolve("new-folder"))).isTrue();
+    }
+
+    @Test
+    void loadFileAsResource_pathTraversal_throwsException() {
+        assertThatThrownBy(() -> fileStorageService.loadFileAsResource("../../etc/passwd"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Invalid file path");
+    }
+
+    @Test
+    void deleteFile_nonExistingFile_doesNotThrow() {
+        org.assertj.core.api.Assertions.assertThatNoException()
+                .isThrownBy(() -> fileStorageService.deleteFile("receipts/nonexistent.pdf"));
+    }
+
+    @Test
+    void deleteFile_pathTraversal_throwsException() {
+        assertThatThrownBy(() -> fileStorageService.deleteFile("../../etc/passwd"))
+                .isInstanceOf(RuntimeException.class)
+                .hasMessageContaining("Invalid file path");
+    }
 }
